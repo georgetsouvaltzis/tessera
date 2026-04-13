@@ -119,10 +119,6 @@ public sealed class PivotTable : Control
         _columns.Clear();
         foreach (var column in columns)
         {
-            if (column is null)
-            {
-                continue;
-            }
 
             _columns.Add(new PivotTableColumn(column.Key, column.Header)
             {
@@ -177,7 +173,7 @@ public sealed class PivotTable : Control
             _ = EnsureRowMap(rowKey);
         }
 
-        foreach (var cell in cells.Where(static cell => cell is not null))
+        foreach (var cell in cells)
         {
             SetValue(cell.RowKey, cell.ColumnKey, cell.Value);
         }

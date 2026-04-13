@@ -135,7 +135,7 @@ public sealed partial class FileExplorer : Control
         var previousItem = SelectedItem;
 
         _roots.Clear();
-        foreach (var item in items.Where(static item => item is not null))
+        foreach (var item in items)
         {
             _roots.Add(Clone(item));
         }

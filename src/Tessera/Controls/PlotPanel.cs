@@ -94,7 +94,7 @@ public sealed class PlotPanel : Control
         ArgumentNullException.ThrowIfNull(plots);
 
         _plots.Clear();
-        foreach (var plot in plots.Where(static plot => plot is not null))
+        foreach (var plot in plots)
         {
             _plots.Add(plot);
         }

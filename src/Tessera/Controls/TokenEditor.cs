@@ -170,7 +170,7 @@ public sealed partial class TokenEditor : Control
         var previousToken = SelectedToken;
 
         _tokens.Clear();
-        foreach (var token in tokens.Where(static token => token is not null))
+        foreach (var token in tokens)
         {
             _tokens.Add(Clone(token));
         }

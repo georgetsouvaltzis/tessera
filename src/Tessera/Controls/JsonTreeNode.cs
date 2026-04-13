@@ -44,7 +44,7 @@ public sealed class JsonTreeNode
         Kind = kind;
         if (children is not null)
         {
-            foreach (var child in children.Where(static child => child is not null))
+            foreach (var child in children)
             {
                 Children.Add(child);
             }

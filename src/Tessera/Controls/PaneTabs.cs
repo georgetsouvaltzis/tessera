@@ -105,10 +105,6 @@ public sealed class PaneTabs : Control
         _tabs.Clear();
         foreach (var tab in tabs)
         {
-            if (tab is null)
-            {
-                continue;
-            }
 
             _tabs.Add(new PaneTabItem(tab.Id, tab.Title, tab.IsDisabled) { IsDirty = tab.IsDirty });
         }

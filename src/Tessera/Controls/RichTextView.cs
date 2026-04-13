@@ -127,11 +127,6 @@ public sealed class RichTextView : Control
         _lines.Clear();
         foreach (var line in lines)
         {
-            if (line is null)
-            {
-                _lines.Add([]);
-                continue;
-            }
 
             var renderedLine = new List<RichTextSegment>();
             foreach (var segment in line)

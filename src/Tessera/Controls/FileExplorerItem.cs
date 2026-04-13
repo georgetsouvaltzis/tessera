@@ -25,7 +25,7 @@ public sealed class FileExplorerItem
         Path = string.IsNullOrWhiteSpace(path) ? Name : path;
         if (children is not null)
         {
-            foreach (var child in children.Where(static child => child is not null))
+            foreach (var child in children)
             {
                 _children.Add(child);
             }

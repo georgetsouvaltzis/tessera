@@ -118,7 +118,7 @@ public sealed class DockWorkspace : Control
     {
         ArgumentNullException.ThrowIfNull(panes);
         _panes.Clear();
-        foreach (var pane in panes.Where(static pane => pane is not null))
+        foreach (var pane in panes)
         {
             _panes.Add(ClonePane(pane));
         }

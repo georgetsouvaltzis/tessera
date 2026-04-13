@@ -153,7 +153,7 @@ public sealed partial class DashboardGrid : Control
         var previousSelectedId = previousTile?.Id;
 
         _tiles.Clear();
-        foreach (var tile in tiles.Where(static tile => tile is not null))
+        foreach (var tile in tiles)
         {
             _tiles.Add(Clone(tile));
         }

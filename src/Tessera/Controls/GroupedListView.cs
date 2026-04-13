@@ -111,10 +111,6 @@ public sealed class GroupedListView<TGroup, TItem> : Control
         _groups.Clear();
         foreach (var group in groups)
         {
-            if (group is null)
-            {
-                continue;
-            }
 
             _groups.Add(
                 new GroupedListViewGroup<TGroup, TItem>(group.Group, group.Items) { IsCollapsed = group.IsCollapsed });

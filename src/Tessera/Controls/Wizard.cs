@@ -136,10 +136,6 @@ public sealed class Wizard : Control
         _steps.Clear();
         foreach (var step in steps)
         {
-            if (step is null)
-            {
-                continue;
-            }
 
             _steps.Add(new WizardStep(step.Id, step.Title, step.Description, step.IsCompleted, step.IsDisabled));
         }

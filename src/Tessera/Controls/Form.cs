@@ -111,7 +111,7 @@ public sealed class Form : Control
     {
         ArgumentNullException.ThrowIfNull(fields);
         _fields.Clear();
-        foreach (var field in fields.Where(static field => field is not null))
+        foreach (var field in fields)
         {
             _fields.Add(new FormField(field.Name, field.Label, field.Value, field.HelperText, field.IsRequired,
                 field.IsDisabled));

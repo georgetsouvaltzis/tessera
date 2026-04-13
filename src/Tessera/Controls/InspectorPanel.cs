@@ -106,7 +106,7 @@ public sealed class InspectorPanel : Control
     {
         ArgumentNullException.ThrowIfNull(sections);
         _sections.Clear();
-        foreach (var section in sections.Where(static section => section is not null))
+        foreach (var section in sections)
         {
             _sections.Add(Clone(section));
         }

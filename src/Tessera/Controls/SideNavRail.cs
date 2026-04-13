@@ -138,7 +138,7 @@ public sealed partial class SideNavRail : Control
         var previousId = previousItem?.Id;
 
         _items.Clear();
-        foreach (var item in items.Where(static item => item is not null))
+        foreach (var item in items)
         {
             _items.Add(item);
         }

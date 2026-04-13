@@ -109,7 +109,7 @@ public sealed class PaletteEditor : Control
         var previousIndex = SelectedIndex;
         var previousSwatch = SelectedSwatch;
         _swatches.Clear();
-        foreach (var swatch in swatches.Where(static swatch => swatch is not null))
+        foreach (var swatch in swatches)
         {
             _swatches.Add(CloneSwatch(swatch));
         }

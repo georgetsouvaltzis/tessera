@@ -165,7 +165,7 @@ public sealed partial class HealthBoard : Control
         var previousItem = SelectedItem;
 
         _services.Clear();
-        foreach (var service in services.Where(static service => service is not null))
+        foreach (var service in services)
         {
             _services.Add(Clone(service));
         }

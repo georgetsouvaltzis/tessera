@@ -41,10 +41,7 @@ internal sealed class TesseraRuntimeLoop(
 
     public void Send(IMessage message)
     {
-        if (message is not null)
-        {
-            _messages.Writer.TryWrite(message);
-        }
+        _messages.Writer.TryWrite(message);
     }
 
     public Task RunAsync(CancellationToken cancellationToken = default)

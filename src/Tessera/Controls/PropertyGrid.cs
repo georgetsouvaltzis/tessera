@@ -103,7 +103,7 @@ public sealed class PropertyGrid : Control
         var previousProperty = SelectedProperty;
 
         _properties.Clear();
-        foreach (var property in properties.Where(static property => property is not null))
+        foreach (var property in properties)
         {
             _properties.Add(property);
         }

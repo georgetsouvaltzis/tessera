@@ -193,7 +193,7 @@ public sealed partial class DataGrid : Control
     {
         ArgumentNullException.ThrowIfNull(columns);
         _columns.Clear();
-        foreach (var column in columns.Where(static column => column is not null))
+        foreach (var column in columns)
         {
             _columns.Add(column);
         }
@@ -227,10 +227,6 @@ public sealed partial class DataGrid : Control
         _rows.Clear();
         foreach (var row in rows)
         {
-            if (row is null)
-            {
-                continue;
-            }
 
             var snapshot = new string[row.Count];
             for (var index = 0; index < row.Count; index++)

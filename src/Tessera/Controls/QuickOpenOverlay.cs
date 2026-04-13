@@ -179,7 +179,7 @@ public sealed partial class QuickOpenOverlay : Control
         ArgumentNullException.ThrowIfNull(items);
 
         _items.Clear();
-        foreach (var item in items.Where(static item => item is not null))
+        foreach (var item in items)
         {
             _items.Add(item);
         }

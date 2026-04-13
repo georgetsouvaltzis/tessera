@@ -170,7 +170,7 @@ public sealed class KanbanBoard : Control
         var previousLane = SelectedLane;
         var previousCard = SelectedCard;
         _lanes.Clear();
-        foreach (var lane in lanes.Where(static lane => lane is not null))
+        foreach (var lane in lanes)
         {
             _lanes.Add(lane);
         }

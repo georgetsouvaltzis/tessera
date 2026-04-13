@@ -175,10 +175,6 @@ public sealed class CommandBar : Control
         _items.Clear();
         foreach (var item in items)
         {
-            if (item is null)
-            {
-                continue;
-            }
 
             _items.Add(item);
         }

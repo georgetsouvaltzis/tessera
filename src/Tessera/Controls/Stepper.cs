@@ -148,10 +148,6 @@ public sealed partial class Stepper : Control
         _steps.Clear();
         foreach (var step in steps)
         {
-            if (step is null)
-            {
-                continue;
-            }
 
             _steps.Add(new StepperStep(step.Id, step.Label, step.IsCompleted, step.IsDisabled));
         }

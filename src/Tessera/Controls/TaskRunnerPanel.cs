@@ -117,7 +117,7 @@ public sealed class TaskRunnerPanel : Control
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         _items.Clear();
-        foreach (var item in items.Where(static item => item is not null))
+        foreach (var item in items)
         {
             _items.Add(new TaskRunItem(item.Id, item.Name, item.Status, item.Description, item.UpdatedAt));
         }

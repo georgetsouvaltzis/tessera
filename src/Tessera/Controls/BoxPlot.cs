@@ -188,7 +188,7 @@ public sealed class BoxPlot : Control
         var previousSeries = SelectedSeries;
 
         _series.Clear();
-        foreach (var entry in series.Where(static entry => entry is not null))
+        foreach (var entry in series)
         {
             _series.Add(Clone(entry));
         }

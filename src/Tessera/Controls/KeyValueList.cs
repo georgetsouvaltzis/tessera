@@ -131,7 +131,7 @@ public sealed class KeyValueList : Control
         var previousItem = SelectedItem;
 
         _entries.Clear();
-        foreach (var entry in entries.Where(static entry => entry is not null))
+        foreach (var entry in entries)
         {
             _entries.Add(entry);
         }

@@ -100,7 +100,7 @@ public sealed class Tabs : Control
     {
         ArgumentNullException.ThrowIfNull(items);
         _items.Clear();
-        _items.AddRange(items.Where(static item => item is not null));
+        _items.AddRange(items);
         if (_items.Count == 0)
         {
             SelectedIndex = 0;

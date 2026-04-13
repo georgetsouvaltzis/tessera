@@ -15,10 +15,6 @@ public sealed partial class LogTailPanel
         _entryBodyCache.Clear();
         foreach (var entry in entries)
         {
-            if (entry is null)
-            {
-                continue;
-            }
 
             _entries.Add(
                 new LogEntry(entry.Message, entry.Level, entry.Timestamp, entry.Source)

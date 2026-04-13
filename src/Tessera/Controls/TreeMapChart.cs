@@ -127,7 +127,7 @@ public sealed class TreeMapChart : Control
         var previousIndex = SelectedIndex;
         var previousNode = SelectedNode;
         _roots.Clear();
-        foreach (var node in nodes.Where(static node => node is not null))
+        foreach (var node in nodes)
         {
             _roots.Add(Clone(node));
         }

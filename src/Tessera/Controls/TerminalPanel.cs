@@ -130,7 +130,7 @@ public sealed class TerminalPanel : Control
     {
         ArgumentNullException.ThrowIfNull(lines);
         _lines.Clear();
-        foreach (var line in lines.Where(static line => line is not null))
+        foreach (var line in lines)
         {
             _lines.Add(CloneLine(line));
         }
@@ -197,7 +197,7 @@ public sealed class TerminalPanel : Control
     public void AppendRange(IEnumerable<TerminalPanelLine> lines)
     {
         ArgumentNullException.ThrowIfNull(lines);
-        foreach (var line in lines.Where(static line => line is not null))
+        foreach (var line in lines)
         {
             _lines.Add(CloneLine(line));
         }

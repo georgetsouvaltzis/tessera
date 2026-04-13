@@ -188,7 +188,7 @@ public sealed partial class AutocompleteInput : Control
         ArgumentNullException.ThrowIfNull(suggestions);
 
         _suggestions.Clear();
-        foreach (var suggestion in suggestions.Where(static suggestion => suggestion is not null))
+        foreach (var suggestion in suggestions)
         {
             _suggestions.Add(suggestion);
         }

@@ -181,7 +181,7 @@ public sealed class NotificationInbox : Control
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         _items.Clear();
-        foreach (var item in items.Where(static item => item is not null))
+        foreach (var item in items)
         {
             _items.Add(Clone(item));
         }

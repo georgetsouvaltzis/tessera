@@ -26,7 +26,7 @@ public sealed class TreeMapNode
         : this(name, value)
     {
         ArgumentNullException.ThrowIfNull(children);
-        foreach (var child in children.Where(static child => child is not null))
+        foreach (var child in children)
         {
             Children.Add(child);
         }

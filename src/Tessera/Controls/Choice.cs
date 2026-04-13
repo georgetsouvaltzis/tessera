@@ -208,10 +208,6 @@ public sealed class Choice : Control
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool TrySetSelectedItem(string item)
     {
-        if (item is null)
-        {
-            return false;
-        }
 
         for (var index = 0; index < _options.Items.Count; index++)
         {

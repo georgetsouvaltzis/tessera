@@ -184,7 +184,7 @@ public sealed partial class LinePlot : Control
         ArgumentNullException.ThrowIfNull(series);
 
         _series.Clear();
-        foreach (var item in series.Where(static item => item is not null))
+        foreach (var item in series)
         {
             _series.Add(item);
         }

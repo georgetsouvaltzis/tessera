@@ -167,10 +167,6 @@ public sealed class SchedulerTimeline : Control
         _entries.Clear();
         foreach (var entry in entries)
         {
-            if (entry is null)
-            {
-                continue;
-            }
 
             _entries.Add(CloneEntry(entry));
         }

@@ -140,7 +140,7 @@ public sealed class TreeView : Control
     {
         ArgumentNullException.ThrowIfNull(items);
         _roots.Clear();
-        foreach (var item in items.Where(static item => item is not null))
+        foreach (var item in items)
         {
             _roots.Add(Clone(item));
         }
