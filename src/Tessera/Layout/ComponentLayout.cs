@@ -55,6 +55,8 @@ internal sealed class ComponentLayout : LayoutNode
 
         return Control is not null
             ? Control.Measure(availableBounds)
-            : LayoutIntrinsicMeasurer.Measure(CanvasComponent!, availableBounds);
+            : LayoutIntrinsicMeasurer.Measure(
+                CanvasComponent ?? throw new InvalidOperationException("ComponentLayout requires a canvas component."),
+                availableBounds);
     }
 }

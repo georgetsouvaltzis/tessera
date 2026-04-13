@@ -1,8 +1,9 @@
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Tessera.Core.Terminal.Adapters.Internal;
 
-internal static class WindowsConsoleSession
+internal static partial class WindowsConsoleSession
 {
     private const int StdInputHandle = -10;
     private const int StdOutputHandle = -11;
@@ -161,28 +162,33 @@ internal static class WindowsConsoleSession
         return handle == IntPtr.Zero || handle == new IntPtr(-1);
     }
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern IntPtr GetStdHandle(int nStdHandle);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial IntPtr GetStdHandle(int nStdHandle);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
+    [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+    private static partial bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
+    [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+    private static partial bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
+    [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetNumberOfConsoleInputEvents(IntPtr hConsoleInput, out uint lpcNumberOfEvents);
+    private static partial bool GetNumberOfConsoleInputEvents(IntPtr hConsoleInput, out uint lpcNumberOfEvents);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
+    [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool PeekConsoleInput(IntPtr hConsoleInput, [Out] InputRecord[] lpBuffer, uint nLength,
+    private static partial bool PeekConsoleInput(
+        IntPtr hConsoleInput,
+        [MarshalUsing(CountElementName = nameof(nLength))]
+        [Out]
+        InputRecord[] lpBuffer,
+        uint nLength,
         out uint lpNumberOfEventsRead);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct Coord

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
@@ -792,7 +793,9 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             }
             else
             {
-                render = component.CanvasComponent!.Render;
+                var canvasComponent = component.CanvasComponent
+                    ?? throw new InvalidOperationException("Component layout requires a canvas component.");
+                render = canvasComponent.Render;
             }
 
             var id = $"{path}/component";
@@ -1150,7 +1153,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             return false;
         }
 
-        private bool TryGetFocusedRegion(out TesseraSceneRegion region)
+        private bool TryGetFocusedRegion([NotNullWhen(true)] out TesseraSceneRegion? region)
         {
             if (FocusedRegionId is not null && TryGetFocusableRegionIndex(FocusedRegionId, out var focusedIndex))
             {
@@ -1158,7 +1161,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 return true;
             }
 
-            region = null!;
+            region = default;
             return false;
         }
 

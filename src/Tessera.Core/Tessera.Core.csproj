@@ -12,6 +12,7 @@
         <IsPackable>true</IsPackable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <PackageId>Tessera.Core</PackageId>
         <Title>Tessera.Core</Title>
         <Description>Advanced runtime, rendering, terminal, and protocol primitives that power Tessera host execution.</Description>

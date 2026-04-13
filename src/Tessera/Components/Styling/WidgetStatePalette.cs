@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using Tessera.Components.Styling.Internal;
 using Tessera.Styles;
 
@@ -66,12 +67,12 @@ internal sealed class WidgetStatePalette
         set => _appearances[state] = value;
     }
 
-    public bool TryGet(WidgetVisualState state, out WidgetStateAppearance appearance)
+    public bool TryGet(WidgetVisualState state, [NotNullWhen(true)] out WidgetStateAppearance? appearance)
     {
-        return _appearances.TryGetValue(state, out appearance!);
+        return _appearances.TryGetValue(state, out appearance);
     }
 
-    public bool TryGetInherited(WidgetVisualState state, out WidgetStateAppearance appearance)
+    public bool TryGetInherited(WidgetVisualState state, [NotNullWhen(true)] out WidgetStateAppearance? appearance)
     {
         var hierarchy = WidgetStatePaletteHierarchy.BuildRootFirst(this);
         return WidgetStatePaletteResolver.TryResolveAppearance(

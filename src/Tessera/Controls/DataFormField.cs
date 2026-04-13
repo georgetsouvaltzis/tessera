@@ -75,7 +75,13 @@ public sealed class DataFormField<TModel>
 
         try
         {
-            WriteValue!(model, value);
+            var writeValue = WriteValue;
+            if (writeValue is null)
+            {
+                return false;
+            }
+
+            writeValue(model, value);
             return true;
         }
         catch (Exception ex)

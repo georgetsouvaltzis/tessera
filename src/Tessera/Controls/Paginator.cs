@@ -197,12 +197,13 @@ public sealed class Paginator : Control
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
-        if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty)
-        {
-            return Handle(message);
-        }
-
-        if (pointer.Kind != PointerEventKind.Press || pointer.Button != PointerButton.Left || pointer.Y != bounds.Y)
+        if (IsDisabled
+            || IsReadOnly
+            || message is not PointerInput pointer
+            || bounds.IsEmpty
+            || pointer.Kind != PointerEventKind.Press
+            || pointer.Button != PointerButton.Left
+            || pointer.Y != bounds.Y)
         {
             return Handle(message);
         }

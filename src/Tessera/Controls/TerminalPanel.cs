@@ -506,7 +506,7 @@ public sealed class TerminalPanel : Control
     {
         if (!string.IsNullOrWhiteSpace(line.Marker))
         {
-            return line.Marker!;
+            return line.Marker ?? string.Empty;
         }
 
         return line.Channel switch

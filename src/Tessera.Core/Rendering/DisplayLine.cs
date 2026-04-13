@@ -30,10 +30,11 @@ internal sealed class DisplayLine(string?[] cells, string?[] styles)
             return ContinuationMarker;
         }
 
+        var cell = _cells[column] ?? string.Empty;
         var style = _styles[column];
         return string.IsNullOrEmpty(style)
-            ? _cells[column]!
-            : $"{style}\u001f{_cells[column]}";
+            ? cell
+            : $"{style}\u001f{cell}";
     }
 
     public string? CellAt(int column)

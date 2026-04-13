@@ -410,7 +410,7 @@ public sealed class Sparkline : Control
     {
         var steps = string.IsNullOrWhiteSpace(configured)
             ? DefaultSteps
-            : configured!;
+            : configured ?? string.Empty;
         return steps.AsSpan().Length >= 2
             ? steps.AsSpan()
             : DefaultSteps.AsSpan();

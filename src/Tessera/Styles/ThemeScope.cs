@@ -121,16 +121,12 @@ public static class ThemeScope
             }
 
             var extensionTarget = parameters[0].ParameterType;
-            if (extensionTarget == controlType)
-            {
-                return method;
-            }
-
-            if (method.IsGenericMethodDefinition
+            if (extensionTarget == controlType
+                || (method.IsGenericMethodDefinition
                 && extensionTarget.IsGenericType
                 && controlType.IsGenericType
                 && extensionTarget.GetGenericTypeDefinition() == controlType.GetGenericTypeDefinition()
-                && method.GetGenericArguments().Length == controlType.GetGenericArguments().Length)
+                && method.GetGenericArguments().Length == controlType.GetGenericArguments().Length))
             {
                 return method;
             }

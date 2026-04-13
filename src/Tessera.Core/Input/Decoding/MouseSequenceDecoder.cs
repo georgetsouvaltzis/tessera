@@ -150,12 +150,7 @@ internal static class MouseSequenceDecoder
     private static (MouseButton Button, KeyModifiers Modifiers) DecodeMouseButtonAndModifiers(int encoded, bool isWheel)
     {
         var button = DecodeMouseButton(encoded, isWheel);
-        if (isWheel || button is MouseButton.None)
-        {
-            return (button, ParseMouseModifiers(encoded));
-        }
-
-        if ((encoded & MouseExtendedButtonsMask) == 0)
+        if (isWheel || button is MouseButton.None || (encoded & MouseExtendedButtonsMask) == 0)
         {
             return (button, ParseMouseModifiers(encoded));
         }

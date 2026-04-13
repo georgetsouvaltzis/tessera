@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Tessera.Styles;
 
 namespace Tessera.Components.Styling.Internal;
@@ -8,7 +9,7 @@ internal static class WidgetStatePaletteResolver
         WidgetVisualState state,
         IReadOnlyList<WidgetStatePalette> hierarchy,
         Func<WidgetStatePalette, WidgetVisualState, WidgetStateAppearance?> resolver,
-        out WidgetStateAppearance appearance)
+        [NotNullWhen(true)] out WidgetStateAppearance? appearance)
     {
         var found = false;
         var style = TesseraStyle.Empty;
@@ -40,7 +41,7 @@ internal static class WidgetStatePaletteResolver
 
         if (!found)
         {
-            appearance = null!;
+            appearance = default;
             return false;
         }
 

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
@@ -327,11 +328,11 @@ public sealed class VirtualizedListView<T> : Control
             Math.Clamp(height, 0, availableBounds.Height));
     }
 
-    private bool TryResolve(int index, out T item)
+    private bool TryResolve(int index, [MaybeNullWhen(false)] out T item)
     {
         if (index < 0 || index >= Count)
         {
-            item = default!;
+            item = default;
             return false;
         }
 

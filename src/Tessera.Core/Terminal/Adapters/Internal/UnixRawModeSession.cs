@@ -1,9 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
 namespace Tessera.Core.Terminal.Adapters.Internal;
 
-internal sealed class UnixRawModeSession
+internal sealed partial class UnixRawModeSession
 {
     private const int Tcsanow = 0;
     private const int OpenReadWrite = 2;
@@ -125,8 +124,8 @@ internal sealed class UnixRawModeSession
 
             var current = _darwinOriginalTermios;
             current.c_lflag &= ~(DarwinEcho | DarwinICanon);
-            current.c_cc[DarwinVMin] = 1;
-            current.c_cc[DarwinVTime] = 0;
+            SetDarwinControlChar(ref current, DarwinVMin, 1);
+            SetDarwinControlChar(ref current, DarwinVTime, 0);
 
             if (TcSetAttrDarwin(_unixTtyFd, Tcsanow, ref current) != 0)
             {
@@ -164,8 +163,8 @@ internal sealed class UnixRawModeSession
 
         var linuxCurrent = _linuxOriginalTermios;
         linuxCurrent.c_lflag &= ~(LinuxEcho | LinuxICanon);
-        linuxCurrent.c_cc[LinuxVMin] = 1;
-        linuxCurrent.c_cc[LinuxVTime] = 0;
+        SetLinuxControlChar(ref linuxCurrent, LinuxVMin, 1);
+        SetLinuxControlChar(ref linuxCurrent, LinuxVTime, 0);
 
         if (TcSetAttrLinux(_unixTtyFd, Tcsanow, ref linuxCurrent) != 0)
         {
@@ -233,18 +232,9 @@ internal sealed class UnixRawModeSession
             ? new[] { "-f", "/dev/tty" }
             : new[] { "-F", "/dev/tty" };
 
-        if (TryRunStty(sttyExecutable, arguments, explicitTtyArgs, out var output, out error))
-        {
-            return output.Trim();
-        }
-
-        if (TryRunStty(sttyExecutable, arguments, null, out output, out var fallbackError))
-        {
-            error = null;
-            return output.Trim();
-        }
-
-        if (TryRunSttyWithShellRedirection(arguments, out output, out fallbackError))
+        if (TryRunStty(sttyExecutable, arguments, explicitTtyArgs, out var output, out error)
+            || TryRunStty(sttyExecutable, arguments, null, out output, out var fallbackError)
+            || TryRunSttyWithShellRedirection(arguments, out output, out fallbackError))
         {
             error = null;
             return output.Trim();
@@ -402,50 +392,56 @@ internal sealed class UnixRawModeSession
         return "stty";
     }
 
-    [DllImport("libc", EntryPoint = "open", SetLastError = true)]
-    private static extern int Open(byte[] path, int flags);
+    private static unsafe void SetLinuxControlChar(ref LinuxTermios termios, int index, byte value)
+    {
+        termios.c_cc[index] = value;
+    }
 
-    [DllImport("libc", EntryPoint = "close", SetLastError = true)]
-    private static extern int Close(int fd);
+    private static unsafe void SetDarwinControlChar(ref DarwinTermios termios, int index, byte value)
+    {
+        termios.c_cc[index] = value;
+    }
 
-    [DllImport("libc", EntryPoint = "tcgetattr", SetLastError = true)]
-    private static extern int TcGetAttrLinux(int fd, out LinuxTermios termios);
+    [LibraryImport("libc", EntryPoint = "open", SetLastError = true)]
+    private static partial int Open(byte[] path, int flags);
 
-    [DllImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
-    private static extern int TcSetAttrLinux(int fd, int optionalActions, ref LinuxTermios termios);
+    [LibraryImport("libc", EntryPoint = "close", SetLastError = true)]
+    private static partial int Close(int fd);
 
-    [DllImport("libc", EntryPoint = "tcgetattr", SetLastError = true)]
-    private static extern int TcGetAttrDarwin(int fd, out DarwinTermios termios);
+    [LibraryImport("libc", EntryPoint = "tcgetattr", SetLastError = true)]
+    private static partial int TcGetAttrLinux(int fd, out LinuxTermios termios);
 
-    [DllImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
-    private static extern int TcSetAttrDarwin(int fd, int optionalActions, ref DarwinTermios termios);
+    [LibraryImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
+    private static partial int TcSetAttrLinux(int fd, int optionalActions, ref LinuxTermios termios);
+
+    [LibraryImport("libc", EntryPoint = "tcgetattr", SetLastError = true)]
+    private static partial int TcGetAttrDarwin(int fd, out DarwinTermios termios);
+
+    [LibraryImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
+    private static partial int TcSetAttrDarwin(int fd, int optionalActions, ref DarwinTermios termios);
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct LinuxTermios
+    private unsafe struct LinuxTermios
     {
         public uint c_iflag;
         public uint c_oflag;
         public uint c_cflag;
         public uint c_lflag;
         public byte c_line;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte[] c_cc;
+        public fixed byte c_cc[32];
 
         public uint c_ispeed;
         public uint c_ospeed;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct DarwinTermios
+    private unsafe struct DarwinTermios
     {
         public ulong c_iflag;
         public ulong c_oflag;
         public ulong c_cflag;
         public ulong c_lflag;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
-        public byte[] c_cc;
+        public fixed byte c_cc[20];
 
         public ulong c_ispeed;
         public ulong c_ospeed;

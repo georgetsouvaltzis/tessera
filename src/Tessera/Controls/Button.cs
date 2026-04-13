@@ -195,13 +195,14 @@ public sealed class Button : Control
             label += " (disabled)";
         }
 
+        var description = Description;
         var renderedLabel = ApplyLabelStyle(label, surfaceStyle);
-        var rowCount = string.IsNullOrWhiteSpace(Description) || content.Height < 2 ? 1 : 2;
+        var rowCount = string.IsNullOrWhiteSpace(description) || content.Height < 2 ? 1 : 2;
         var top = content.Y + Math.Max(0, (content.Height - rowCount) / 2);
         WriteCenteredLabel(canvas, content, top, label, renderedLabel);
-        if (rowCount > 1)
+        if (rowCount > 1 && description is not null)
         {
-            ControlTextLayout.WriteCentered(canvas, content, top + 1, Description!);
+            ControlTextLayout.WriteCentered(canvas, content, top + 1, description);
         }
     }
 

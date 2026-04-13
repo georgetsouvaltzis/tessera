@@ -125,7 +125,7 @@ internal sealed class CommandErrorCaptureModel : TestRuntimeModel
 
     public Exception? CapturedError { get; private set; }
 
-    public override Effect? Init()
+    public override Effect Init()
     {
         return _ => throw new InvalidOperationException(CommandFailureMessage);
     }
@@ -320,7 +320,7 @@ internal sealed class CapabilityRefinementModel : TestRuntimeModel
 {
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public override Effect? Init()
+    public override Effect Init()
     {
         return Effects.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset));
     }
@@ -349,7 +349,7 @@ internal sealed class UnsupportedModeReportRefinementModel : TestRuntimeModel
 {
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public override Effect? Init()
+    public override Effect Init()
     {
         return Effects.FromMessage(new ModeReportMsg(1006, ModeReportState.Unsupported));
     }
@@ -380,7 +380,7 @@ internal sealed class CapabilityProbeTimeoutModel(TimeSpan safetyQuitDelay) : Te
 
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public override Effect? Init()
+    public override Effect Init()
     {
         return Effects.Tick(_safetyQuitDelay, _ => new QuitMsg());
     }
@@ -445,7 +445,7 @@ internal sealed class TimedQuitModel(TimeSpan delay) : TestRuntimeModel
 {
     private readonly TimeSpan _delay = delay;
 
-    public override Effect? Init()
+    public override Effect Init()
     {
         return Effects.Tick(_delay, _ => new QuitMsg());
     }
@@ -465,7 +465,7 @@ internal sealed class TimedQuitProbeViewModel(TimeSpan delay) : TestRuntimeModel
 {
     private readonly TimeSpan _delay = delay;
 
-    public override Effect? Init()
+    public override Effect Init()
     {
         return Effects.Tick(_delay, _ => new QuitMsg());
     }

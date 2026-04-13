@@ -286,17 +286,14 @@ public sealed partial class Stepper : Control
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
-        if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty)
-        {
-            return Handle(message);
-        }
-
-        if (pointer.Kind != PointerEventKind.Press || pointer.Button != PointerButton.Left)
-        {
-            return Handle(message);
-        }
-
-        if (!bounds.Contains(pointer.X, pointer.Y) || pointer.Y != bounds.Y)
+        if (IsDisabled
+            || IsReadOnly
+            || message is not PointerInput pointer
+            || bounds.IsEmpty
+            || pointer.Kind != PointerEventKind.Press
+            || pointer.Button != PointerButton.Left
+            || !bounds.Contains(pointer.X, pointer.Y)
+            || pointer.Y != bounds.Y)
         {
             return Handle(message);
         }

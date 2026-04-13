@@ -436,12 +436,10 @@ internal sealed class AnsiDiffRenderer(
 
     private Task QueryModeReportAsync(int mode)
     {
-        if (_writer is null || !_capabilities.ModeReports || !_options.QueryModeReports)
-        {
-            return Task.CompletedTask;
-        }
-
-        if (_options.QueryModeReportsOncePerMode && !_queriedModes.Add(mode))
+        if (_writer is null
+            || !_capabilities.ModeReports
+            || !_options.QueryModeReports
+            || (_options.QueryModeReportsOncePerMode && !_queriedModes.Add(mode)))
         {
             return Task.CompletedTask;
         }

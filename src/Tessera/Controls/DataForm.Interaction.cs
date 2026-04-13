@@ -68,12 +68,7 @@ public sealed partial class DataForm<TModel>
             return false;
         }
 
-        if (key.Is(Key.Backspace))
-        {
-            return RemoveFromBuffer();
-        }
-
-        if (key.Is(Key.Delete))
+        if (key.Is(Key.Backspace) || key.Is(Key.Delete))
         {
             return RemoveFromBuffer();
         }
@@ -205,14 +200,7 @@ public sealed partial class DataForm<TModel>
             return true;
         }
 
-        if (!CanEditCurrentField())
-        {
-            IsEditing = false;
-            _isDirty = false;
-            return true;
-        }
-
-        if (Model is null || SelectedField is null)
+        if (!CanEditCurrentField() || Model is null || SelectedField is null)
         {
             IsEditing = false;
             _isDirty = false;

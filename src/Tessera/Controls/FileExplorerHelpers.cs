@@ -1,10 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Tessera.Styles;
 
 namespace Tessera.Controls;
 
 public sealed partial class FileExplorer
 {
-    private bool TryFindNode(string path, out FileExplorerItem node)
+    private bool TryFindNode(string path, [NotNullWhen(true)] out FileExplorerItem? node)
     {
         var stack = new Stack<FileExplorerItem>(_roots);
         while (stack.Count > 0)
@@ -22,7 +23,7 @@ public sealed partial class FileExplorer
             }
         }
 
-        node = null!;
+        node = default;
         return false;
     }
 

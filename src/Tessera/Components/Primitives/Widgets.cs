@@ -210,7 +210,8 @@ internal static class Widgets
             contentRect = clipped.Inset(padding);
             if (!string.IsNullOrWhiteSpace(title))
             {
-                canvas.WriteText(contentRect.X, contentRect.Y, title!, contentRect.Width);
+                var resolvedTitle = title ?? string.Empty;
+                canvas.WriteText(contentRect.X, contentRect.Y, resolvedTitle, contentRect.Width);
                 contentRect = new Rect(contentRect.X, contentRect.Y + 1, contentRect.Width, contentRect.Height - 1);
             }
         }

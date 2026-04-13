@@ -166,7 +166,8 @@ public sealed class Label : Control
             height += 2;
             if (!string.IsNullOrWhiteSpace(Title))
             {
-                width = Math.Max(width, Title!.Length + 4);
+                var title = Title ?? string.Empty;
+                width = Math.Max(width, title.Length + 4);
             }
         }
 

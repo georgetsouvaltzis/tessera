@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using Tessera.Core.Messages;
 
 namespace Tessera.Core.Input.Decoding;
@@ -65,9 +66,9 @@ internal static class OscDcsSequenceDecoder
         };
     }
 
-    private static bool TryDecodeClipboardOsc(string data, out ClipboardMsg message)
+    private static bool TryDecodeClipboardOsc(string data, [NotNullWhen(true)] out ClipboardMsg? message)
     {
-        message = default!;
+        message = default;
         var firstSeparator = data.IndexOf(';', StringComparison.Ordinal);
         if (firstSeparator <= 0 || firstSeparator == data.Length - 1)
         {

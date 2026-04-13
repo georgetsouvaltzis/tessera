@@ -19,13 +19,7 @@ public static class Program
 
     public static void Main(string[] args)
     {
-        if (PerfGateRunner.TryRun(args, out var exitCode))
-        {
-            Environment.ExitCode = exitCode;
-            return;
-        }
-
-        if (RuntimeEndToEndRunner.TryRun(args, out exitCode))
+        if (PerfGateRunner.TryRun(args, out var exitCode) || RuntimeEndToEndRunner.TryRun(args, out exitCode))
         {
             Environment.ExitCode = exitCode;
             return;

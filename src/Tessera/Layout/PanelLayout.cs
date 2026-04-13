@@ -126,7 +126,8 @@ public sealed class PanelLayout : LayoutNode
 
         if (!string.IsNullOrWhiteSpace(Title))
         {
-            width = Math.Max(width, Title!.Length + (Border == BorderStyle.None ? 0 : 4));
+            var title = Title ?? string.Empty;
+            width = Math.Max(width, title.Length + (Border == BorderStyle.None ? 0 : 4));
         }
 
         return new LayoutMeasurement(

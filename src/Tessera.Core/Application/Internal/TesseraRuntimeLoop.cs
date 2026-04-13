@@ -101,7 +101,9 @@ internal sealed class TesseraRuntimeLoop(
                     TesseraResizeMonitor.Start(_runtime.Terminal, _options, size, Send, token);
             }
 
-            var commandLoop = Task.Run(() => _runtime.EffectScheduler!.RunLoopAsync(_effects.Reader, token), token);
+            var effectScheduler = _runtime.EffectScheduler
+                ?? throw new InvalidOperationException("Effect scheduler must be initialized before the runtime loop starts.");
+            var commandLoop = Task.Run(() => effectScheduler.RunLoopAsync(_effects.Reader, token), token);
             var inputLoop = StartInputLoop(token);
             await _capabilityProbe.StartAsync(_runtime.Terminal, _options, _runtime.Capabilities, Send, token)
                 .ConfigureAwait(false);
@@ -261,7 +263,9 @@ internal sealed class TesseraRuntimeLoop(
     {
         if (filtered is SequenceMsg sequence)
         {
-            _ = Task.Run(() => _runtime.EffectScheduler!.RunSequenceAsync(sequence.Effects, token), token);
+            var effectScheduler = _runtime.EffectScheduler
+                ?? throw new InvalidOperationException("Effect scheduler must be initialized before sequence handling.");
+            _ = Task.Run(() => effectScheduler.RunSequenceAsync(sequence.Effects, token), token);
             return true;
         }
 

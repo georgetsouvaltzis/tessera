@@ -207,19 +207,10 @@ public sealed class InspectorPanel : Control
             return SetSelectedRowIndex(rows.Count - 1);
         }
 
-        if ((key.Is(Key.Enter) || key.IsCharacter(' ')) && TryGetSelectedSectionHeader(rows, out var sectionIndex))
-        {
-            return ToggleSection(sectionIndex);
-        }
-
-        if (key.Is(Key.Left) && TryGetSelectedSectionOrAncestor(rows, out sectionIndex) &&
-            _sections[sectionIndex].IsExpanded)
-        {
-            return ToggleSection(sectionIndex);
-        }
-
-        if (key.Is(Key.Right) && TryGetSelectedSectionOrAncestor(rows, out sectionIndex) &&
-            !_sections[sectionIndex].IsExpanded)
+        if (((key.Is(Key.Enter) || key.IsCharacter(' ')) && TryGetSelectedSectionHeader(rows, out var sectionIndex))
+            || ((key.Is(Key.Left) || key.Is(Key.Right))
+                && TryGetSelectedSectionOrAncestor(rows, out sectionIndex)
+                && _sections[sectionIndex].IsExpanded == key.Is(Key.Left)))
         {
             return ToggleSection(sectionIndex);
         }
