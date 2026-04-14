@@ -52,7 +52,7 @@ Examples in this repository should:
 
 If a new example becomes part of the public learning path, update:
 
-- [README.md](../README.md)
+- [overview.md](overview.md)
 - [getting-started.md](getting-started.md)
 - [public-api-guidelines.md](public-api-guidelines.md)
 - [spec.md](spec.md)

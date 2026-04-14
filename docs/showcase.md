@@ -1,74 +1,116 @@
-# Tessera Showcase
+---
+title: Showcase
+hide:
+  - toc
+---
 
-The public evaluation path is intentionally split:
+# Showcase
 
-- starter ladder for first contact
-- flagship examples for product-level evaluation
-- supporting demos for narrower domain exploration
+<div class="page-shell">
+  <section class="section-block">
+    <div class="section-head">
+      <div>
+        <span class="section-kicker">Evaluation lane</span>
+        <h2>From polished starters to denser product surfaces.</h2>
+      </div>
+      <p>The showcase is intentionally tiered so you can evaluate the framework in the same order a real team would adopt it.</p>
+    </div>
+    <div class="signal-row">
+      <article class="signal-card">
+        <strong>Starter ladder</strong>
+        <span>First-contact examples for layout, controls, forms, and multi-pane composition.</span>
+      </article>
+      <article class="signal-card">
+        <strong>Flagship apps</strong>
+        <span>Richer shells that show how the public path handles dashboards, workbenches, and command-heavy workflows.</span>
+      </article>
+      <article class="signal-card">
+        <strong>Supporting demos</strong>
+        <span>Narrower domain showcases for boards, media, transfer surfaces, and incident-style layouts.</span>
+      </article>
+    </div>
+  </section>
 
-## Starter ladder
+  <section class="section-block">
+    <div class="section-head">
+      <div>
+        <span class="section-kicker">Starter ladder</span>
+        <h2>Learn the framework without starting in the deep end.</h2>
+      </div>
+      <p>These are the right first runs when you want to understand Tessera’s public model before judging its denser surfaces.</p>
+    </div>
+    <div class="starter-grid">
+      <article>
+        <div class="starter-card__header">
+          <strong class="starter-card__title">HelloWorld</strong>
+          <span class="starter-card__tag">starter</span>
+        </div>
+        <span class="starter-card__copy">Smallest polished entry point. Centered composition, status text, first button activation.</span>
+        <div class="command-line">dotnet run --project examples/HelloWorld/HelloWorld.csproj</div>
+      </article>
+      <article>
+        <div class="starter-card__header">
+          <strong class="starter-card__title">CounterForm</strong>
+          <span class="starter-card__tag">interactive</span>
+        </div>
+        <span class="starter-card__copy">Inputs, choice, progress, and message-driven updates inside the standard public surface.</span>
+        <div class="command-line">dotnet run --project examples/CounterForm/CounterForm.csproj</div>
+      </article>
+      <article>
+        <div class="starter-card__header">
+          <strong class="starter-card__title">WorkspaceApp</strong>
+          <span class="starter-card__tag">multi-pane</span>
+        </div>
+        <span class="starter-card__copy">Preview, editing, navigation, and actions together in one shell.</span>
+        <div class="command-line">dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj</div>
+      </article>
+    </div>
+  </section>
 
-<div class="grid cards" markdown>
+  <section class="section-block">
+    <div class="section-head">
+      <div>
+        <span class="section-kicker">Flagship examples</span>
+        <h2>Evaluate how the public path behaves under real application pressure.</h2>
+      </div>
+      <p>Flagships are where Tessera should start to feel like product infrastructure, not just a control catalog.</p>
+    </div>
+    <div class="showcase-grid">
+      <article>
+        <div class="showcase-card__header">
+          <strong class="showcase-card__title">GitConsole</strong>
+          <span class="showcase-card__tag">workflow</span>
+        </div>
+        <span class="showcase-card__copy">Editing, navigation, diff review, command history, and action rails.</span>
+        <div class="command-line">dotnet run --project examples/GitConsole/GitConsole.csproj</div>
+      </article>
+      <article>
+        <div class="showcase-card__header">
+          <strong class="showcase-card__title">OpsWatch</strong>
+          <span class="showcase-card__tag">dashboard</span>
+        </div>
+        <span class="showcase-card__copy">Dense telemetry cards, alerts, chips, health rails, and operator actions.</span>
+        <div class="command-line">dotnet run --project examples/OpsWatch/OpsWatch.csproj</div>
+      </article>
+      <article>
+        <div class="showcase-card__header">
+          <strong class="showcase-card__title">DataWorkbench</strong>
+          <span class="showcase-card__tag">workbench</span>
+        </div>
+        <span class="showcase-card__copy">Richer state orchestration, multi-pane composition, and pointer-ready runtime configuration.</span>
+        <div class="command-line">dotnet run --project examples/DataWorkbench/DataWorkbench.csproj</div>
+      </article>
+    </div>
+  </section>
 
--   :material-gesture-tap-button: **HelloWorld**
-
-    ---
-
-    Smallest polished starter. Centered composition, first button activation, and status text.
-
-    ```bash
-    dotnet run --project examples/HelloWorld/HelloWorld.csproj
-    ```
-
--   :material-form-textbox: **CounterForm**
-
-    ---
-
-    Interactive starter for forms, choice, progress, and message-driven state transitions.
-
-    ```bash
-    dotnet run --project examples/CounterForm/CounterForm.csproj
-    ```
-
--   :material-view-split-horizontal: **WorkspaceApp**
-
-    ---
-
-    Multi-pane starter for navigation, editing, preview, and action flow inside one shell.
-
-    ```bash
-    dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj
-    ```
-
-</div>
-
-## Flagship examples
-
-=== "GitConsole"
-
-    Use this when you want to evaluate command-heavy workflow surfaces, editing, navigation, diff review, and action history.
-
-    ```bash
-    dotnet run --project examples/GitConsole/GitConsole.csproj
-    ```
-
-=== "OpsWatch"
-
-    Use this when you want to evaluate a dense dashboard surface with telemetry, health rails, chips, and operator actions.
-
-    ```bash
-    dotnet run --project examples/OpsWatch/OpsWatch.csproj
-    ```
-
-=== "DataWorkbench"
-
-    Use this when you want to evaluate richer multi-pane shells, state orchestration, and pointer-ready runtime composition.
-
-    ```bash
-    dotnet run --project examples/DataWorkbench/DataWorkbench.csproj
-    ```
-
-## Supporting demos
+  <section class="support-band" markdown="1">
+    <div class="section-head">
+      <div>
+        <span class="section-kicker">Supporting demos</span>
+        <h2>Explore narrower domains after the flagship pass.</h2>
+      </div>
+      <p>These demos are useful once you already understand the main public path and want domain-specific texture.</p>
+    </div>
 
 | Example | What to look for | Run |
 | --- | --- | --- |
@@ -76,20 +118,5 @@ The public evaluation path is intentionally split:
 | `IncidentDesk` | triage and queue-like workflows | `dotnet run --project examples/IncidentDesk/IncidentDesk.csproj` |
 | `MusicDeck` | media-oriented dashboard styling and browse/playback flows | `dotnet run --project examples/MusicDeck/MusicDeck.csproj` |
 | `TransitBoard` | dense board-style presentation and schedule surfaces | `dotnet run --project examples/TransitBoard/TransitBoard.csproj` |
-
-## What to evaluate
-
-When you run the examples, check these things:
-
-- readability under dense terminal layouts
-- keyboard-first navigation and action flow
-- theme coherence across panels, buttons, overlays, and data surfaces
-- how the default public path feels without host-heavy setup
-- whether the example shell reads like a product surface, not a widget dump
-
-## Where to go next
-
-- [Getting started](getting-started.md)
-- [Example guide](examples.md)
-- [Theme system](theme-system.md)
-- [Architecture overview](architecture-overview.md)
+  </section>
+</div>

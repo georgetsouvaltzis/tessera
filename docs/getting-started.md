@@ -4,7 +4,7 @@ This guide is the default onboarding path for Tessera public alpha.
 
 If you are evaluating Tessera for a product, follow this order:
 
-1. read the quick-start snippet in [README.md](../README.md)
+1. read the framework overview in [overview.md](overview.md)
 2. run `HelloWorld`
 3. run `CounterForm`
 4. run `WorkspaceApp`

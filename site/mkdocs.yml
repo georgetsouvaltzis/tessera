@@ -31,6 +31,7 @@ exclude_docs: |
   AGENTS.md
   dotnet-tools.json
   LICENSE
+  README.md
   global.json
 
 theme:
@@ -39,7 +40,7 @@ theme:
   logo: docs/assets/images/logo.svg
   favicon: docs/assets/images/favicon.svg
   font:
-    text: Space Grotesk
+    text: Manrope
     code: JetBrains Mono
   palette:
     - scheme: slate
@@ -48,11 +49,12 @@ theme:
   features:
     - navigation.instant
     - navigation.instant.progress
+    - navigation.tabs
     - navigation.sections
     - navigation.top
     - navigation.tracking
     - navigation.footer
-    - toc.follow
+    - toc.integrate
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -61,7 +63,7 @@ theme:
 nav:
   - Home: docs/index.md
   - Start Here:
-      - Overview: README.md
+      - Overview: docs/overview.md
       - Getting Started: docs/getting-started.md
       - Example Guide: docs/examples.md
       - Showcase: docs/showcase.md
@@ -108,5 +110,6 @@ markdown_extensions:
 
 extra_css:
   - docs/assets/stylesheets/extra.css
+  - docs/assets/stylesheets/landing.css
 
 copyright: Copyright &copy; 2026 Tessera

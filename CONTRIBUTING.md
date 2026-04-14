@@ -6,7 +6,7 @@ Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 
 ## Before You Start
 
-- read [README.md](README.md)
+- read [docs/overview.md](docs/overview.md)
 - read [docs/getting-started.md](docs/getting-started.md)
 - read [docs/architecture-overview.md](docs/architecture-overview.md)
 - read [docs/public-api-guidelines.md](docs/public-api-guidelines.md)
@@ -61,7 +61,7 @@ If your change touches perf-sensitive code or release-track behavior, also follo
 
 If you change a public API or public behavior, update the same slice:
 
-- [README.md](README.md)
+- [docs/overview.md](docs/overview.md)
 - [CHANGELOG.md](CHANGELOG.md)
 - [docs/spec.md](docs/spec.md)
 - [docs/public-api-guidelines.md](docs/public-api-guidelines.md)

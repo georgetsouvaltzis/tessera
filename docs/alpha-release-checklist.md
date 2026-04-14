@@ -81,7 +81,7 @@ Open caveat:
 
 Before public alpha signoff, do one final docs pass confirming that these files agree:
 
-- [README.md](../README.md)
+- [overview.md](overview.md)
 - [CHANGELOG.md](../CHANGELOG.md)
 - [SUPPORT.md](../SUPPORT.md)
 - [getting-started.md](getting-started.md)

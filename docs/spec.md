@@ -140,7 +140,7 @@ Default app shape:
 
 Canonical learning path:
 
-1. [README.md](../README.md)
+1. [overview.md](overview.md)
 2. [getting-started.md](getting-started.md)
 3. [examples.md](examples.md)
 

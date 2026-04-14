@@ -21,7 +21,7 @@ Tessera does not currently provide private product support or response-time guar
 
 Please check these first:
 
-- [README.md](README.md)
+- [docs/overview.md](docs/overview.md)
 - [docs/getting-started.md](docs/getting-started.md)
 - [docs/examples.md](docs/examples.md)
 - [CHANGELOG.md](CHANGELOG.md)

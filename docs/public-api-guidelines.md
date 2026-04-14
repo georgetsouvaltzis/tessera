@@ -64,7 +64,7 @@ await app.RunAsync();
 
 Public onboarding should teach one story:
 
-1. start with [README.md](../README.md)
+1. start with [overview.md](overview.md)
 2. follow [getting-started.md](getting-started.md)
 3. use the starter example order in [examples.md](examples.md): `HelloWorld` -> `CounterForm` -> `WorkspaceApp`
 4. use the flagship examples only after the starter ladder is clear
