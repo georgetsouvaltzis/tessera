@@ -1,22 +1,22 @@
 :root {
     --tessera-bg: #07090f;
     --tessera-bg-soft: #0d1118;
-    --tessera-surface: rgba(18, 23, 35, 0.82);
-    --tessera-surface-strong: rgba(23, 29, 42, 0.94);
-    --tessera-surface-stronger: rgba(26, 33, 47, 0.98);
-    --tessera-surface-muted: rgba(20, 25, 37, 0.88);
-    --tessera-border: rgba(255, 255, 255, 0.08);
-    --tessera-border-strong: rgba(255, 79, 163, 0.28);
+    --tessera-surface: rgba(15, 19, 28, 0.78);
+    --tessera-surface-strong: rgba(18, 23, 34, 0.9);
+    --tessera-surface-stronger: rgba(21, 27, 39, 0.96);
+    --tessera-surface-muted: rgba(17, 21, 31, 0.84);
+    --tessera-border: rgba(255, 255, 255, 0.07);
+    --tessera-border-strong: rgba(255, 79, 163, 0.2);
     --tessera-border-gold: rgba(231, 179, 90, 0.26);
     --tessera-text: #f5f7fb;
-    --tessera-muted: #aab2c5;
-    --tessera-subtle: #7e879b;
+    --tessera-muted: #adb5c7;
+    --tessera-subtle: #80899d;
     --tessera-pink: #ff4fb4;
     --tessera-rose: #ff6d96;
     --tessera-soft-rose: #ff8cca;
     --tessera-gold: #e7b35a;
     --tessera-cyan: #7de8ff;
-    --tessera-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
+    --tessera-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
 }
 
 [data-md-color-scheme="slate"] {
@@ -57,8 +57,8 @@ select {
 
 [data-md-color-scheme="slate"] body {
     background:
-        radial-gradient(circle at top left, rgba(255, 79, 180, 0.08), transparent 22%),
-        radial-gradient(circle at top right, rgba(231, 179, 90, 0.05), transparent 20%),
+        radial-gradient(circle at top left, rgba(255, 79, 180, 0.05), transparent 20%),
+        radial-gradient(circle at top right, rgba(231, 179, 90, 0.04), transparent 18%),
         linear-gradient(180deg, #090c13, #06080d 72%);
 }
 
@@ -67,28 +67,28 @@ select {
     position: fixed;
     inset: 0;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-    background-size: 144px 144px;
-    mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.35), transparent 88%);
+        linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px);
+    background-size: 160px 160px;
+    mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.18), transparent 88%);
     pointer-events: none;
     z-index: -1;
 }
 
 .md-grid {
-    max-width: 88rem;
+    max-width: 82rem;
 }
 
 .md-main__inner {
-    margin-top: 1.15rem;
-    gap: 1.2rem;
+    margin-top: 1rem;
+    gap: 1rem;
 }
 
 .md-header {
     background: rgba(10, 13, 19, 0.88);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
 }
 
 .md-header__title,
@@ -100,15 +100,15 @@ select {
 
 .site-announcement {
     display: block;
-    padding: 0.62rem 1rem;
+    padding: 0.58rem 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     background:
-        linear-gradient(90deg, rgba(255, 79, 180, 0.1), rgba(231, 179, 90, 0.08)),
+        linear-gradient(90deg, rgba(255, 79, 180, 0.08), rgba(231, 179, 90, 0.06)),
         rgba(9, 11, 17, 0.92);
     color: var(--tessera-text);
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-align: center;
     text-transform: uppercase;
 }
@@ -122,7 +122,7 @@ select {
 .md-search-result__meta {
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(18, 23, 35, 0.9);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 .md-search__form {
@@ -139,16 +139,18 @@ select {
 .md-typeset table:not([class]),
 .md-typeset .tabbed-set > label {
     border: 1px solid var(--tessera-border);
-    background: linear-gradient(180deg, rgba(18, 23, 35, 0.96), rgba(12, 15, 22, 0.96));
+    background: linear-gradient(180deg, rgba(18, 23, 35, 0.94), rgba(12, 15, 22, 0.94));
     box-shadow: var(--tessera-shadow);
 }
 
 .md-sidebar__scrollwrap {
-    border-radius: 1rem;
+    border-radius: 0.85rem;
+    background: transparent;
+    box-shadow: none;
 }
 
 .md-sidebar__inner {
-    padding: 0.15rem;
+    padding: 0;
 }
 
 .md-nav__title {
@@ -160,8 +162,8 @@ select {
 
 .md-nav__link {
     margin: 0.08rem 0;
-    padding: 0.38rem 0.56rem;
-    border-radius: 0.72rem;
+    padding: 0.34rem 0.5rem;
+    border-radius: 0.6rem;
     color: var(--tessera-muted);
     transition:
         background 140ms ease,
@@ -172,15 +174,15 @@ select {
 
 .md-nav__link:hover {
     color: var(--tessera-text);
-    background: rgba(255, 255, 255, 0.03);
-    transform: translateX(1px);
+    background: rgba(255, 255, 255, 0.02);
+    transform: none;
 }
 
 .md-nav__link--active,
 .md-nav__item--active > .md-nav__link {
     color: var(--tessera-text);
-    background: linear-gradient(90deg, rgba(255, 79, 180, 0.12), rgba(255, 109, 150, 0.04));
-    border: 1px solid rgba(255, 79, 180, 0.16);
+    background: linear-gradient(90deg, rgba(255, 79, 180, 0.1), rgba(255, 109, 150, 0.03));
+    border: 1px solid rgba(255, 79, 163, 0.12);
 }
 
 .md-content__inner {
@@ -188,39 +190,39 @@ select {
 }
 
 .md-typeset {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
 }
 
 .md-typeset h1,
 .md-typeset h2,
 .md-typeset h3 {
     color: var(--tessera-text);
-    font-weight: 750;
-    letter-spacing: -0.04em;
+    font-weight: 700;
+    letter-spacing: -0.045em;
 }
 
 .md-typeset h1 {
     margin-bottom: 1rem;
-    font-size: clamp(2.6rem, 5vw, 4.2rem);
+    font-size: clamp(2.4rem, 4.2vw, 3.8rem);
 }
 
 .md-typeset h2 {
-    margin-top: 3.1rem;
-    padding-top: 0.95rem;
+    margin-top: 2.8rem;
+    padding-top: 0.85rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: clamp(1.65rem, 3vw, 2.2rem);
+    font-size: clamp(1.45rem, 2.6vw, 1.95rem);
 }
 
 .md-typeset h1 + p {
-    max-width: 44rem;
+    max-width: 40rem;
     color: var(--tessera-muted);
-    font-size: 1.02rem;
+    font-size: 0.98rem;
 }
 
 .md-typeset p,
 .md-typeset li {
     color: var(--tessera-muted);
-    line-height: 1.75;
+    line-height: 1.72;
 }
 
 .md-typeset strong,
@@ -242,7 +244,7 @@ select {
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.025);
     color: var(--tessera-text);
-    font-weight: 750;
+    font-weight: 700;
     transition:
         transform 140ms ease,
         border-color 140ms ease,
@@ -252,7 +254,7 @@ select {
 .md-typeset .md-button:hover {
     transform: translateY(-1px);
     border-color: rgba(255, 79, 163, 0.36);
-    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
 }
 
 .md-typeset .md-button--primary {
@@ -260,8 +262,8 @@ select {
     border-color: transparent;
     box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.04),
-        0 0 24px rgba(255, 79, 163, 0.28),
-        0 18px 44px rgba(0, 0, 0, 0.38);
+        0 0 16px rgba(255, 79, 163, 0.18),
+        0 12px 30px rgba(0, 0, 0, 0.24);
 }
 
 .md-typeset .md-button--primary:hover {
@@ -269,7 +271,7 @@ select {
 }
 
 .md-typeset .grid.cards > ul > li {
-    border-radius: 1.1rem;
+    border-radius: 0.9rem;
     border: 1px solid var(--tessera-border);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 32%),
@@ -299,7 +301,7 @@ select {
 .md-typeset table:not([class]),
 .md-typeset .admonition,
 .md-typeset details {
-    border-radius: 1.15rem;
+    border-radius: 0.95rem;
 }
 
 .md-typeset .tabbed-set > label {

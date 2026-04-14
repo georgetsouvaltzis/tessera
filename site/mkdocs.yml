@@ -40,7 +40,7 @@ theme:
   logo: docs/assets/images/logo.svg
   favicon: docs/assets/images/favicon.svg
   font:
-    text: Plus Jakarta Sans
+    text: Inter
     code: IBM Plex Mono
   palette:
     - scheme: slate

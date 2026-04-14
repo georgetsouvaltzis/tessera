@@ -1,6 +1,6 @@
 .page-shell {
     display: grid;
-    gap: 1.5rem;
+    gap: 1.8rem;
 }
 
 .hero-panel,
@@ -13,16 +13,16 @@
 .starter-grid article,
 .showcase-grid article {
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.5rem;
+    border-radius: 1.15rem;
     background: linear-gradient(180deg, rgba(18, 23, 35, 0.96), rgba(12, 15, 22, 0.98));
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.34);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
 }
 
 .hero-panel {
     display: grid;
-    grid-template-columns: minmax(0, 1.02fr) minmax(20rem, 0.98fr);
-    gap: 1.7rem;
-    padding: 2.15rem;
+    grid-template-columns: minmax(0, 1.05fr) minmax(18rem, 0.95fr);
+    gap: 1.8rem;
+    padding: 2.3rem 2.4rem;
     overflow: hidden;
     position: relative;
 }
@@ -30,11 +30,11 @@
 .hero-panel::before {
     content: "";
     position: absolute;
-    inset: auto -8% -24% auto;
-    width: 24rem;
-    height: 24rem;
+    inset: -8rem -7rem auto auto;
+    width: 18rem;
+    height: 18rem;
     border-radius: 999px;
-    background: radial-gradient(circle, rgba(255, 79, 163, 0.18), transparent 70%);
+    background: radial-gradient(circle, rgba(255, 79, 163, 0.14), transparent 72%);
     pointer-events: none;
 }
 
@@ -54,12 +54,12 @@
 }
 
 .hero-title {
-    max-width: 35rem;
-    margin: 1rem 0 0.9rem;
-    font-size: clamp(3rem, 6vw, 5.4rem);
-    font-weight: 900;
-    letter-spacing: -0.06em;
-    line-height: 0.92;
+    max-width: 31rem;
+    margin: 1rem 0 1rem;
+    font-size: clamp(2.9rem, 5vw, 4.6rem);
+    font-weight: 800;
+    letter-spacing: -0.065em;
+    line-height: 0.96;
 }
 
 .gradient-text {
@@ -70,18 +70,18 @@
 }
 
 .hero-copy .lede {
-    max-width: 33rem;
+    max-width: 30rem;
     margin: 0;
     color: var(--tessera-muted);
     font-size: 1rem;
-    line-height: 1.75;
+    line-height: 1.68;
 }
 
 .action-row {
     display: flex;
     flex-wrap: wrap;
     gap: 0.85rem;
-    margin: 1.5rem 0 1.5rem;
+    margin: 1.6rem 0 1.7rem;
 }
 
 .trust-grid,
@@ -97,8 +97,8 @@
 }
 
 .trust-card {
-    padding: 1rem 1.05rem;
-    border-radius: 1.05rem;
+    padding: 0.95rem 1rem;
+    border-radius: 0.9rem;
     border: 1px solid rgba(255, 255, 255, 0.07);
     background: rgba(255, 255, 255, 0.025);
 }
@@ -129,10 +129,10 @@
 
 .product-stage {
     position: relative;
-    border-radius: 1.35rem;
-    padding: 1rem;
+    border-radius: 1rem;
+    padding: 0.95rem;
     background:
-        radial-gradient(circle at top right, rgba(255, 79, 163, 0.12), transparent 22%),
+        radial-gradient(circle at top right, rgba(255, 79, 163, 0.1), transparent 22%),
         linear-gradient(180deg, rgba(10, 13, 20, 0.98), rgba(13, 17, 25, 0.98));
     border: 1px solid rgba(255, 255, 255, 0.07);
 }
@@ -171,7 +171,7 @@
 .stage-actionbar,
 .code-panel {
     border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 1rem;
+    border-radius: 0.85rem;
     background: rgba(255, 255, 255, 0.025);
 }
 
@@ -180,7 +180,7 @@
 }
 
 .stage-pane--wide {
-    min-height: 10rem;
+    min-height: 9.2rem;
 }
 
 .stage-label {
@@ -194,14 +194,14 @@
 }
 
 .stage-title {
-    font-size: 1.06rem;
+    font-size: 1rem;
 }
 
 .stage-list {
     margin: 0.8rem 0 0;
     padding-left: 1rem;
     color: var(--tessera-muted);
-    line-height: 1.7;
+    line-height: 1.62;
 }
 
 .stage-meta {
@@ -215,7 +215,7 @@
 }
 
 .stage-metric strong {
-    font-size: 1.08rem;
+    font-size: 1rem;
 }
 
 .stage-metric span {
@@ -232,11 +232,11 @@
 
 .action-pill {
     display: inline-flex;
-    padding: 0.42rem 0.8rem;
+    padding: 0.38rem 0.74rem;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.75rem;
-    font-weight: 800;
+    font-size: 0.72rem;
+    font-weight: 700;
 }
 
 .action-pill--pink {
@@ -258,7 +258,7 @@
 .overview-band,
 .split-band,
 .support-band {
-    padding: 1.45rem;
+    padding: 1.35rem 1.4rem;
 }
 
 .section-head {
@@ -266,7 +266,7 @@
     align-items: end;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.05rem;
 }
 
 .section-head h2,
@@ -291,7 +291,7 @@
 .overview-proof > article,
 .starter-grid article,
 .showcase-grid article {
-    padding: 1rem 1.05rem;
+    padding: 0.95rem 1rem;
 }
 
 .starter-grid,
@@ -305,30 +305,30 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.8rem;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.7rem;
 }
 
 .starter-card__tag,
 .showcase-card__tag {
-    padding: 0.28rem 0.6rem;
+    padding: 0.24rem 0.52rem;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.04);
     color: var(--tessera-subtle);
-    font-size: 0.7rem;
-    font-weight: 800;
+    font-size: 0.66rem;
+    font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
 .command-line {
     margin-top: 1rem;
-    padding: 0.88rem 1rem;
-    border-radius: 1rem;
+    padding: 0.82rem 0.9rem;
+    border-radius: 0.8rem;
     border: 1px solid rgba(255, 255, 255, 0.07);
     background: rgba(8, 10, 15, 0.9);
     color: #ffc8e7;
     font-family: "JetBrains Mono", monospace;
-    font-size: 0.79rem;
+    font-size: 0.76rem;
 }
 
 .overview-band {
@@ -355,14 +355,14 @@
 }
 
 .workflow-step {
-    padding: 0.95rem 1rem;
-    border-radius: 1rem;
+    padding: 0.92rem 0.96rem;
+    border-radius: 0.85rem;
     border: 1px solid rgba(255, 255, 255, 0.07);
     background: rgba(255, 255, 255, 0.025);
 }
 
 .code-panel {
-    padding: 1rem 1.1rem;
+    padding: 0.95rem 1rem;
 }
 
 .code-panel pre {
@@ -402,11 +402,11 @@
     .overview-band,
     .split-band,
     .support-band {
-        padding: 1.1rem;
+        padding: 1rem;
     }
 
     .hero-title {
-        font-size: 2.6rem;
+        font-size: 2.45rem;
     }
 
     .section-head {
