@@ -1,6 +1,7 @@
-# Tessera Site
+# Tessera Docs Site
 
-This directory contains the MkDocs Material configuration for the public Tessera docs site.
+This directory contains the MkDocs configuration for the documentation site only.
+The marketing landing page lives in `web/`.
 
 The actual content source is the repository root:
 
@@ -12,7 +13,7 @@ The actual content source is the repository root:
 - `SECURITY.md`
 - `docs/`
 
-## Local development
+## Local docs development
 
 ```bash
 cd site

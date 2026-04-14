@@ -12,3 +12,6 @@ site/node_modules/
 site/.docusaurus/
 site/build/
 site/.venv/
+web/node_modules/
+web/.next/
+web/out/

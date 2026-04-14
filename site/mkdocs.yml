@@ -22,7 +22,9 @@ exclude_docs: |
   site/**
   src/**
   tests/**
+  web/**
   *.DotSettings
+  *.user
   *.cs
   *.csproj
   *.props
@@ -40,8 +42,8 @@ theme:
   logo: docs/assets/images/logo.svg
   favicon: docs/assets/images/favicon.svg
   font:
-    text: Sora
-    code: JetBrains Mono
+    text: Inter
+    code: IBM Plex Mono
   palette:
     - scheme: slate
       primary: black
@@ -109,7 +111,6 @@ markdown_extensions:
 
 extra_css:
   - docs/assets/stylesheets/extra.css
-  - docs/assets/stylesheets/home.css
   - docs/assets/stylesheets/landing.css
 
 copyright: Copyright &copy; 2026 Tessera

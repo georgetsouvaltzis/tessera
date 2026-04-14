@@ -1,0 +1,57 @@
+:root {
+    color-scheme: dark;
+    --font-sans: "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+    --page-bg: #07090d;
+    --page-bg-soft: #0b0f16;
+    --surface: rgba(16, 20, 28, 0.9);
+    --surface-strong: rgba(18, 24, 35, 0.96);
+    --surface-muted: rgba(255, 255, 255, 0.025);
+    --border: rgba(255, 255, 255, 0.09);
+    --text: #f5f7fb;
+    --muted: #9ea8bc;
+    --subtle: #7d8698;
+    --rose: #ff4fa3;
+    --rose-soft: #ff7ec5;
+    --gold: #e6b45c;
+    --cyan: #74ddff;
+    --shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background:
+        radial-gradient(circle at top center, rgba(255, 79, 163, 0.08), transparent 24%),
+        linear-gradient(180deg, #090b10, #06080c 70%);
+    color: var(--text);
+    font-family: var(--font-sans), sans-serif;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent 90%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+a {
+    color: inherit;
+}
+
+code {
+    font-family: var(--font-mono), monospace;
+}

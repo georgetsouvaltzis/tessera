@@ -15,6 +15,7 @@ on:
       - 'SECURITY.md'
       - 'docs/**'
       - 'site/**'
+      - 'web/**'
   pull_request:
     paths:
       - '.github/workflows/site.yml'
@@ -26,6 +27,7 @@ on:
       - 'SECURITY.md'
       - 'docs/**'
       - 'site/**'
+      - 'web/**'
   workflow_dispatch:
 
 permissions:
@@ -41,10 +43,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      TESSERA_SITE_DIR: ${{ runner.temp }}/tessera-site-build
+      PAGES_BASE_PATH: /${{ github.event.repository.name }}
+      TESSERA_DOCS_BUILD_DIR: ${{ runner.temp }}/tessera-docs-build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -56,16 +66,31 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Install dependencies
+      - name: Install docs dependencies
         run: pip install -r site/requirements-docs.txt
 
-      - name: Build site
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Build landing page
+        working-directory: web
+        run: npm run build
+
+      - name: Build docs
         run: mkdocs build -f site/mkdocs.yml --strict
+        env:
+          TESSERA_SITE_DIR: ${{ env.TESSERA_DOCS_BUILD_DIR }}
+
+      - name: Merge docs into landing output
+        run: |
+          mkdir -p web/out/docs
+          cp -R "${TESSERA_DOCS_BUILD_DIR}/." web/out/docs/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ runner.temp }}/tessera-site-build
+          path: web/out
 
   deploy:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
