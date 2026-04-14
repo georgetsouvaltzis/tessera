@@ -1,7 +1,6 @@
 # Tessera Docs Site
 
-This directory contains the MkDocs configuration for the documentation site only.
-The marketing landing page lives in `web/`.
+This directory contains the MkDocs configuration for the public Tessera site.
 
 The actual content source is the repository root:
 
@@ -24,7 +23,6 @@ mkdocs serve -f mkdocs.yml
 ```
 
 The docs server runs at `http://127.0.0.1:8000/`.
-The Next.js landing page in `web/` links to this origin automatically during local development.
 
 ## Verification
 

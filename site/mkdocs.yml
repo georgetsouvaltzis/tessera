@@ -22,7 +22,6 @@ exclude_docs: |
   site/**
   src/**
   tests/**
-  web/**
   *.DotSettings
   *.user
   *.cs

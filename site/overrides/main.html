@@ -1,7 +1,72 @@
 {% extends "base.html" %}
 
 {% block announce %}
-  <a class="site-announcement" href="{{ 'docs/getting-started/' | url }}">
-    Public alpha · C#-first terminal UI for serious tools
-  </a>
+  {% if not page.is_homepage %}
+    <a class="site-announcement" href="{{ 'docs/getting-started/' | url }}">
+      Public alpha · C#-first terminal UI for serious tools
+    </a>
+  {% endif %}
+{% endblock %}
+
+{% block header %}
+  {% if page.is_homepage %}
+    <header class="t-home-header">
+      <div class="md-grid t-home-header__inner">
+        <a class="t-home-brand" href="{{ '' | url }}" aria-label="{{ config.site_name }}">
+          <span class="t-home-brand__mark">{% include "partials/logo.html" %}</span>
+          <span class="t-home-brand__name">{{ config.site_name }}</span>
+        </a>
+        <nav class="t-home-nav" aria-label="Primary">
+          <a href="{{ 'docs/getting-started/' | url }}">Start here</a>
+          <a href="{{ 'docs/examples/' | url }}">Examples</a>
+          <a href="{{ 'docs/overview/' | url }}">Docs</a>
+        </nav>
+        <div class="t-home-header__actions">
+          <a class="t-home-header__link" href="https://github.com/georgetsouvaltzis/teasharp">GitHub</a>
+          <a class="t-home-header__cta" href="{{ 'docs/getting-started/' | url }}">Start here</a>
+        </div>
+      </div>
+    </header>
+  {% else %}
+    {% include "partials/header.html" %}
+  {% endif %}
+{% endblock %}
+
+{% block site_nav %}
+  {% if not page.is_homepage %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block container %}
+  {% if page.is_homepage %}
+    <div class="md-content t-home-content" data-md-component="content">
+      <article class="md-typeset t-home-content__inner">
+        {% include "partials/content.html" %}
+      </article>
+    </div>
+    {% include "partials/javascripts/content.html" %}
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block footer %}
+  {% if page.is_homepage %}
+    <footer class="t-home-footer">
+      <div class="md-grid t-home-footer__inner">
+        <div>
+          <strong>Tessera</strong>
+          <span>C#-first terminal UI for serious tools.</span>
+        </div>
+        <div class="t-home-footer__links">
+          <a href="{{ 'docs/getting-started/' | url }}">Getting started</a>
+          <a href="{{ 'docs/examples/' | url }}">Example guide</a>
+          <a href="{{ 'docs/overview/' | url }}">Overview</a>
+        </div>
+      </div>
+    </footer>
+  {% else %}
+    {{ super() }}
+  {% endif %}
 {% endblock %}
