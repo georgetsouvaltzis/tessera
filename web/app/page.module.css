@@ -18,10 +18,9 @@
 }
 
 .headerShell {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.1rem;
     min-height: 3.35rem;
     padding: 0 0.9rem;
     border: 1px solid var(--border);
@@ -67,8 +66,9 @@
 }
 
 .primaryNav {
-    justify-content: center;
+    justify-content: flex-start;
     gap: 1rem;
+    margin-left: 2rem;
 }
 
 .primaryNav a,
@@ -94,6 +94,7 @@
 .headerActions {
     justify-content: flex-end;
     gap: 0.8rem;
+    margin-left: auto;
 }
 
 .headerCta,
@@ -421,7 +422,6 @@
 }
 
 @media (max-width: 960px) {
-    .headerShell,
     .hero,
     .cardGrid {
         grid-template-columns: 1fr;
@@ -429,10 +429,17 @@
 
     .primaryNav {
         justify-content: flex-start;
+        margin-left: 0;
     }
 
     .headerShell {
+        display: grid;
+        grid-template-columns: 1fr;
         gap: 0.9rem;
+    }
+
+    .headerActions {
+        margin-left: 0;
     }
 }
 
