@@ -15,7 +15,7 @@ export function appHref(path: string): string {
 export function docsHref(path: string = "/"): string {
     const normalized = path === "/" ? "/" : path.startsWith("/") ? path : `/${path}`;
     if (docsOrigin.length > 0) {
-        return `${docsOrigin}${normalized}`;
+        return normalized === "/" ? `${docsOrigin}/` : `${docsOrigin}/docs${normalized}`;
     }
 
     return `${basePath}/docs${normalized === "/" ? "/" : normalized}`;
