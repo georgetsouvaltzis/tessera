@@ -3,9 +3,7 @@ import { appHref, docsHref } from "@/lib/site";
 import styles from "@/app/page.module.css";
 
 const primaryLinks = [
-    { label: "Getting started", href: docsHref("/getting-started/") },
-    { label: "Showcase", href: docsHref("/showcase/") },
-    { label: "Theming", href: docsHref("/theme-system/") },
+    { label: "Start here", href: docsHref("/getting-started/") },
     { label: "Docs", href: docsHref("/") },
 ];
 
@@ -27,11 +25,11 @@ export function SiteHeader() {
                     ))}
                 </nav>
                 <div className={styles.headerActions}>
-                    <Link className={styles.headerGhost} href={docsHref("/overview/")}>
-                        Overview
-                    </Link>
+                    <a className={styles.headerGhost} href="https://github.com/georgetsouvaltzis/teasharp">
+                        GitHub
+                    </a>
                     <Link className={styles.headerCta} href={docsHref("/getting-started/")}>
-                        Get started
+                        Start here
                     </Link>
                 </div>
             </div>

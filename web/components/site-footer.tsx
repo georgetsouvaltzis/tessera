@@ -8,12 +8,12 @@ export function SiteFooter() {
             <div className={styles.footerShell}>
                 <div>
                     <strong>Tessera</strong>
-                    <span>C#-first terminal UI for real software surfaces.</span>
+                    <span>Start with the three public examples. Scale later.</span>
                 </div>
                 <nav className={styles.footerLinks} aria-label="Footer">
                     <Link href={docsHref("/getting-started/")}>Getting started</Link>
-                    <Link href={docsHref("/showcase/")}>Showcase</Link>
-                    <Link href={docsHref("/public-api-guidelines/")}>Public API</Link>
+                    <Link href={docsHref("/examples/")}>Example guide</Link>
+                    <a href="https://github.com/georgetsouvaltzis/teasharp">GitHub</a>
                 </nav>
             </div>
         </footer>

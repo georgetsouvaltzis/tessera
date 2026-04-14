@@ -1,21 +1,22 @@
 :root {
     color-scheme: dark;
-    --font-sans: "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-display: "Space Grotesk", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
     --page-bg: #07090d;
     --page-bg-soft: #0b0f16;
-    --surface: rgba(16, 20, 28, 0.9);
-    --surface-strong: rgba(18, 24, 35, 0.96);
-    --surface-muted: rgba(255, 255, 255, 0.025);
-    --border: rgba(255, 255, 255, 0.09);
+    --surface: rgba(14, 17, 24, 0.9);
+    --surface-strong: rgba(17, 21, 30, 0.96);
+    --surface-muted: rgba(255, 255, 255, 0.02);
+    --border: rgba(255, 255, 255, 0.08);
     --text: #f5f7fb;
-    --muted: #9ea8bc;
-    --subtle: #7d8698;
-    --rose: #ff4fa3;
-    --rose-soft: #ff7ec5;
-    --gold: #e6b45c;
-    --cyan: #74ddff;
-    --shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+    --muted: #9da6ba;
+    --subtle: #7f8798;
+    --rose: #ff4db4;
+    --rose-soft: #ff80ca;
+    --gold: #e0ab54;
+    --cyan: #6bd0ff;
+    --shadow: 0 30px 72px rgba(0, 0, 0, 0.24);
 }
 
 * {
@@ -29,10 +30,11 @@ html {
 body {
     margin: 0;
     background:
-        radial-gradient(circle at top center, rgba(255, 79, 163, 0.08), transparent 24%),
+        radial-gradient(circle at top center, rgba(255, 77, 180, 0.08), transparent 24%),
         linear-gradient(180deg, #090b10, #06080c 70%);
     color: var(--text);
     font-family: var(--font-sans), sans-serif;
+    overflow-x: clip;
 }
 
 body::before {
@@ -40,10 +42,10 @@ body::before {
     position: fixed;
     inset: 0;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent 90%);
+        linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.026) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.56), transparent 92%);
     pointer-events: none;
     z-index: -1;
 }
