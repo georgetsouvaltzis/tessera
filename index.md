@@ -1,168 +1,156 @@
 ---
 title: Tessera
+description: Build terminal software that feels like a real product from the first run.
 hide:
   - navigation
   - toc
   - path
 ---
 
-<div class="page-shell page-shell--landing">
-  <section class="hero-panel">
-    <div class="hero-copy">
-      <span class="eyebrow">Public alpha · .NET 10 · C# first</span>
-      <h1 class="hero-title">Ship terminal software with <span class="gradient-text">product-grade taste.</span></h1>
-      <p class="lede">
+<div class="home-shell">
+  <section class="home-hero">
+    <div class="home-copy">
+      <span class="home-badge">Public alpha · .NET 10 · C# first</span>
+      <h1 class="home-title">Build terminal software with <span class="home-title__accent">real product taste.</span></h1>
+      <p class="home-lede">
         Tessera gives you a compact public app model, first-class controls and layouts, semantic theming,
-        and showcase apps that read like products instead of demos.
+        and polished examples that already feel like tools instead of framework demos.
       </p>
-      <div class="action-row">
-        <a class="md-button md-button--primary" href="docs/getting-started/">Start here</a>
+      <div class="home-actions">
+        <a class="md-button md-button--primary" href="docs/getting-started/">Get started</a>
         <a class="md-button" href="docs/showcase/">See the showcase</a>
       </div>
-      <div class="trust-grid">
-        <div class="trust-card">
-          <strong>.NET 10</strong>
-          <span>single pinned SDK, library-first startup path</span>
-        </div>
-        <div class="trust-card">
-          <strong>C# object model</strong>
-          <span>explicit screens, layouts, controls, and messages</span>
-        </div>
-        <div class="trust-card">
-          <strong>Public alpha</strong>
-          <span>ready for evaluation, contribution, and early product work</span>
-        </div>
-      </div>
+      <ul class="home-proof">
+        <li>library-first startup path</li>
+        <li>semantic theming built in</li>
+        <li>real examples, not widget dumps</li>
+      </ul>
     </div>
-    <div class="product-stage">
-      <div class="stage-topline">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <div class="stage-grid">
-        <div class="stage-pane stage-pane--wide">
-          <span class="stage-label">WorkspaceApp</span>
-          <div class="stage-title">Editor · Preview · Action rail</div>
-          <div class="stage-copy">A multi-pane starter that already feels like a real workflow shell.</div>
-          <ul class="stage-list">
-            <li>query composer and action dock</li>
-            <li>preview rail and focused editing zone</li>
-            <li>theme-aware controls, not ad hoc styling</li>
+    <div class="home-terminal">
+      <div class="home-terminal__frame">
+        <div class="home-terminal__bar">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="home-terminal__body">
+          <span class="home-terminal__eyebrow">WorkspaceApp</span>
+          <h2 class="home-terminal__title">Editor. Preview. Actions. One cohesive shell.</h2>
+          <p class="home-terminal__copy">
+            A starter application that already reads like a shipping workflow surface.
+          </p>
+          <div class="home-command">dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj</div>
+          <div class="home-chip-row">
+            <span class="home-chip home-chip--rose">semantic theming</span>
+            <span class="home-chip home-chip--gold">built-in controls</span>
+            <span class="home-chip home-chip--cyan">message-driven updates</span>
+          </div>
+          <ul class="home-terminal__list">
+            <li>focused editing zone with preview rail</li>
+            <li>action dock and navigation flow already in place</li>
+            <li>small public API, no host-heavy ceremony</li>
           </ul>
         </div>
-        <div class="stage-meta">
-          <div class="stage-metric">
-            <strong>Starter ladder</strong>
-            <span>HelloWorld → CounterForm → WorkspaceApp</span>
-          </div>
-          <div class="stage-metric">
-            <strong>Flagships</strong>
-            <span>GitConsole · OpsWatch · DataWorkbench</span>
-          </div>
-        </div>
-        <div class="stage-actionbar">
-          <span class="action-pill action-pill--pink">semantic theming</span>
-          <span class="action-pill action-pill--gold">built-in controls</span>
-          <span class="action-pill action-pill--cyan">message-driven updates</span>
-        </div>
       </div>
     </div>
   </section>
 
-  <section class="section-block">
-    <div class="section-head">
-      <div>
-        <span class="section-kicker">Start with the public path</span>
-        <h2>From first run to richer application surfaces.</h2>
-      </div>
-      <p>The docs site should help you evaluate the framework quickly, then deepen only where you need detail.</p>
+  <section class="home-band">
+    <article>
+      <strong>Small public model</strong>
+      <span>Start with explicit screens, layouts, controls, and messages. No nested DSL maze.</span>
+    </article>
+    <article>
+      <strong>Theme it intentionally</strong>
+      <span>Tessera treats tokens and control overrides as real API, not last-mile hacks.</span>
+    </article>
+    <article>
+      <strong>Scale into richer shells</strong>
+      <span>Move from the starter ladder into dashboards and workbenches without leaving the same public path.</span>
+    </article>
+  </section>
+
+  <section class="home-section">
+    <div class="home-section__head">
+      <span class="home-section__kicker">Starter ladder</span>
+      <h2>Three examples. One deliberate learning curve.</h2>
+      <p>
+        Learn the public path in sequence, then open the denser showcases when you want the full picture.
+      </p>
     </div>
-    <div class="signal-row">
-      <article class="signal-card">
-        <strong>Run the starter ladder</strong>
-        <span>Start with <code>HelloWorld</code>, <code>CounterForm</code>, and <code>WorkspaceApp</code> before opening the larger showcases.</span>
+    <div class="home-grid">
+      <article class="home-example">
+        <span class="home-example__eyebrow">starter</span>
+        <h3>HelloWorld</h3>
+        <p>Centered first screen, first action button, first status line, first polished terminal surface.</p>
+        <div class="home-example__meta">
+          <span class="home-chip home-chip--rose">layout</span>
+          <span class="home-chip">button flow</span>
+        </div>
+        <div class="home-example__command">dotnet run --project examples/HelloWorld/HelloWorld.csproj</div>
       </article>
-      <article class="signal-card">
-        <strong>Theme it intentionally</strong>
-        <span>Tessera treats tokens and control overrides as first-class public API, not last-mile hacks.</span>
+      <article class="home-example">
+        <span class="home-example__eyebrow">interactive</span>
+        <h3>CounterForm</h3>
+        <p>Inputs, selection, progress, and message-driven updates without leaving the small public surface.</p>
+        <div class="home-example__meta">
+          <span class="home-chip home-chip--gold">state</span>
+          <span class="home-chip">controls</span>
+        </div>
+        <div class="home-example__command">dotnet run --project examples/CounterForm/CounterForm.csproj</div>
       </article>
-      <article class="signal-card">
-        <strong>Evaluate bigger shells</strong>
-        <span>Move into <code>GitConsole</code>, <code>OpsWatch</code>, and <code>DataWorkbench</code> when you want the fuller picture.</span>
+      <article class="home-example">
+        <span class="home-example__eyebrow">multi-pane</span>
+        <h3>WorkspaceApp</h3>
+        <p>Navigation, preview, editing, and action rails inside one shell that already feels product-ready.</p>
+        <div class="home-example__meta">
+          <span class="home-chip home-chip--cyan">composition</span>
+          <span class="home-chip">workflow</span>
+        </div>
+        <div class="home-example__command">dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj</div>
       </article>
     </div>
   </section>
 
-  <section class="section-block">
-    <div class="section-head">
-      <div>
-        <span class="section-kicker">Starter ladder</span>
-        <h2>Three examples. One deliberate learning curve.</h2>
-      </div>
-      <p>Each example is there to teach one level of app composition, not to dump the entire widget surface on first contact.</p>
+  <section class="home-section">
+    <div class="home-section__head">
+      <span class="home-section__kicker">Flagship examples</span>
+      <h2>See how the same model scales up.</h2>
+      <p>
+        Use the flagships to evaluate denser dashboards, command-heavy flows, and workbench-style product shells.
+      </p>
     </div>
-    <div class="starter-grid">
-      <article>
-        <div class="starter-card__header">
-          <strong class="starter-card__title">HelloWorld</strong>
-          <span class="starter-card__tag">starter</span>
-        </div>
-        <span class="starter-card__copy">Centered layout, first button activation, first status line, first polished screen.</span>
-        <div class="command-line">dotnet run --project examples/HelloWorld/HelloWorld.csproj</div>
+    <div class="home-grid">
+      <article class="home-example">
+        <span class="home-example__eyebrow">workflow</span>
+        <h3>GitConsole</h3>
+        <p>Command-driven workflow surface with editing, diff review, and action history.</p>
+        <div class="home-example__command">dotnet run --project examples/GitConsole/GitConsole.csproj</div>
       </article>
-      <article>
-        <div class="starter-card__header">
-          <strong class="starter-card__title">CounterForm</strong>
-          <span class="starter-card__tag">interactive</span>
-        </div>
-        <span class="starter-card__copy">Inputs, choice, progress, and message-driven updates without leaving the small public path.</span>
-        <div class="command-line">dotnet run --project examples/CounterForm/CounterForm.csproj</div>
+      <article class="home-example">
+        <span class="home-example__eyebrow">dashboard</span>
+        <h3>OpsWatch</h3>
+        <p>Telemetry rails, alerts, chips, and operator actions in a dense operations shell.</p>
+        <div class="home-example__command">dotnet run --project examples/OpsWatch/OpsWatch.csproj</div>
       </article>
-      <article>
-        <div class="starter-card__header">
-          <strong class="starter-card__title">WorkspaceApp</strong>
-          <span class="starter-card__tag">multi-pane</span>
-        </div>
-        <span class="starter-card__copy">Navigation, preview, editing, and actions inside one cohesive shell.</span>
-        <div class="command-line">dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj</div>
+      <article class="home-example">
+        <span class="home-example__eyebrow">workbench</span>
+        <h3>DataWorkbench</h3>
+        <p>Multi-pane composition, richer state orchestration, and pointer-ready runtime configuration.</p>
+        <div class="home-example__command">dotnet run --project examples/DataWorkbench/DataWorkbench.csproj</div>
       </article>
     </div>
   </section>
 
-  <section class="section-block">
-    <div class="section-head">
-      <div>
-        <span class="section-kicker">Flagship examples</span>
-        <h2>See how the public model scales up.</h2>
-      </div>
-      <p>Flagships are the evaluation lane for denser dashboards, command workflows, and workbench-style shells.</p>
-    </div>
-    <div class="showcase-grid">
-      <article>
-        <div class="showcase-card__header">
-          <strong class="showcase-card__title">GitConsole</strong>
-          <span class="showcase-card__tag">workflow</span>
-        </div>
-        <span class="showcase-card__copy">Command-driven workflow surface with editing, diff review, and action history.</span>
-        <div class="command-line">dotnet run --project examples/GitConsole/GitConsole.csproj</div>
-      </article>
-      <article>
-        <div class="showcase-card__header">
-          <strong class="showcase-card__title">OpsWatch</strong>
-          <span class="showcase-card__tag">dashboard</span>
-        </div>
-        <span class="showcase-card__copy">Telemetry rails, alerts, chips, and operator actions in a dense operations shell.</span>
-        <div class="command-line">dotnet run --project examples/OpsWatch/OpsWatch.csproj</div>
-      </article>
-      <article>
-        <div class="showcase-card__header">
-          <strong class="showcase-card__title">DataWorkbench</strong>
-          <span class="showcase-card__tag">workbench</span>
-        </div>
-        <span class="showcase-card__copy">Multi-pane composition, richer state orchestration, and pointer-ready runtime configuration.</span>
-        <div class="command-line">dotnet run --project examples/DataWorkbench/DataWorkbench.csproj</div>
-      </article>
+  <section class="home-cta">
+    <span class="home-section__kicker">Public path</span>
+    <h2>Start with the docs. Then run something real.</h2>
+    <p>
+      The best way to evaluate Tessera is to open the starter ladder, then run the showcase apps and judge the shape of the product shells yourself.
+    </p>
+    <div class="home-actions">
+      <a class="md-button md-button--primary" href="docs/getting-started/">Read the docs</a>
+      <a class="md-button" href="docs/overview/">See the overview</a>
     </div>
   </section>
 </div>

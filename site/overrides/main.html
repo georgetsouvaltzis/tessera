@@ -1,7 +1,78 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+  {{ super() }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap">
+{% endblock %}
+
 {% block announce %}
   <a class="site-announcement" href="{{ 'docs/getting-started/' | url }}">
     Public alpha · C#-first terminal UI for serious tools
   </a>
+{% endblock %}
+
+{% block header %}
+  {% if page.is_homepage %}
+    <header class="t-home-header">
+      <div class="md-grid t-home-header__inner">
+        <a class="t-home-brand" href="{{ '' | url }}" aria-label="{{ config.site_name }}">
+          <span class="t-home-brand__mark">{% include "partials/logo.html" %}</span>
+          <span class="t-home-brand__name">{{ config.site_name }}</span>
+        </a>
+        <nav class="t-home-nav" aria-label="Primary">
+          <a href="{{ 'docs/getting-started/' | url }}">Start here</a>
+          <a href="{{ 'docs/showcase/' | url }}">Showcase</a>
+          <a href="{{ 'docs/theme-system/' | url }}">Theming</a>
+          <a href="{{ 'docs/public-api-guidelines/' | url }}">API</a>
+        </nav>
+        <div class="t-home-header__actions">
+          <a class="t-home-header__link" href="{{ 'docs/overview/' | url }}">Docs</a>
+          <a class="t-home-header__cta" href="{{ 'docs/getting-started/' | url }}">Get started</a>
+        </div>
+      </div>
+    </header>
+  {% else %}
+    {% include "partials/header.html" %}
+  {% endif %}
+{% endblock %}
+
+{% block site_nav %}
+  {% if not page.is_homepage %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block container %}
+  {% if page.is_homepage %}
+    <div class="md-content t-home-content" data-md-component="content">
+      <article class="md-typeset t-home-content__inner">
+        {% include "partials/content.html" %}
+      </article>
+    </div>
+    {% include "partials/javascripts/content.html" %}
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block footer %}
+  {% if page.is_homepage %}
+    <footer class="t-home-footer">
+      <div class="md-grid t-home-footer__inner">
+        <div>
+          <strong>Tessera</strong>
+          <span>C#-first terminal UI for real product surfaces.</span>
+        </div>
+        <div class="t-home-footer__links">
+          <a href="{{ 'docs/getting-started/' | url }}">Getting started</a>
+          <a href="{{ 'docs/showcase/' | url }}">Showcase</a>
+          <a href="{{ 'docs/public-api-guidelines/' | url }}">Public API</a>
+        </div>
+      </div>
+    </footer>
+  {% else %}
+    {{ super() }}
+  {% endif %}
 {% endblock %}

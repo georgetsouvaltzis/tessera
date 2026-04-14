@@ -40,7 +40,7 @@ theme:
   logo: docs/assets/images/logo.svg
   favicon: docs/assets/images/favicon.svg
   font:
-    text: Inter
+    text: Plus Jakarta Sans
     code: IBM Plex Mono
   palette:
     - scheme: slate
@@ -109,6 +109,7 @@ markdown_extensions:
 
 extra_css:
   - docs/assets/stylesheets/extra.css
+  - docs/assets/stylesheets/home.css
   - docs/assets/stylesheets/landing.css
 
 copyright: Copyright &copy; 2026 Tessera
