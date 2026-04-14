@@ -35,32 +35,46 @@ export default function HomePage() {
             <main className={styles.main}>
                 <section className={styles.hero}>
                     <div className={styles.heroCopy}>
-                        <span className={styles.heroBadge}>Public alpha · .NET 10 · C# first</span>
+                        <span className={styles.heroBadge}>
+                            <span className={styles.heroBadgeDot} aria-hidden="true" />
+                            v1.0.0-alpha.1 — Public Preview
+                        </span>
                         <h1>
                             <span className={styles.heroLeadLine}>C# Terminal UI.</span>
-                            One clean way in.
-                            <span> Start with three examples.</span>
+                            Small public path.
+                            <span> Serious product feel.</span>
                         </h1>
                         <p>
-                            Tessera is a C#-first terminal UI framework with a deliberate public
-                            path. Open HelloWorld, then CounterForm, then WorkspaceApp. Everything
-                            else should come after that.
+                            Start with HelloWorld, then CounterForm, then WorkspaceApp. That is
+                            the intended public path into Tessera before you open any denser
+                            dashboards or workbenches.
                         </p>
                         <div className={styles.heroActions}>
                             <Link className={styles.primaryButton} href={docsHref("/getting-started/")}>
-                                Open the starter path
+                                Start here
                             </Link>
-                            <Link className={styles.secondaryButton} href={docsHref("/")}>
-                                Read the docs
-                            </Link>
+                            <a className={styles.secondaryButton} href="https://github.com/georgetsouvaltzis/teasharp">
+                                GitHub
+                            </a>
                         </div>
-                        <ul className={styles.heroProof}>
-                            <li>HelloWorld → CounterForm → WorkspaceApp</li>
-                            <li>library-first startup path</li>
-                            <li>examples that already look serious</li>
-                        </ul>
+                        <div className={styles.heroNote}>
+                            <span>Public path</span>
+                            <p>HelloWorld → CounterForm → WorkspaceApp</p>
+                        </div>
+                        <div className={styles.quickLinks}>
+                            <Link href={docsHref("/getting-started/")}>Getting started</Link>
+                            <Link href={docsHref("/examples/")}>Example guide</Link>
+                            <Link href={docsHref("/overview/")}>Overview</Link>
+                            <Link href={docsHref("/showcase/")}>Showcase</Link>
+                        </div>
                     </div>
-                    <TerminalPreview />
+                    <div className={styles.heroPanel}>
+                        <TerminalPreview />
+                        <div className={styles.heroPanelNote}>
+                            <strong>Start with the starter ladder.</strong>
+                            <p>Open the showcase only after the first three examples feel obvious.</p>
+                        </div>
+                    </div>
                 </section>
 
                 <section className={styles.section}>
@@ -73,11 +87,6 @@ export default function HomePage() {
                         {starterExamples.map((example) => (
                             <ExampleCard key={example.title} {...example} />
                         ))}
-                    </div>
-                    <div className={styles.quickLinks}>
-                        <Link href={docsHref("/getting-started/")}>Getting started</Link>
-                        <Link href={docsHref("/examples/")}>Example guide</Link>
-                        <Link href={docsHref("/overview/")}>Overview</Link>
                     </div>
                 </section>
             </main>

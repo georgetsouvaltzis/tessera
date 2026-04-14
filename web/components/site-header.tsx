@@ -25,12 +25,16 @@ export function SiteHeader() {
                     ))}
                 </nav>
                 <div className={styles.headerActions}>
+                    <Link className={styles.headerSearch} href={docsHref("/")}>
+                        <span className={styles.searchIcon} aria-hidden="true">
+                            ⌕
+                        </span>
+                        <span>Search</span>
+                        <span className={styles.searchKey}>K</span>
+                    </Link>
                     <a className={styles.headerGhost} href="https://github.com/georgetsouvaltzis/teasharp">
                         GitHub
                     </a>
-                    <Link className={styles.headerCta} href={docsHref("/getting-started/")}>
-                        Start here
-                    </Link>
                 </div>
             </div>
         </header>

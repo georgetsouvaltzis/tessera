@@ -3,11 +3,11 @@
 }
 
 .header {
-    position: sticky;
-    top: 0;
     z-index: 20;
-    padding: 0.7rem 1.25rem 0;
-    background: linear-gradient(180deg, rgba(7, 9, 13, 0.96), rgba(7, 9, 13, 0));
+    padding: 0 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(11, 13, 18, 0.94);
+    backdrop-filter: blur(8px);
 }
 
 .headerShell,
@@ -21,13 +21,8 @@
     display: flex;
     align-items: center;
     gap: 1.1rem;
-    min-height: 3.35rem;
-    padding: 0 0.9rem;
-    border: 1px solid var(--border);
-    border-radius: 1rem;
-    background: rgba(10, 13, 19, 0.82);
-    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.14);
-    backdrop-filter: blur(12px);
+    min-height: 4rem;
+    padding: 0;
 }
 
 .brand {
@@ -42,7 +37,7 @@
     place-items: center;
     width: 1.12rem;
     height: 1.12rem;
-    color: var(--rose-soft);
+    color: var(--rose-neon);
     font-size: 0.95rem;
     text-shadow: 0 0 14px rgba(255, 65, 184, 0.4);
 }
@@ -67,8 +62,8 @@
 
 .primaryNav {
     justify-content: flex-start;
-    gap: 1rem;
-    margin-left: 2rem;
+    gap: 1.35rem;
+    margin-left: 1.35rem;
 }
 
 .primaryNav a,
@@ -93,8 +88,47 @@
 
 .headerActions {
     justify-content: flex-end;
-    gap: 0.8rem;
+    gap: 1rem;
     margin-left: auto;
+}
+
+.headerSearch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 2.55rem;
+    padding: 0 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--subtle);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.headerSearch:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--text);
+}
+
+.searchIcon {
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.searchKey {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.4rem;
+    padding: 0 0.3rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.45rem;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--subtle);
+    font-family: var(--font-mono), monospace;
+    font-size: 0.72rem;
 }
 
 .headerCta,
@@ -156,15 +190,16 @@
 .main {
     display: grid;
     gap: 3.6rem;
-    padding: 1.9rem 1.25rem 4rem;
+    padding: 2.2rem 1.25rem 4rem;
 }
 
 .hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(22rem, 31rem);
-    gap: clamp(2rem, 4.5vw, 3.5rem);
-    align-items: center;
-    min-height: min(35rem, calc(100vh - 8rem));
+    grid-template-columns: minmax(0, 31rem) minmax(22rem, 34rem);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+    justify-content: space-between;
+    padding-top: 1.2rem;
 }
 
 .heroCopy,
@@ -174,7 +209,7 @@
 }
 
 .heroCopy {
-    max-width: 39rem;
+    max-width: 31rem;
 }
 
 .heroBadge,
@@ -196,12 +231,21 @@
     text-transform: uppercase;
 }
 
+.heroBadgeDot {
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-right: 0.55rem;
+    border-radius: 999px;
+    background: var(--rose-neon);
+    box-shadow: 0 0 12px rgba(255, 53, 194, 0.4);
+}
+
 .heroCopy h1 {
     display: grid;
     gap: 0.1em;
-    margin: 1rem 0 1rem;
+    margin: 1rem 0 1.15rem;
     font-family: var(--font-display), sans-serif;
-    font-size: clamp(3rem, 6.8vw, 5.1rem);
+    font-size: clamp(3.15rem, 6.6vw, 5.2rem);
     font-weight: 700;
     letter-spacing: -0.09em;
     line-height: 0.92;
@@ -233,47 +277,63 @@
 
 .heroActions {
     gap: 0.9rem;
-    margin: 1.55rem 0 1.15rem;
+    margin: 1.65rem 0 1.1rem;
 }
 
-.heroProof {
-    gap: 0.7rem 1.2rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+.heroNote {
+    display: grid;
+    gap: 0.35rem;
+    margin-bottom: 1.1rem;
 }
 
-.heroProof li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
+.heroNote span {
+    color: var(--gold);
+    font-family: var(--font-mono), monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.heroNote p {
+    font-family: var(--font-mono), monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.heroPanel {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+}
+
+.heroPanelNote {
+    max-width: 26rem;
     color: var(--muted);
-    font-size: 0.96rem;
+    line-height: 1.7;
 }
 
-.heroProof li::before {
-    content: "";
-    width: 0.34rem;
-    height: 0.34rem;
-    border-radius: 999px;
-    background: var(--rose);
-    box-shadow: 0 0 10px rgba(255, 77, 180, 0.3);
+.heroPanelNote strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--text);
+    font-size: 0.98rem;
 }
 
 .terminalFrame {
-    padding: 0.85rem;
+    overflow: hidden;
+    padding: 0;
     border: 1px solid var(--border);
-    border-radius: 1.4rem;
-    background:
-        radial-gradient(circle at top right, rgba(255, 77, 180, 0.14), transparent 26%),
-        linear-gradient(180deg, rgba(13, 16, 24, 0.96), rgba(9, 11, 16, 1));
-    box-shadow: var(--shadow);
+    border-radius: 1rem;
+    background: rgba(13, 16, 22, 0.9);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
 }
 
 .terminalChrome {
     display: flex;
+    align-items: center;
     gap: 0.42rem;
-    padding-bottom: 0.95rem;
+    padding: 0.95rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .terminalChrome span {
@@ -294,22 +354,25 @@
     background: #4ec7ff;
 }
 
+.terminalTitle {
+    margin-left: 0.45rem;
+    color: var(--subtle);
+    font-family: var(--font-mono), monospace;
+    font-size: 0.76rem;
+    font-style: normal;
+}
+
 .terminalBody {
     display: grid;
-    gap: 0.95rem;
-    padding: 1.15rem;
-    border: 1px solid var(--border);
-    border-radius: 1.15rem;
-    background: rgba(11, 13, 19, 0.9);
+    gap: 0.9rem;
+    padding: 1rem 1.05rem 1.05rem;
+    background: rgba(11, 13, 19, 0.96);
 }
 
 .terminalSnippet {
     display: grid;
     gap: 0.55rem;
-    padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.02);
+    padding: 0;
     color: #e8ecf6;
     font-family: var(--font-mono), monospace;
     font-size: 0.84rem;
@@ -318,6 +381,29 @@
 
 .terminalSnippet span {
     color: var(--rose-soft);
+}
+
+.terminalStatus {
+    display: grid;
+    gap: 0.2rem;
+    width: fit-content;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.8rem;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.terminalStatus strong {
+    color: var(--text);
+    font-family: var(--font-mono), monospace;
+    font-size: 0.84rem;
+    font-weight: 500;
+}
+
+.terminalStatus span {
+    color: var(--muted);
+    font-family: var(--font-mono), monospace;
+    font-size: 0.8rem;
 }
 
 .section {
@@ -429,13 +515,14 @@
 
     .primaryNav {
         justify-content: flex-start;
-        margin-left: 0;
+        margin-left: 0.6rem;
     }
 
     .headerShell {
         display: grid;
         grid-template-columns: 1fr;
         gap: 0.9rem;
+        padding: 0.7rem 0;
     }
 
     .headerActions {
@@ -445,12 +532,12 @@
 
 @media (max-width: 640px) {
     .header {
-        padding: 0.55rem 0.85rem 0;
+        padding: 0 0.85rem;
     }
 
     .main {
         gap: 3.5rem;
-        padding: 1.3rem 0.85rem 4rem;
+        padding: 1.4rem 0.85rem 4rem;
     }
 
     .heroCopy h1 {

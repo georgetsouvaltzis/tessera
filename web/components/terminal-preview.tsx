@@ -7,15 +7,18 @@ export function TerminalPreview() {
                 <span />
                 <span />
                 <span />
+                <em className={styles.terminalTitle}>~/starter-path</em>
             </div>
             <div className={styles.terminalBody}>
-                <span className={styles.terminalLabel}>Starter ladder</span>
                 <div className={styles.terminalSnippet}>
                     <div><span>$</span> dotnet run --project examples/HelloWorld</div>
-                    <div><span>$</span> dotnet run --project examples/CounterForm</div>
+                    <div><span>✓</span> first screen online</div>
                     <div><span>$</span> dotnet run --project examples/WorkspaceApp</div>
                 </div>
-                <p>Run them in order. Stop after WorkspaceApp if the public path already clicks.</p>
+                <div className={styles.terminalStatus}>
+                    <strong>Tessera starter path</strong>
+                    <span>Ready in 3 examples</span>
+                </div>
             </div>
         </div>
     );
