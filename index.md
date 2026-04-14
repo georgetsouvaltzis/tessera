@@ -16,8 +16,8 @@ hide:
         and showcase apps that read like products instead of demos.
       </p>
       <div class="action-row">
-        <a class="md-button md-button--primary" href="getting-started/">Start here</a>
-        <a class="md-button" href="showcase/">See the showcase</a>
+        <a class="md-button md-button--primary" href="docs/getting-started/">Start here</a>
+        <a class="md-button" href="docs/showcase/">See the showcase</a>
       </div>
       <div class="trust-grid">
         <div class="trust-card">
@@ -134,7 +134,7 @@ hide:
     <div class="section-head">
       <div>
         <span class="section-kicker">Flagship examples</span>
-        <h2>See how the same public model scales up.</h2>
+        <h2>See how the public model scales up.</h2>
       </div>
       <p>Flagships are the evaluation lane for denser dashboards, command workflows, and workbench-style shells.</p>
     </div>

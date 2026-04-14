@@ -60,7 +60,7 @@ theme:
     - content.tabs.link
 
 nav:
-  - Home: docs/index.md
+  - Home: index.md
   - Start Here:
       - Overview: docs/overview.md
       - Getting Started: docs/getting-started.md
