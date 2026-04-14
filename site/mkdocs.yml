@@ -42,7 +42,7 @@ theme:
   favicon: docs/assets/images/favicon.svg
   font:
     text: Inter
-    code: IBM Plex Mono
+    code: JetBrains Mono
   palette:
     - scheme: slate
       primary: black
