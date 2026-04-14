@@ -1,16 +1,11 @@
 {% extends "base.html" %}
 
-{% block extrahead %}
-  {{ super() }}
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap">
-{% endblock %}
-
 {% block announce %}
-  <a class="site-announcement" href="{{ 'docs/getting-started/' | url }}">
-    Public alpha · C#-first terminal UI for serious tools
-  </a>
+  {% if not page.is_homepage %}
+    <a class="site-announcement" href="{{ 'docs/getting-started/' | url }}">
+      Public alpha · C#-first terminal UI for serious tools
+    </a>
+  {% endif %}
 {% endblock %}
 
 {% block header %}
@@ -22,13 +17,13 @@
           <span class="t-home-brand__name">{{ config.site_name }}</span>
         </a>
         <nav class="t-home-nav" aria-label="Primary">
-          <a href="{{ 'docs/getting-started/' | url }}">Start here</a>
+          <a href="{{ 'docs/getting-started/' | url }}">Getting started</a>
           <a href="{{ 'docs/showcase/' | url }}">Showcase</a>
           <a href="{{ 'docs/theme-system/' | url }}">Theming</a>
-          <a href="{{ 'docs/public-api-guidelines/' | url }}">API</a>
+          <a href="{{ 'docs/overview/' | url }}">Docs</a>
         </nav>
         <div class="t-home-header__actions">
-          <a class="t-home-header__link" href="{{ 'docs/overview/' | url }}">Docs</a>
+          <a class="t-home-header__link" href="{{ 'CHANGELOG/' | url }}">Alpha</a>
           <a class="t-home-header__cta" href="{{ 'docs/getting-started/' | url }}">Get started</a>
         </div>
       </div>

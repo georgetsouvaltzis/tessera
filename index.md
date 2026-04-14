@@ -11,10 +11,10 @@ hide:
   <section class="home-hero">
     <div class="home-copy">
       <span class="home-badge">Public alpha · .NET 10 · C# first</span>
-      <h1 class="home-title">Build terminal software with <span class="home-title__accent">real product taste.</span></h1>
+      <h1 class="home-title">C# terminal UI with <span class="home-title__accent">real product taste.</span></h1>
       <p class="home-lede">
-        Tessera gives you a compact public app model, first-class controls and layouts, semantic theming,
-        and polished examples that already feel like tools instead of framework demos.
+        Ship operator dashboards, workflow shells, and multi-pane tools with a small public app model,
+        semantic theming, and examples that already look serious.
       </p>
       <div class="home-actions">
         <a class="md-button md-button--primary" href="docs/getting-started/">Get started</a>
@@ -37,7 +37,7 @@ hide:
           <span class="home-terminal__eyebrow">WorkspaceApp</span>
           <h2 class="home-terminal__title">Editor. Preview. Actions. One cohesive shell.</h2>
           <p class="home-terminal__copy">
-            A starter application that already reads like a shipping workflow surface.
+            A starter application that already feels like a product workflow, not a toy sample.
           </p>
           <div class="home-command">dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj</div>
           <div class="home-chip-row">
@@ -58,15 +58,15 @@ hide:
   <section class="home-band">
     <article>
       <strong>Small public model</strong>
-      <span>Start with explicit screens, layouts, controls, and messages. No nested DSL maze.</span>
+      <span>Explicit screens, layouts, controls, and messages. No nested DSL maze.</span>
     </article>
     <article>
       <strong>Theme it intentionally</strong>
-      <span>Tessera treats tokens and control overrides as real API, not last-mile hacks.</span>
+      <span>Tokens and control overrides are real API, not last-mile hacks.</span>
     </article>
     <article>
       <strong>Scale into richer shells</strong>
-      <span>Move from the starter ladder into dashboards and workbenches without leaving the same public path.</span>
+      <span>Move from the starter ladder into dashboards and workbenches without leaving the same path.</span>
     </article>
   </section>
 
@@ -75,7 +75,7 @@ hide:
       <span class="home-section__kicker">Starter ladder</span>
       <h2>Three examples. One deliberate learning curve.</h2>
       <p>
-        Learn the public path in sequence, then open the denser showcases when you want the full picture.
+        Learn the public path in sequence, then open the denser showcases when you want the fuller picture.
       </p>
     </div>
     <div class="home-grid">
@@ -117,7 +117,7 @@ hide:
       <span class="home-section__kicker">Flagship examples</span>
       <h2>See how the same model scales up.</h2>
       <p>
-        Use the flagships to evaluate denser dashboards, command-heavy flows, and workbench-style product shells.
+        Use the flagships to evaluate denser dashboards, command-heavy flows, and workbench-style shells.
       </p>
     </div>
     <div class="home-grid">
