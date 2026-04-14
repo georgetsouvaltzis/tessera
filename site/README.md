@@ -23,6 +23,9 @@ pip install -r requirements-docs.txt
 mkdocs serve -f mkdocs.yml
 ```
 
+The docs server runs at `http://127.0.0.1:8000/`.
+The Next.js landing page in `web/` links to this origin automatically during local development.
+
 ## Verification
 
 ```bash

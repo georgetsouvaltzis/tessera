@@ -25,6 +25,13 @@ pip install -r requirements-docs.txt
 mkdocs serve -f mkdocs.yml
 ```
 
+When both servers are running locally:
+
+- landing page: `http://127.0.0.1:3000/`
+- docs site: `http://127.0.0.1:8000/`
+
+The landing page automatically points docs links to the MkDocs server in local development.
+
 ## GitHub Pages build shape
 
 1. Next.js builds to `web/out`

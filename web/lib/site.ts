@@ -1,5 +1,7 @@
 export const basePath = process.env.NEXT_PUBLIC_BASE_PATH?.trim() ?? "";
-export const docsOrigin = process.env.NEXT_PUBLIC_DOCS_ORIGIN?.trim() ?? "";
+const configuredDocsOrigin = process.env.NEXT_PUBLIC_DOCS_ORIGIN?.trim() ?? "";
+const localDocsOrigin = process.env.NODE_ENV === "development" ? "http://127.0.0.1:8000" : "";
+export const docsOrigin = configuredDocsOrigin || localDocsOrigin;
 
 export function appHref(path: string): string {
     if (path.length === 0 || path === "/") {
@@ -12,6 +14,9 @@ export function appHref(path: string): string {
 
 export function docsHref(path: string = "/"): string {
     const normalized = path === "/" ? "/" : path.startsWith("/") ? path : `/${path}`;
-    const docsPath = `${basePath}/docs${normalized === "/" ? "/" : normalized}`;
-    return docsOrigin.length > 0 ? `${docsOrigin}${docsPath}` : docsPath;
+    if (docsOrigin.length > 0) {
+        return `${docsOrigin}${normalized}`;
+    }
+
+    return `${basePath}/docs${normalized === "/" ? "/" : normalized}`;
 }
