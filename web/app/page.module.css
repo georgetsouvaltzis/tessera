@@ -190,16 +190,16 @@
 .main {
     display: grid;
     gap: 3.6rem;
-    padding: 2.2rem 1.25rem 4rem;
+    padding: 1.7rem 1.25rem 4rem;
 }
 
 .hero {
     display: grid;
-    grid-template-columns: minmax(0, 36rem) minmax(20rem, 30rem);
-    gap: clamp(1.8rem, 4vw, 3.4rem);
+    grid-template-columns: minmax(0, 39rem) minmax(19rem, 28rem);
+    gap: clamp(1.6rem, 3.2vw, 2.8rem);
     align-items: start;
     justify-content: space-between;
-    padding-top: 1rem;
+    padding-top: 0.7rem;
 }
 
 .heroCopy,
@@ -209,7 +209,7 @@
 }
 
 .heroCopy {
-    max-width: 36rem;
+    max-width: 39rem;
 }
 
 .heroBadge,
@@ -243,18 +243,18 @@
 .heroCopy h1 {
     display: grid;
     gap: 0.1em;
-    margin: 0.9rem 0 1rem;
+    margin: 0.8rem 0 0.9rem;
     font-family: var(--font-display), sans-serif;
-    font-size: clamp(2.75rem, 5.8vw, 4.45rem);
+    font-size: clamp(2.35rem, 4.8vw, 3.7rem);
     font-weight: 700;
-    letter-spacing: -0.085em;
-    line-height: 0.94;
+    letter-spacing: -0.075em;
+    line-height: 0.96;
 }
 
 .heroLeadLine {
     color: var(--rose-neon);
     font-family: var(--font-mono), monospace;
-    font-size: 0.54em;
+    font-size: 0.52em;
     letter-spacing: -0.04em;
     text-shadow:
         0 0 10px rgba(255, 53, 194, 0.52),
@@ -276,52 +276,41 @@
 }
 
 .heroCopy > p {
-    max-width: 33rem;
-    font-size: 0.98rem;
+    max-width: 35rem;
+    font-size: 0.95rem;
 }
 
 .heroActions {
     gap: 0.9rem;
-    margin: 1.45rem 0 1rem;
+    margin: 1.25rem 0 0.75rem;
 }
 
-.heroNote {
-    display: grid;
-    gap: 0.35rem;
-    margin-bottom: 1.1rem;
-}
-
-.heroNote span {
-    color: var(--gold);
+.heroPath {
+    margin: 0;
+    color: var(--subtle);
     font-family: var(--font-mono), monospace;
-    font-size: 0.75rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-.heroNote p {
-    font-family: var(--font-mono), monospace;
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     line-height: 1.6;
 }
 
 .heroPanel {
     display: grid;
-    gap: 1rem;
+    gap: 0.85rem;
     align-content: start;
+    padding-top: 0.55rem;
 }
 
 .heroPanelNote {
-    max-width: 26rem;
+    max-width: 24rem;
     color: var(--muted);
-    line-height: 1.7;
+    line-height: 1.65;
 }
 
 .heroPanelNote strong {
     display: block;
     margin-bottom: 0.25rem;
     color: var(--text);
-    font-size: 0.98rem;
+    font-size: 0.94rem;
 }
 
 .terminalFrame {
@@ -414,20 +403,20 @@
 .section {
     display: grid;
     gap: 1.35rem;
-    padding-top: 0.2rem;
+    padding-top: 0.1rem;
     border-top: 1px solid var(--border);
 }
 
 .sectionHeading {
     display: grid;
-    gap: 0.8rem;
-    max-width: 40rem;
+    gap: 0.7rem;
+    max-width: 34rem;
 }
 
 .sectionHeading h2 {
     margin: 0;
     font-family: var(--font-display), sans-serif;
-    font-size: clamp(1.85rem, 4vw, 2.9rem);
+    font-size: clamp(1.6rem, 3.5vw, 2.45rem);
     font-weight: 700;
     letter-spacing: -0.08em;
     line-height: 0.94;
@@ -483,7 +472,7 @@
 
 .quickLinks {
     gap: 1rem;
-    padding-top: 0.2rem;
+    padding-top: 0.05rem;
 }
 
 .footer {
@@ -543,11 +532,11 @@
 
     .main {
         gap: 3.5rem;
-        padding: 1.4rem 0.85rem 4rem;
+        padding: 1.1rem 0.85rem 4rem;
     }
 
     .heroCopy h1 {
-        font-size: 2.75rem;
+        font-size: 2.35rem;
     }
 
     .terminalBody,

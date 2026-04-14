@@ -57,16 +57,7 @@ export default function HomePage() {
                                 GitHub
                             </a>
                         </div>
-                        <div className={styles.heroNote}>
-                            <span>Public path</span>
-                            <p>HelloWorld → CounterForm → WorkspaceApp</p>
-                        </div>
-                        <div className={styles.quickLinks}>
-                            <Link href={docsHref("/getting-started/")}>Getting started</Link>
-                            <Link href={docsHref("/examples/")}>Example guide</Link>
-                            <Link href={docsHref("/overview/")}>Overview</Link>
-                            <Link href={docsHref("/showcase/")}>Showcase</Link>
-                        </div>
+                        <p className={styles.heroPath}>HelloWorld → CounterForm → WorkspaceApp</p>
                     </div>
                     <div className={styles.heroPanel}>
                         <TerminalPreview />
@@ -87,6 +78,12 @@ export default function HomePage() {
                         {starterExamples.map((example) => (
                             <ExampleCard key={example.title} {...example} />
                         ))}
+                    </div>
+                    <div className={styles.quickLinks}>
+                        <Link href={docsHref("/getting-started/")}>Getting started</Link>
+                        <Link href={docsHref("/examples/")}>Example guide</Link>
+                        <Link href={docsHref("/overview/")}>Overview</Link>
+                        <Link href={docsHref("/showcase/")}>Showcase</Link>
                     </div>
                 </section>
             </main>
