@@ -18,7 +18,6 @@ hide:
       <div class="action-row">
         <a class="md-button md-button--primary" href="getting-started/">Start here</a>
         <a class="md-button" href="showcase/">See the showcase</a>
-        <a class="md-button" href="overview/">Read the overview</a>
       </div>
       <div class="trust-grid">
         <div class="trust-card">

@@ -1,21 +1,22 @@
 :root {
-    --tessera-bg: #05070d;
-    --tessera-bg-soft: #090c14;
-    --tessera-surface: rgba(15, 18, 27, 0.78);
-    --tessera-surface-strong: rgba(18, 22, 33, 0.92);
-    --tessera-surface-stronger: rgba(22, 26, 39, 0.96);
-    --tessera-surface-muted: rgba(27, 31, 46, 0.82);
+    --tessera-bg: #07090f;
+    --tessera-bg-soft: #0d1118;
+    --tessera-surface: rgba(18, 23, 35, 0.82);
+    --tessera-surface-strong: rgba(23, 29, 42, 0.94);
+    --tessera-surface-stronger: rgba(26, 33, 47, 0.98);
+    --tessera-surface-muted: rgba(20, 25, 37, 0.88);
     --tessera-border: rgba(255, 255, 255, 0.08);
-    --tessera-border-strong: rgba(255, 89, 166, 0.26);
-    --tessera-border-gold: rgba(236, 185, 102, 0.24);
-    --tessera-text: #f7f3fb;
-    --tessera-muted: #b9b2c7;
-    --tessera-subtle: #8f899f;
+    --tessera-border-strong: rgba(255, 79, 163, 0.28);
+    --tessera-border-gold: rgba(231, 179, 90, 0.26);
+    --tessera-text: #f5f7fb;
+    --tessera-muted: #aab2c5;
+    --tessera-subtle: #7e879b;
     --tessera-pink: #ff4fb4;
     --tessera-rose: #ff6d96;
-    --tessera-gold: #e9bc67;
+    --tessera-soft-rose: #ff8cca;
+    --tessera-gold: #e7b35a;
     --tessera-cyan: #7de8ff;
-    --tessera-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+    --tessera-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
 }
 
 [data-md-color-scheme="slate"] {
@@ -48,10 +49,9 @@ html {
 
 [data-md-color-scheme="slate"] body {
     background:
-        radial-gradient(circle at top left, rgba(255, 79, 180, 0.15), transparent 28%),
-        radial-gradient(circle at top right, rgba(233, 188, 103, 0.08), transparent 22%),
-        radial-gradient(circle at 80% 20%, rgba(125, 232, 255, 0.07), transparent 20%),
-        linear-gradient(180deg, #080a10, #04060b 68%);
+        radial-gradient(circle at top left, rgba(255, 79, 180, 0.08), transparent 22%),
+        radial-gradient(circle at top right, rgba(231, 179, 90, 0.05), transparent 20%),
+        linear-gradient(180deg, #090c13, #06080d 72%);
 }
 
 [data-md-color-scheme="slate"] body::before {
@@ -61,8 +61,8 @@ html {
     background-image:
         linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-    background-size: 120px 120px;
-    mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.6), transparent 88%);
+    background-size: 144px 144px;
+    mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.35), transparent 88%);
     pointer-events: none;
     z-index: -1;
 }
@@ -77,10 +77,10 @@ html {
 }
 
 .md-header {
-    background: rgba(8, 10, 15, 0.82);
-    backdrop-filter: blur(16px);
+    background: rgba(10, 13, 19, 0.84);
+    backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
 }
 
 .md-header__title,
@@ -92,7 +92,7 @@ html {
 }
 
 .md-tabs {
-    background: rgba(9, 11, 17, 0.8);
+    background: rgba(10, 13, 19, 0.78);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -106,11 +106,11 @@ html {
     padding: 0.7rem 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     background:
-        linear-gradient(90deg, rgba(255, 79, 180, 0.12), rgba(233, 188, 103, 0.12)),
+        linear-gradient(90deg, rgba(255, 79, 180, 0.1), rgba(231, 179, 90, 0.08)),
         rgba(9, 11, 17, 0.92);
     color: var(--tessera-text);
-    font-size: 0.78rem;
-    font-weight: 800;
+    font-size: 0.76rem;
+    font-weight: 700;
     letter-spacing: 0.06em;
     text-align: center;
     text-transform: uppercase;
@@ -124,8 +124,8 @@ html {
 .md-search__output,
 .md-search-result__meta {
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(19, 22, 32, 0.9);
-    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    background: rgba(18, 23, 35, 0.9);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
 }
 
 .md-search__form {
@@ -142,7 +142,7 @@ html {
 .md-typeset table:not([class]),
 .md-typeset .tabbed-set > label {
     border: 1px solid var(--tessera-border);
-    background: linear-gradient(180deg, rgba(19, 22, 33, 0.95), rgba(11, 14, 21, 0.94));
+    background: linear-gradient(180deg, rgba(18, 23, 35, 0.96), rgba(12, 15, 22, 0.96));
     box-shadow: var(--tessera-shadow);
 }
 
@@ -182,8 +182,8 @@ html {
 .md-nav__link--active,
 .md-nav__item--active > .md-nav__link {
     color: var(--tessera-text);
-    background: linear-gradient(90deg, rgba(255, 79, 180, 0.14), rgba(255, 109, 150, 0.06));
-    border: 1px solid rgba(255, 79, 180, 0.18);
+    background: linear-gradient(90deg, rgba(255, 79, 180, 0.12), rgba(255, 109, 150, 0.04));
+    border: 1px solid rgba(255, 79, 180, 0.16);
 }
 
 .md-content__inner {
@@ -217,7 +217,7 @@ html {
 .md-typeset h1 + p {
     max-width: 44rem;
     color: var(--tessera-muted);
-    font-size: 1.08rem;
+    font-size: 1.02rem;
 }
 
 .md-typeset p,
@@ -243,7 +243,7 @@ html {
 .md-typeset .md-button {
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.025);
     color: var(--tessera-text);
     font-weight: 800;
     transition:
@@ -254,25 +254,29 @@ html {
 
 .md-typeset .md-button:hover {
     transform: translateY(-1px);
-    border-color: rgba(255, 109, 150, 0.34);
-    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.34);
+    border-color: rgba(255, 79, 163, 0.36);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
 }
 
 .md-typeset .md-button--primary {
-    background: linear-gradient(135deg, #ff4fb4, #ff6d96);
+    background: linear-gradient(135deg, #ff4fa3, #ff69b7);
     border-color: transparent;
     box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.04),
-        0 0 30px rgba(255, 79, 180, 0.22),
-        0 22px 46px rgba(0, 0, 0, 0.42);
+        0 0 24px rgba(255, 79, 163, 0.28),
+        0 18px 44px rgba(0, 0, 0, 0.38);
+}
+
+.md-typeset .md-button--primary:hover {
+    background: linear-gradient(135deg, #ff69b7, #ff8cca);
 }
 
 .md-typeset .grid.cards > ul > li {
     border-radius: 1.3rem;
     border: 1px solid var(--tessera-border);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 32%),
-        linear-gradient(180deg, rgba(19, 22, 33, 0.96), rgba(12, 14, 21, 0.96));
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 32%),
+        linear-gradient(180deg, rgba(18, 23, 35, 0.96), rgba(12, 15, 22, 0.96));
     box-shadow: var(--tessera-shadow);
 }
 
