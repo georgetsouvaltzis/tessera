@@ -1,39 +1,35 @@
 # Tessera Site
 
-This directory contains the Docusaurus-based public docs and marketing site for Tessera.
+This directory contains the MkDocs Material configuration for the public Tessera docs site.
+
+The actual content source is the repository root:
+
+- `README.md`
+- `CHANGELOG.md`
+- `CONTRIBUTING.md`
+- `SUPPORT.md`
+- `CODE_OF_CONDUCT.md`
+- `SECURITY.md`
+- `docs/`
 
 ## Local development
 
 ```bash
 cd site
-npm install
-npm run start
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-docs.txt
+mkdocs serve -f mkdocs.yml
 ```
 
 ## Verification
 
 ```bash
 cd site
-npm run typecheck
-npm run build
+source .venv/bin/activate
+export TESSERA_SITE_DIR="${TMPDIR:-/tmp}/tessera-site-build"
+mkdocs build -f mkdocs.yml
 ```
 
-## Deployment
-
-The repository is configured for GitHub Pages via GitHub Actions.
-
-- source: `main`
-- site root: `site/`
-- output: `site/build/`
-- Pages source: `GitHub Actions`
-
-The current config assumes project-pages hosting at:
-
-- `https://georgetsouvaltzis.github.io/tessera/`
-
-For a brand-new repository, GitHub Pages may still need one repo setting enabled before the first deploy:
-
-1. Open `Settings -> Pages`
-2. Set `Build and deployment -> Source` to `GitHub Actions`
-
-Optional: if you add a repository secret named `PAGES_ENABLEMENT_TOKEN`, the workflow will try to enable Pages automatically. That token must be a PAT or GitHub App token with the required Pages/admin rights; `GITHUB_TOKEN` is not enough for auto-enable.
+Build output goes to `TESSERA_SITE_DIR`.
+If you do not set it, the default build output is `/tmp/tessera-site-build`.

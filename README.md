@@ -179,7 +179,7 @@ The full guide lives in [docs/examples.md](docs/examples.md).
 
 ## Build And Verify
 
-Tessera uses the `.NET 10.0.103` SDK pinned in [global.json](global.json).
+Tessera uses the `.NET 10.0.103` SDK pinned in `global.json`.
 
 Primary repo verification commands:
 

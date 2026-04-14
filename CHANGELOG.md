@@ -36,6 +36,7 @@ Tessera uses `major.minor.patch` versioning with SemVer prerelease labels during
 - project and solution branding now use `Tessera` across source, tests, examples, docs, and solution entrypoints
 - public docs now teach the starter ladder before the flagship showcases
 - `README.md` now acts as a stronger public-facing front page for GitHub visitors
+- the docs site now uses MkDocs Material rooted on the live repo docs instead of a separate Docusaurus content tree
 - button visuals now default to flat filled rectangular action surfaces on the public path
 - README and contributor guidance now point to the support policy
 - repo verification guidance now includes `dotnet build examples/Tessera.Examples.slnx`

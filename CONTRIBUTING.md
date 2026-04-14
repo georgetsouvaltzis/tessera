@@ -14,7 +14,7 @@ Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 
 ## Development Prerequisites
 
-- `.NET 10.0.103` SDK from [global.json](global.json)
+- `.NET 10.0.103` SDK pinned in `global.json`
 - a terminal with strong ANSI/CSI behavior for manual app checks
 - repo-local tools via `dotnet tool restore`
 
