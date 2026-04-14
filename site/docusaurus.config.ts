@@ -146,57 +146,57 @@ const config: Config = {
     prism: {
       theme: {
         plain: {
-          color: '#f3f4f6',
-          backgroundColor: '#101725',
+          color: '#f7f4ee',
+          backgroundColor: '#191c22',
         },
         styles: [
           {
             types: ['comment'],
-            style: { color: '#8b94a7', fontStyle: 'italic' },
+            style: { color: '#b9b1a4', fontStyle: 'italic' },
           },
           {
             types: ['keyword', 'operator'],
-            style: { color: '#f38ba8' },
+            style: { color: '#ff8a65' },
           },
           {
             types: ['string'],
-            style: { color: '#a6e3a1' },
+            style: { color: '#7ef0c3' },
           },
           {
             types: ['class-name', 'function'],
-            style: { color: '#89b4fa' },
+            style: { color: '#7db2ff' },
           },
           {
             types: ['number'],
-            style: { color: '#f9e2af' },
+            style: { color: '#e3a85b' },
           },
         ],
       },
       darkTheme: {
         plain: {
-          color: '#f3f4f6',
-          backgroundColor: '#101725',
+          color: '#f7f4ee',
+          backgroundColor: '#191c22',
         },
         styles: [
           {
             types: ['comment'],
-            style: { color: '#8b94a7', fontStyle: 'italic' },
+            style: { color: '#b9b1a4', fontStyle: 'italic' },
           },
           {
             types: ['keyword', 'operator'],
-            style: { color: '#f38ba8' },
+            style: { color: '#ff8a65' },
           },
           {
             types: ['string'],
-            style: { color: '#a6e3a1' },
+            style: { color: '#7ef0c3' },
           },
           {
             types: ['class-name', 'function'],
-            style: { color: '#89b4fa' },
+            style: { color: '#7db2ff' },
           },
           {
             types: ['number'],
-            style: { color: '#f9e2af' },
+            style: { color: '#e3a85b' },
           },
         ],
       },
