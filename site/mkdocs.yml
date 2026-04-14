@@ -40,8 +40,8 @@ theme:
   logo: docs/assets/images/logo.svg
   favicon: docs/assets/images/favicon.svg
   font:
-    text: Manrope
-    code: JetBrains Mono
+    text: Plus Jakarta Sans
+    code: IBM Plex Mono
   palette:
     - scheme: slate
       primary: black
@@ -49,7 +49,6 @@ theme:
   features:
     - navigation.instant
     - navigation.instant.progress
-    - navigation.tabs
     - navigation.sections
     - navigation.top
     - navigation.tracking

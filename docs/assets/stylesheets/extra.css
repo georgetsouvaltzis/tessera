@@ -47,6 +47,14 @@ html {
     scroll-behavior: smooth;
 }
 
+body,
+input,
+button,
+textarea,
+select {
+    font-feature-settings: "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1;
+}
+
 [data-md-color-scheme="slate"] body {
     background:
         radial-gradient(circle at top left, rgba(255, 79, 180, 0.08), transparent 22%),
@@ -68,42 +76,31 @@ html {
 }
 
 .md-grid {
-    max-width: 94rem;
+    max-width: 88rem;
 }
 
 .md-main__inner {
-    margin-top: 1.35rem;
-    gap: 1.4rem;
+    margin-top: 1.15rem;
+    gap: 1.2rem;
 }
 
 .md-header {
-    background: rgba(10, 13, 19, 0.84);
-    backdrop-filter: blur(14px);
+    background: rgba(10, 13, 19, 0.88);
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
 }
 
 .md-header__title,
 .md-nav__title,
-.md-nav__link,
-.md-tabs__link {
+.md-nav__link {
     font-weight: 700;
     letter-spacing: 0.01em;
 }
 
-.md-tabs {
-    background: rgba(10, 13, 19, 0.78);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.md-tabs__link--active,
-.md-tabs__link:hover {
-    color: var(--tessera-gold);
-}
-
 .site-announcement {
     display: block;
-    padding: 0.7rem 1rem;
+    padding: 0.62rem 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     background:
         linear-gradient(90deg, rgba(255, 79, 180, 0.1), rgba(231, 179, 90, 0.08)),
@@ -125,7 +122,7 @@ html {
 .md-search-result__meta {
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(18, 23, 35, 0.9);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
 }
 
 .md-search__form {
@@ -147,11 +144,11 @@ html {
 }
 
 .md-sidebar__scrollwrap {
-    border-radius: 1.25rem;
+    border-radius: 1rem;
 }
 
 .md-sidebar__inner {
-    padding: 0.2rem;
+    padding: 0.15rem;
 }
 
 .md-nav__title {
@@ -162,9 +159,9 @@ html {
 }
 
 .md-nav__link {
-    margin: 0.12rem 0;
-    padding: 0.42rem 0.6rem;
-    border-radius: 0.8rem;
+    margin: 0.08rem 0;
+    padding: 0.38rem 0.56rem;
+    border-radius: 0.72rem;
     color: var(--tessera-muted);
     transition:
         background 140ms ease,
@@ -175,8 +172,8 @@ html {
 
 .md-nav__link:hover {
     color: var(--tessera-text);
-    background: rgba(255, 255, 255, 0.035);
-    transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.03);
+    transform: translateX(1px);
 }
 
 .md-nav__link--active,
@@ -191,25 +188,25 @@ html {
 }
 
 .md-typeset {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
 }
 
 .md-typeset h1,
 .md-typeset h2,
 .md-typeset h3 {
     color: var(--tessera-text);
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    font-weight: 750;
+    letter-spacing: -0.04em;
 }
 
 .md-typeset h1 {
     margin-bottom: 1rem;
-    font-size: clamp(2.4rem, 4.8vw, 4rem);
+    font-size: clamp(2.6rem, 5vw, 4.2rem);
 }
 
 .md-typeset h2 {
-    margin-top: 3.4rem;
-    padding-top: 1rem;
+    margin-top: 3.1rem;
+    padding-top: 0.95rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     font-size: clamp(1.65rem, 3vw, 2.2rem);
 }
@@ -223,7 +220,7 @@ html {
 .md-typeset p,
 .md-typeset li {
     color: var(--tessera-muted);
-    line-height: 1.8;
+    line-height: 1.75;
 }
 
 .md-typeset strong,
@@ -245,7 +242,7 @@ html {
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.025);
     color: var(--tessera-text);
-    font-weight: 800;
+    font-weight: 750;
     transition:
         transform 140ms ease,
         border-color 140ms ease,
@@ -255,7 +252,7 @@ html {
 .md-typeset .md-button:hover {
     transform: translateY(-1px);
     border-color: rgba(255, 79, 163, 0.36);
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
 }
 
 .md-typeset .md-button--primary {
@@ -272,7 +269,7 @@ html {
 }
 
 .md-typeset .grid.cards > ul > li {
-    border-radius: 1.3rem;
+    border-radius: 1.1rem;
     border: 1px solid var(--tessera-border);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 32%),
@@ -294,6 +291,11 @@ html {
     background: linear-gradient(180deg, rgba(10, 11, 16, 0.98), rgba(7, 8, 12, 1));
 }
 
+.md-typeset blockquote {
+    border-left: 2px solid rgba(255, 79, 163, 0.4);
+    color: var(--tessera-muted);
+}
+
 .md-typeset table:not([class]),
 .md-typeset .admonition,
 .md-typeset details {
@@ -306,6 +308,10 @@ html {
 
 .md-footer {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.md-footer-meta {
+    background: rgba(6, 8, 12, 0.92);
 }
 
 @media screen and (max-width: 76.1875em) {
