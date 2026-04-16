@@ -127,11 +127,12 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} Tessera.`,
     },
     colorMode: {
+      defaultMode: 'dark',
       respectPrefersColorScheme: true,
     },
     prism: {
       theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      darkTheme: prismThemes.nightOwl,
       additionalLanguages: ['bash', 'csharp'],
     },
     metadata: [

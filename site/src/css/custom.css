@@ -1,35 +1,128 @@
 :root {
-  --ifm-color-primary: #c43cff;
-  --ifm-color-primary-dark: #bc24ff;
-  --ifm-color-primary-darker: #b51aff;
-  --ifm-color-primary-darkest: #9400db;
-  --ifm-color-primary-light: #cc54ff;
-  --ifm-color-primary-lighter: #d25eff;
-  --ifm-color-primary-lightest: #df88ff;
+  --ifm-color-primary: #219de8;
+  --ifm-color-primary-dark: #128ecf;
+  --ifm-color-primary-darker: #1186c3;
+  --ifm-color-primary-darkest: #0e6f9f;
+  --ifm-color-primary-light: #3ca9ed;
+  --ifm-color-primary-lighter: #49b0ef;
+  --ifm-color-primary-lightest: #72c2f3;
+  --ifm-background-color: #f6f9fb;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-navbar-background-color: rgba(246, 249, 251, 0.92);
+  --ifm-footer-background-color: #eaf1f5;
+  --ifm-heading-color: #15202b;
+  --ifm-font-color-base: #253241;
+  --ifm-color-content-secondary: #607182;
+  --ifm-menu-color: #334255;
+  --ifm-menu-color-active: #219de8;
+  --ifm-menu-color-background-active: rgba(33, 157, 232, 0.12);
+  --ifm-breadcrumb-color-active: #219de8;
+  --ifm-link-color: #219de8;
+  --ifm-code-background: rgba(18, 142, 207, 0.1);
+  --ifm-pre-background: #edf4f8;
   --ifm-code-font-size: 95%;
+  --ifm-global-radius: 12px;
   --ifm-footer-padding-vertical: 3rem;
-  --docusaurus-highlighted-code-line-bg: rgba(196, 60, 255, 0.08);
+  --docusaurus-highlighted-code-line-bg: rgba(33, 157, 232, 0.08);
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #d56aff;
-  --ifm-color-primary-dark: #cd52ff;
-  --ifm-color-primary-darker: #c948ff;
-  --ifm-color-primary-darkest: #bd27ff;
-  --ifm-color-primary-light: #dd82ff;
-  --ifm-color-primary-lighter: #e18cff;
-  --ifm-color-primary-lightest: #ecafff;
-  --docusaurus-highlighted-code-line-bg: rgba(213, 106, 255, 0.12);
+  --ifm-color-primary: #46b8ff;
+  --ifm-color-primary-dark: #24a9ff;
+  --ifm-color-primary-darker: #13a2ff;
+  --ifm-color-primary-darkest: #0088df;
+  --ifm-color-primary-light: #68c7ff;
+  --ifm-color-primary-lighter: #79ceff;
+  --ifm-color-primary-lightest: #ace0ff;
+  --ifm-background-color: #0f1115;
+  --ifm-background-surface-color: #171a21;
+  --ifm-navbar-background-color: rgba(15, 17, 21, 0.92);
+  --ifm-footer-background-color: #0b0e13;
+  --ifm-heading-color: #e8ecf1;
+  --ifm-font-color-base: #d7dde5;
+  --ifm-color-content-secondary: #9aa4b2;
+  --ifm-menu-color: #c0c9d4;
+  --ifm-menu-color-active: #46b8ff;
+  --ifm-menu-color-background-active: rgba(70, 184, 255, 0.12);
+  --ifm-breadcrumb-color-active: #46b8ff;
+  --ifm-link-color: #46b8ff;
+  --ifm-code-background: rgba(70, 184, 255, 0.12);
+  --ifm-pre-background: #111827;
+  --docusaurus-highlighted-code-line-bg: rgba(70, 184, 255, 0.12);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--ifm-background-color);
+}
+
+.navbar {
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.footer {
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.theme-doc-sidebar-container,
+.table-of-contents {
+  border-color: var(--ifm-color-emphasis-200);
+}
+
+.menu__link:hover,
+.table-of-contents__link:hover {
+  color: var(--ifm-color-primary);
+}
+
+.menu__link--active,
+.navbar__link--active,
+.table-of-contents__link--active,
+.breadcrumbs__link:any-link:hover {
+  color: var(--ifm-color-primary);
+}
+
+.card,
+.pagination-nav__link {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: none;
+}
+
+.theme-code-block,
+pre {
+  border: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: none;
+}
+
+.theme-code-block code,
+pre code {
+  color: inherit;
+}
+
+code {
+  background: var(--ifm-code-background);
 }
 
 .hero--primary {
-  background: var(--ifm-background-surface-color);
+  background:
+    radial-gradient(circle at top right, rgba(126, 240, 200, 0.14), transparent 28%),
+    radial-gradient(circle at top left, rgba(70, 184, 255, 0.14), transparent 30%),
+    var(--ifm-background-surface-color);
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
   color: var(--ifm-font-color-base);
 }
 
 .hero--primary .hero__title,
 .hero--primary .hero__subtitle {
   color: inherit;
+}
+
+.hero--primary .hero__subtitle {
+  max-width: 40rem;
 }
 
 .hero--primary .button--secondary {
