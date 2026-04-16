@@ -1,13 +1,12 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import CodeBlock from '@theme/CodeBlock';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 const proofItems = [
   {
     title: '.NET 10',
-    description: 'C#-first authoring with a small public surface.',
+    description: 'Small public surface. C# first.',
   },
   {
     title: 'Starter Ladder',
@@ -15,7 +14,7 @@ const proofItems = [
   },
   {
     title: 'Flagship Apps',
-    description: 'GitConsole, OpsWatch, and DataWorkbench.',
+    description: 'GitConsole, OpsWatch, DataWorkbench.',
   },
 ];
 
@@ -46,46 +45,23 @@ const showcaseItems = [
 const evaluationSteps = [
   {
     step: '01',
-    title: 'Read the overview',
-    description: 'Understand the public path before touching the denser examples.',
+    title: 'Overview',
+    description: 'Framework model, boundaries, and public path.',
     href: '/docs/overview',
   },
   {
     step: '02',
-    title: 'Run the starters',
-    description: 'Confirm the framework model with HelloWorld, CounterForm, and WorkspaceApp.',
+    title: 'Starter apps',
+    description: 'HelloWorld, CounterForm, then WorkspaceApp.',
     href: '/docs/getting-started',
   },
   {
     step: '03',
-    title: 'Open the flagships',
-    description: 'Judge whether the same API still holds under real application pressure.',
+    title: 'Flagships',
+    description: 'Open the denser shells and judge the same API under pressure.',
     href: '/docs/showcase',
   },
 ];
-
-const starterSample = `using Tessera;
-using Tessera.Controls;
-using Tessera.Layout;
-
-var app = TesseraApplication.CreateBuilder()
-    .UseApp<WorkspaceApp>()
-    .Build();
-
-await app.RunAsync();
-
-internal sealed class WorkspaceApp : TesseraApp
-{
-    public override Screen Build(ScreenContext context)
-        => Screen.Build(window =>
-        {
-            window.Padding(1);
-            window.Body(body => body.Center(
-                new Button { Text = "Launch" },
-                width: 20,
-                height: 3));
-        });
-}`;
 
 function HomepageHero() {
   const { siteConfig } = useDocusaurusContext();
@@ -97,13 +73,15 @@ function HomepageHero() {
           <div className="home-hero__copy">
             <span className="home-badge">Public alpha • .NET 10 • C#-first</span>
             <h1 className="home-hero__title">
-              Terminal UI for
+              C# terminal UI
               <br />
-              serious .NET apps.
+              for real product
+              <br />
+              shells.
             </h1>
             <p className="home-hero__subtitle">
-              Build dashboards, workflows, and workbenches in C# without a host-heavy stack or
-              a toy-widget first impression.
+              Build dashboards, workflows, and workbenches in C# without a host-heavy stack,
+              framework glue, or a toy-widget first impression.
             </p>
             <div className="home-hero__actions">
               <Link className="button button--primary button--lg" to="/docs/getting-started">
@@ -136,7 +114,7 @@ function HomepageHero() {
                   <strong>HelloWorld</strong>
                   <strong>CounterForm</strong>
                   <strong className="is-active">WorkspaceApp</strong>
-                  <span className="home-preview__label">Flagships</span>
+                  <span className="home-preview__label">Evaluation</span>
                   <strong>GitConsole</strong>
                   <strong>OpsWatch</strong>
                   <strong>DataWorkbench</strong>
@@ -144,7 +122,7 @@ function HomepageHero() {
                 <div className="home-preview__content">
                   <div className="home-preview__toolbar">
                     <span>Workspace</span>
-                    <span>Preview</span>
+                    <span>Inspect</span>
                     <span>Actions</span>
                   </div>
                   <div className="home-preview__panes">
@@ -163,9 +141,9 @@ function HomepageHero() {
                       </div>
                     </div>
                     <div className="home-preview__pane">
-                      <div className="home-preview__log">$ run starter ladder</div>
-                      <div className="home-preview__log">$ open DataWorkbench</div>
-                      <div className="home-preview__log is-accent">$ evaluate flagship shell</div>
+                      <div className="home-preview__log">$ run WorkspaceApp</div>
+                      <div className="home-preview__log">$ inspect OpsWatch</div>
+                      <div className="home-preview__log is-accent">$ pressure-test DataWorkbench</div>
                     </div>
                   </div>
                 </div>
@@ -183,12 +161,12 @@ function HomepageContent() {
     <main>
       <section className="home-section">
         <div className="container">
-          <div className="home-section__header">
+          <div className="home-section__header home-section__header--compact">
             <span className="home-section__eyebrow">Flagship examples</span>
-            <h2>See the framework under real layout pressure.</h2>
+            <h2>Product pressure. Same public path.</h2>
             <p>
-              The homepage should show more than generic feature claims. These are the interfaces
-              that answer whether Tessera feels like product infrastructure or just a widget set.
+              Rezi keeps the landing page product-led. Prisma keeps docs quiet. Tessera should do
+              both: show the densest apps quickly, then move people into docs.
             </p>
           </div>
           <div className="home-showcase-grid">
@@ -204,63 +182,28 @@ function HomepageContent() {
         </div>
       </section>
 
-      <section className="home-section home-section--split">
+      <section className="home-eval-band">
         <div className="container">
-          <div className="home-split">
-            <div className="home-split__copy">
-              <span className="home-section__eyebrow">Starter API</span>
-              <h2>Readable first app. No hidden ceremony.</h2>
+          <div className="home-eval-band__frame">
+            <div className="home-eval-band__intro">
+              <span className="home-section__eyebrow">Evaluate in order</span>
+              <h2>Overview. Starters. Flagships.</h2>
               <p>
-                Prisma’s docs work because the structure is calm. Rezi works because the landing
-                page shows the product quickly. For Tessera, the first sample should do the same:
-                obvious builder, obvious app shell, obvious screen composition.
+                Keep the landing page short. The real evaluation path belongs here, not stretched
+                across multiple teaching sections.
               </p>
-              <ul className="home-copy-list">
-                <li>derive from `TesseraApp`</li>
-                <li>compose with `Screen.Build(...)`</li>
-                <li>drop into runtime seams only when needed</li>
-              </ul>
             </div>
-            <div className="home-split__code">
-              <CodeBlock language="csharp" title="starter.cs">
-                {starterSample}
-              </CodeBlock>
+            <div className="home-steps">
+              {evaluationSteps.map((item) => (
+                <article key={item.step} className="home-step">
+                  <span className="home-step__index">{item.step}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                  <Link to={item.href}>Open</Link>
+                </article>
+              ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="home-section">
-        <div className="container">
-          <div className="home-section__header">
-            <span className="home-section__eyebrow">Evaluation path</span>
-            <h2>Three steps. Fast signal.</h2>
-            <p>
-              Keep the homepage honest: show the path a real evaluator should take, instead of
-              burying them in equal-weight feature blocks.
-            </p>
-          </div>
-          <div className="home-steps">
-            {evaluationSteps.map((item) => (
-              <article key={item.step} className="home-step">
-                <span className="home-step__index">{item.step}</span>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <Link to={item.href}>Open</Link>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="home-cta-band">
-        <div className="container">
-          <div className="home-cta-band__inner">
-            <div>
-              <span className="home-section__eyebrow">Ready to evaluate?</span>
-              <h2>Start with the guide, then open the flagship apps.</h2>
-            </div>
-            <div className="home-hero__actions">
+            <div className="home-eval-band__actions">
               <Link className="button button--primary button--lg" to="/docs/getting-started">
                 Get Started
               </Link>
