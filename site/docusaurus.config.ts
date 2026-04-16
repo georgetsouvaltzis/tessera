@@ -131,8 +131,8 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.nightOwl,
+      theme: prismThemes.oneLight,
+      darkTheme: prismThemes.oneDark,
       additionalLanguages: ['bash', 'csharp'],
     },
     metadata: [

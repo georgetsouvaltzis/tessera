@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
   <defs>
     <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
-      <stop offset="0%" stop-color="#11151c"/>
-      <stop offset="100%" stop-color="#0a0d12"/>
+      <stop offset="0%" stop-color="#17181c"/>
+      <stop offset="100%" stop-color="#0d0f13"/>
     </linearGradient>
     <linearGradient id="signal" x1="0%" x2="100%" y1="0%" y2="100%">
-      <stop offset="0%" stop-color="#46b8ff"/>
-      <stop offset="100%" stop-color="#7ef0c8"/>
+      <stop offset="0%" stop-color="#ff7aa2"/>
+      <stop offset="100%" stop-color="#ffb5c8"/>
     </linearGradient>
     <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="4" result="blur"/>
@@ -18,6 +18,6 @@
   </defs>
   <rect width="96" height="96" rx="24" fill="url(#bg)"/>
   <rect x="19" y="18" width="58" height="13" rx="6.5" fill="url(#signal)" filter="url(#glow)"/>
-  <rect x="42" y="18" width="12" height="57" rx="6" fill="#eefcff"/>
+  <rect x="42" y="18" width="12" height="57" rx="6" fill="#fff4f7"/>
   <rect x="26" y="57" width="44" height="13" rx="6.5" fill="url(#signal)" filter="url(#glow)"/>
 </svg>

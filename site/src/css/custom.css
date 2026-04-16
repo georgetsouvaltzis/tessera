@@ -1,54 +1,54 @@
 :root {
-  --ifm-color-primary: #219de8;
-  --ifm-color-primary-dark: #128ecf;
-  --ifm-color-primary-darker: #1186c3;
-  --ifm-color-primary-darkest: #0e6f9f;
-  --ifm-color-primary-light: #3ca9ed;
-  --ifm-color-primary-lighter: #49b0ef;
-  --ifm-color-primary-lightest: #72c2f3;
-  --ifm-background-color: #f6f9fb;
+  --ifm-color-primary: #e56f97;
+  --ifm-color-primary-dark: #de5786;
+  --ifm-color-primary-darker: #db4b7d;
+  --ifm-color-primary-darkest: #c1275c;
+  --ifm-color-primary-light: #ec87a8;
+  --ifm-color-primary-lighter: #ef93b0;
+  --ifm-color-primary-lightest: #f6bdd0;
+  --ifm-background-color: #faf7f8;
   --ifm-background-surface-color: #ffffff;
-  --ifm-navbar-background-color: rgba(246, 249, 251, 0.92);
-  --ifm-footer-background-color: #eaf1f5;
-  --ifm-heading-color: #15202b;
-  --ifm-font-color-base: #253241;
-  --ifm-color-content-secondary: #607182;
-  --ifm-menu-color: #334255;
-  --ifm-menu-color-active: #219de8;
-  --ifm-menu-color-background-active: rgba(33, 157, 232, 0.12);
-  --ifm-breadcrumb-color-active: #219de8;
-  --ifm-link-color: #219de8;
-  --ifm-code-background: rgba(18, 142, 207, 0.1);
-  --ifm-pre-background: #edf4f8;
+  --ifm-navbar-background-color: rgba(250, 247, 248, 0.92);
+  --ifm-footer-background-color: #f0e8eb;
+  --ifm-heading-color: #241f24;
+  --ifm-font-color-base: #3b343c;
+  --ifm-color-content-secondary: #796e79;
+  --ifm-menu-color: #4a424c;
+  --ifm-menu-color-active: #e56f97;
+  --ifm-menu-color-background-active: rgba(229, 111, 151, 0.12);
+  --ifm-breadcrumb-color-active: #e56f97;
+  --ifm-link-color: #d85883;
+  --ifm-code-background: rgba(229, 111, 151, 0.1);
+  --ifm-pre-background: #f4edef;
   --ifm-code-font-size: 95%;
   --ifm-global-radius: 12px;
   --ifm-footer-padding-vertical: 3rem;
-  --docusaurus-highlighted-code-line-bg: rgba(33, 157, 232, 0.08);
+  --docusaurus-highlighted-code-line-bg: rgba(229, 111, 151, 0.08);
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #46b8ff;
-  --ifm-color-primary-dark: #24a9ff;
-  --ifm-color-primary-darker: #13a2ff;
-  --ifm-color-primary-darkest: #0088df;
-  --ifm-color-primary-light: #68c7ff;
-  --ifm-color-primary-lighter: #79ceff;
-  --ifm-color-primary-lightest: #ace0ff;
-  --ifm-background-color: #0f1115;
-  --ifm-background-surface-color: #171a21;
-  --ifm-navbar-background-color: rgba(15, 17, 21, 0.92);
-  --ifm-footer-background-color: #0b0e13;
-  --ifm-heading-color: #e8ecf1;
-  --ifm-font-color-base: #d7dde5;
-  --ifm-color-content-secondary: #9aa4b2;
-  --ifm-menu-color: #c0c9d4;
-  --ifm-menu-color-active: #46b8ff;
-  --ifm-menu-color-background-active: rgba(70, 184, 255, 0.12);
-  --ifm-breadcrumb-color-active: #46b8ff;
-  --ifm-link-color: #46b8ff;
-  --ifm-code-background: rgba(70, 184, 255, 0.12);
-  --ifm-pre-background: #111827;
-  --docusaurus-highlighted-code-line-bg: rgba(70, 184, 255, 0.12);
+  --ifm-color-primary: #ff7aa2;
+  --ifm-color-primary-dark: #ff5f90;
+  --ifm-color-primary-darker: #ff5086;
+  --ifm-color-primary-darkest: #f42369;
+  --ifm-color-primary-light: #ff95b4;
+  --ifm-color-primary-lighter: #ffa3be;
+  --ifm-color-primary-lightest: #ffc9d9;
+  --ifm-background-color: #111215;
+  --ifm-background-surface-color: #191b20;
+  --ifm-navbar-background-color: rgba(17, 18, 21, 0.94);
+  --ifm-footer-background-color: #0d0f13;
+  --ifm-heading-color: #f3f1ed;
+  --ifm-font-color-base: #e3dde3;
+  --ifm-color-content-secondary: #b0a8b3;
+  --ifm-menu-color: #d1c8d1;
+  --ifm-menu-color-active: #ff7aa2;
+  --ifm-menu-color-background-active: rgba(255, 122, 162, 0.14);
+  --ifm-breadcrumb-color-active: #ff7aa2;
+  --ifm-link-color: #ff8eb0;
+  --ifm-code-background: rgba(255, 122, 162, 0.13);
+  --ifm-pre-background: #15171c;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 122, 162, 0.12);
 }
 
 html {
@@ -109,8 +109,8 @@ code {
 
 .hero--primary {
   background:
-    radial-gradient(circle at top right, rgba(126, 240, 200, 0.14), transparent 28%),
-    radial-gradient(circle at top left, rgba(70, 184, 255, 0.14), transparent 30%),
+    radial-gradient(circle at top right, rgba(255, 122, 162, 0.14), transparent 30%),
+    radial-gradient(circle at top left, rgba(243, 179, 196, 0.1), transparent 34%),
     var(--ifm-background-surface-color);
   border-bottom: 1px solid var(--ifm-color-emphasis-200);
   color: var(--ifm-font-color-base);
