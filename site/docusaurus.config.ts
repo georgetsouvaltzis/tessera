@@ -1,5 +1,6 @@
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import { themes as prismThemes } from 'prism-react-renderer';
 
 const config: Config = {
   title: 'Tessera',
@@ -127,6 +128,11 @@ const config: Config = {
     },
     colorMode: {
       respectPrefersColorScheme: true,
+    },
+    prism: {
+      theme: prismThemes.github,
+      darkTheme: prismThemes.dracula,
+      additionalLanguages: ['bash', 'csharp'],
     },
     metadata: [
       {
