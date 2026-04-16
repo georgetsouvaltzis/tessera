@@ -161,12 +161,15 @@ function HomepageContent() {
     <main>
       <section className="home-section">
         <div className="container">
-          <div className="home-section__header home-section__header--compact">
-            <span className="home-section__eyebrow">Flagship examples</span>
-            <h2>Product pressure. Same public path.</h2>
-            <p>
-              Rezi keeps the landing page product-led. Prisma keeps docs quiet. Tessera should do
-              both: show the densest apps quickly, then move people into docs.
+          <div className="home-section__lead">
+            <div className="home-section__header home-section__header--compact">
+              <span className="home-section__eyebrow">Flagship examples</span>
+              <h2>Flagship apps. Same public API.</h2>
+            </div>
+            <p className="home-section__summary">
+              Start with the smaller path, then open the denser shells. The point is not extra
+              surface area. The point is that the same mental model still holds when the UI starts
+              feeling like software.
             </p>
           </div>
           <div className="home-showcase-grid">
@@ -185,13 +188,23 @@ function HomepageContent() {
       <section className="home-eval-band">
         <div className="container">
           <div className="home-eval-band__frame">
-            <div className="home-eval-band__intro">
-              <span className="home-section__eyebrow">Evaluate in order</span>
-              <h2>Overview. Starters. Flagships.</h2>
-              <p>
-                Keep the landing page short. The real evaluation path belongs here, not stretched
-                across multiple teaching sections.
-              </p>
+            <div className="home-eval-band__header">
+              <div className="home-eval-band__intro">
+                <span className="home-section__eyebrow">Evaluate in order</span>
+                <h2>Overview. Starters. Flagships.</h2>
+                <p>
+                  Read the contract, run the starter ladder, then pressure-test the flagship apps.
+                  That is the fastest way to decide whether Tessera fits a real product surface.
+                </p>
+              </div>
+              <div className="home-eval-band__actions">
+                <Link className="button button--primary button--lg" to="/docs/getting-started">
+                  Get Started
+                </Link>
+                <Link className="button button--secondary button--lg" to="/docs/showcase">
+                  Browse Showcase
+                </Link>
+              </div>
             </div>
             <div className="home-steps">
               {evaluationSteps.map((item) => (
@@ -202,14 +215,6 @@ function HomepageContent() {
                   <Link to={item.href}>Open</Link>
                 </article>
               ))}
-            </div>
-            <div className="home-eval-band__actions">
-              <Link className="button button--primary button--lg" to="/docs/getting-started">
-                Get Started
-              </Link>
-              <Link className="button button--secondary button--lg" to="/docs/showcase">
-                Browse Showcase
-              </Link>
             </div>
           </div>
         </div>
