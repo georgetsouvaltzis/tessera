@@ -40,34 +40,36 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      TESSERA_DOCS_BUILD_DIR: ${{ runner.temp }}/tessera-docs-build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.12'
-          cache: 'pip'
-          cache-dependency-path: site/requirements-docs.txt
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: site/package-lock.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Install docs dependencies
-        run: pip install -r site/requirements-docs.txt
+      - name: Install site dependencies
+        working-directory: site
+        run: npm ci
 
-      - name: Build docs
-        run: mkdocs build -f site/mkdocs.yml --strict
-        env:
-          TESSERA_SITE_DIR: ${{ env.TESSERA_DOCS_BUILD_DIR }}
+      - name: Typecheck site
+        working-directory: site
+        run: npm run typecheck
+
+      - name: Build site
+        working-directory: site
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.TESSERA_DOCS_BUILD_DIR }}
+          path: site/build
 
   deploy:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')

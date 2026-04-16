@@ -11,14 +11,14 @@ Primary metrics:
 - p95 input latency
 
 SLO targets (Release build, local terminal, same machine profile per run):
-- Startup (DataWorkbench): <= 250 ms to first frame
-- Startup (OpsWatch): <= 250 ms to first frame
-- Frame time p95 (normal UI load): <= 16 ms
-- Frame time p95 (heavy styled output): <= 33 ms
-- Allocations/frame (normal UI load): <= 32 KB
-- Allocations/frame (heavy styled output): <= 96 KB
-- Input latency p95 (normal UI load): <= 12 ms
-- Input latency p95 (heavy load): <= 25 ms
+- Startup (DataWorkbench): `<= 250 ms` to first frame
+- Startup (OpsWatch): `<= 250 ms` to first frame
+- Frame time p95 (normal UI load): `<= 16 ms`
+- Frame time p95 (heavy styled output): `<= 33 ms`
+- Allocations/frame (normal UI load): `<= 32 KB`
+- Allocations/frame (heavy styled output): `<= 96 KB`
+- Input latency p95 (normal UI load): `<= 12 ms`
+- Input latency p95 (heavy load): `<= 25 ms`
 
 ## Scenario Matrix
 

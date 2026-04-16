@@ -82,4 +82,4 @@ dotnet run --project examples/DataWorkbench/DataWorkbench.csproj
 - public API boundaries: [public-api-guidelines.md](public-api-guidelines.md)
 - API surface map: [public-api-inventory.md](public-api-inventory.md)
 - custom controls: [custom-components.md](custom-components.md)
-- contributing: [CONTRIBUTING.md](../CONTRIBUTING.md)
+- contributing: [CONTRIBUTING.md](/contributing)

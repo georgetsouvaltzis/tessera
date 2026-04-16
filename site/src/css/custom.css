@@ -1,0 +1,39 @@
+:root {
+  --ifm-color-primary: #c43cff;
+  --ifm-color-primary-dark: #bc24ff;
+  --ifm-color-primary-darker: #b51aff;
+  --ifm-color-primary-darkest: #9400db;
+  --ifm-color-primary-light: #cc54ff;
+  --ifm-color-primary-lighter: #d25eff;
+  --ifm-color-primary-lightest: #df88ff;
+  --ifm-code-font-size: 95%;
+  --ifm-footer-padding-vertical: 3rem;
+  --docusaurus-highlighted-code-line-bg: rgba(196, 60, 255, 0.08);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #d56aff;
+  --ifm-color-primary-dark: #cd52ff;
+  --ifm-color-primary-darker: #c948ff;
+  --ifm-color-primary-darkest: #bd27ff;
+  --ifm-color-primary-light: #dd82ff;
+  --ifm-color-primary-lighter: #e18cff;
+  --ifm-color-primary-lightest: #ecafff;
+  --docusaurus-highlighted-code-line-bg: rgba(213, 106, 255, 0.12);
+}
+
+.hero--primary {
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+}
+
+.hero--primary .hero__title,
+.hero--primary .hero__subtitle {
+  color: inherit;
+}
+
+.hero--primary .button--secondary {
+  --ifm-button-background-color: var(--ifm-color-emphasis-200);
+  --ifm-button-border-color: var(--ifm-color-emphasis-200);
+  --ifm-button-color: var(--ifm-font-color-base);
+}

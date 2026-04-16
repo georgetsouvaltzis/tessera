@@ -82,14 +82,14 @@ Open caveat:
 Before public alpha signoff, do one final docs pass confirming that these files agree:
 
 - [overview.md](overview.md)
-- [CHANGELOG.md](../CHANGELOG.md)
-- [SUPPORT.md](../SUPPORT.md)
+- [CHANGELOG.md](/changelog)
+- [SUPPORT.md](/support)
 - [getting-started.md](getting-started.md)
 - [examples.md](examples.md)
 - [architecture-overview.md](architecture-overview.md)
-- [CONTRIBUTING.md](../CONTRIBUTING.md)
-- [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md)
-- [SECURITY.md](../SECURITY.md)
+- [CONTRIBUTING.md](/contributing)
+- [CODE_OF_CONDUCT.md](/code-of-conduct)
+- [SECURITY.md](/security)
 
 - [spec.md](spec.md)
 - [public-api-guidelines.md](public-api-guidelines.md)

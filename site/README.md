@@ -1,37 +1,25 @@
-# Tessera Docs Site
+# Tessera Site
 
-This directory contains the MkDocs configuration for the public Tessera site.
+This directory contains the Docusaurus-based public docs site for Tessera.
 
-The actual content source is the repository root:
-
-- `README.md`
-- `CHANGELOG.md`
-- `CONTRIBUTING.md`
-- `SUPPORT.md`
-- `CODE_OF_CONDUCT.md`
-- `SECURITY.md`
-- `docs/`
-
-## Local docs development
+## Local development
 
 ```bash
 cd site
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-docs.txt
-mkdocs serve -f mkdocs.yml
+npm install
+npm run start
 ```
-
-The docs server runs at `http://127.0.0.1:8000/`.
 
 ## Verification
 
 ```bash
 cd site
-source .venv/bin/activate
-export TESSERA_SITE_DIR="${TMPDIR:-/tmp}/tessera-site-build"
-mkdocs build -f mkdocs.yml
+npm run typecheck
+npm run build
 ```
 
-Build output goes to `TESSERA_SITE_DIR`.
-If you do not set it, the default build output is `/tmp/tessera-site-build`.
+## Notes
+
+- docs source: `../docs`
+- project pages: root repository markdown files exposed through `src/pages`
+- output directory: `site/build/`
