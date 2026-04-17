@@ -218,7 +218,10 @@ function HomepageHero() {
         <div className="home-hero__grid">
           <div className="home-hero__copy">
             <span className="home-badge">Public alpha • .NET 10 • C#-first</span>
-            <h1 className="home-hero__title">Terminal UI for serious product surfaces that get dense fast.</h1>
+            <h1 className="home-hero__title">
+              <span className="home-hero__title-line">Terminal UI for real</span>
+              <span className="home-hero__title-line">product surfaces.</span>
+            </h1>
             <p className="home-hero__subtitle">
               Build dashboards, workflows, and workbenches in C# without a host-heavy stack or a
               starter path that falls apart once the UI stops being simple.
@@ -238,7 +241,7 @@ function HomepageHero() {
               {capabilityStats.slice(0, 3).map((item) => (
                 <article key={item.label} className="home-hero__signal">
                   <strong>{item.value}</strong>
-                  <span>{item.label}</span>
+                  <span className="home-hero__signal-label">{item.label}</span>
                 </article>
               ))}
             </div>
@@ -257,8 +260,8 @@ function HomepageProof() {
   return (
     <section className="home-section home-section--proof">
       <div className="container">
-        <div className="home-proof-shell">
-          <div className="home-proof-story">
+        <div className="home-proof-layout">
+          <div className="home-proof-copy">
             <div className="home-section__header home-section__header--compact">
               <span className="home-section__eyebrow">Why it sells</span>
               <h2>Start on the guide. Still hold up when the terminal turns into real software.</h2>
@@ -267,17 +270,22 @@ function HomepageProof() {
               Tessera covers forms, overlays, logs, traces, plotting, dashboards, and workspace
               composition without pushing teams onto a second authoring model once the UI gets operational.
             </p>
-            <div className="home-proof-stats" aria-label="Tessera selling points">
+            <div className="home-proof-metrics" aria-label="Tessera selling points">
               {capabilityStats.map((item) => (
-                <article key={item.label} className="home-proof-stat">
-                  <span>{item.label}</span>
+                <article key={item.label} className="home-proof-metric">
                   <strong>{item.value}</strong>
-                  <p>{item.detail}</p>
+                  <div>
+                    <span>{item.label}</span>
+                    <p>{item.detail}</p>
+                  </div>
                 </article>
               ))}
             </div>
+            <Link className="home-link home-proof-copy__link" to="/docs/showcase">
+              Explore the showcase
+            </Link>
           </div>
-          <div className="home-proof-stack">
+          <div className="home-proof-stage">
             <HomepageInstallConsole />
             <div className="home-proof-notes">
               {capabilityNotes.map((item) => (
@@ -287,9 +295,6 @@ function HomepageProof() {
                 </article>
               ))}
             </div>
-            <Link className="home-link home-proof-stack__link" to="/docs/showcase">
-              Explore the showcase
-            </Link>
           </div>
         </div>
       </div>
@@ -301,7 +306,7 @@ function HomepageRoutes() {
   return (
     <section className="home-routes">
       <div className="container">
-        <div className="home-routes__frame">
+        <div className="home-routes__layout">
           <div className="home-routes__intro">
             <span className="home-section__eyebrow">Choose a lane</span>
             <h2>Keep the pitch short. Move into docs with intent.</h2>
@@ -309,8 +314,18 @@ function HomepageRoutes() {
               The homepage should prove the product quickly, then hand off to a clear next door
               instead of repeating the same story in a flatter layout.
             </p>
+            <div className="home-routes__aside">
+              <span className="home-pill home-pill--soft">Still evaluating?</span>
+              <p>
+                Need more product proof first?{' '}
+                <Link className="home-link" to="/docs/showcase">
+                  Browse the full showcase
+                </Link>
+                .
+              </p>
+            </div>
           </div>
-          <div className="home-routes__grid">
+          <div className="home-routes__cards">
             {pathCards.map((item) => (
               <Link
                 key={item.title}
@@ -322,16 +337,6 @@ function HomepageRoutes() {
                 <span className="home-route-card__cta">{item.cta}</span>
               </Link>
             ))}
-          </div>
-          <div className="home-routes__aside">
-            <span className="home-pill home-pill--soft">Still evaluating?</span>
-            <p>
-              Need more product proof first?{' '}
-              <Link className="home-link" to="/docs/showcase">
-                Browse the full showcase
-              </Link>
-              .
-            </p>
           </div>
         </div>
       </div>
