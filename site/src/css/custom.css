@@ -482,7 +482,8 @@ code {
   height: 1.05rem;
   margin-left: 0.2rem;
   vertical-align: -0.16rem;
-  background: #2ae9ff;
+  background: #ff7ac6;
+  box-shadow: 0 0 10px rgba(255, 122, 198, 0.28);
   animation: home-terminal-cursor 900ms steps(1) infinite;
 }
 
@@ -496,10 +497,10 @@ code {
   border-radius: 0.82rem;
   background: rgba(16, 21, 31, 0.88);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-  opacity: 0.16;
-  transform: translateY(0) scale(0.985);
+  opacity: 0;
+  transform: translateY(6px) scale(0.985);
   animation: home-terminal-status 1.2s forwards;
-  animation-delay: 4.8s;
+  animation-delay: 5.15s;
 }
 
 .home-pill--soft {
@@ -879,8 +880,8 @@ code {
 
 @keyframes home-terminal-status {
   0% {
-    opacity: 0.16;
-    transform: translateY(0) scale(0.985);
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
   }
 
   100% {
