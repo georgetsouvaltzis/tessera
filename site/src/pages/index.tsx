@@ -3,119 +3,71 @@ import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-const proofItems = ['.NET 10', 'C#-first API', 'Starter ladder', 'Flagship apps'];
-
 const heroShot = {
-  title: 'DataWorkbench',
   alt: 'DataWorkbench flagship workbench screenshot',
-  role: 'Hero screenshot',
   src: 'img/home/dataworkbench-hero.png',
   href: '/docs/showcase',
-  description: 'Investigation workspace with rails, tabs, result grid, and inspector.',
-  command: 'dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build',
-  capture: '176x48 terminal • 16:10 crop',
 };
 
 const flagshipShots = [
   {
     title: 'OpsWatch',
     alt: 'OpsWatch operator dashboard screenshot',
-    role: 'Operator dashboard',
+    label: 'Operator dashboard',
     src: 'img/home/opswatch-card.png',
     href: '/docs/showcase',
-    description: 'Telemetry cards, charts, and incident feed in one operator surface.',
-    command: 'dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build',
-    capture: '176x48 terminal • 16:10 crop',
+    description: 'Telemetry panels, alert pressure, and operator actions in one dense surface.',
+    frameClassName: 'home-media__frame--wide',
   },
   {
     title: 'GitConsole',
     alt: 'GitConsole workflow shell screenshot',
-    role: 'Workflow shell',
+    label: 'Workflow shell',
     src: 'img/home/gitconsole-card.png',
     href: '/docs/showcase',
-    description: 'Patch deck, commit flow, and worktree review in a denser command surface.',
-    command: 'dotnet run --project examples/GitConsole/GitConsole.csproj --no-build',
-    capture: '176x48 terminal • 4:3 crop',
+    description: 'Patch review, commit flow, and worktree context without leaving the shell.',
+    frameClassName: 'home-media__frame--narrow',
   },
 ];
 
-const evaluationSteps = [
+const pathCards = [
   {
-    step: '01',
-    title: 'Read the overview',
-    description: 'Boundaries, app model, and the public path.',
-    href: '/docs/overview',
-  },
-  {
-    step: '02',
-    title: 'Run the starters',
-    description: 'HelloWorld, CounterForm, then WorkspaceApp.',
+    title: 'Getting Started',
+    description: 'Take the shortest guided path from overview to starter examples and the first flagship apps.',
     href: '/docs/getting-started',
+    cta: 'Follow the guide',
   },
   {
-    step: '03',
-    title: 'Pressure-test the flagships',
-    description: 'Open DataWorkbench, OpsWatch, and GitConsole on the same API model.',
-    href: '/docs/showcase',
+    title: 'API Reference',
+    description: 'Jump straight into runtime, controls, layout, styling, and terminal capability details.',
+    href: '/docs/api-reference',
+    cta: 'Browse the surface',
   },
 ];
 
-type ScreenshotSlotProps = {
-  title: string;
+type MediaFrameProps = {
   alt: string;
-  role: string;
-  src: string;
   href: string;
-  description: string;
-  command: string;
-  capture: string;
-  aspectClassName?: string;
-  compact?: boolean;
+  src: string;
+  frameClassName?: string;
 };
 
-function ScreenshotSlot({
-  title,
-  alt,
-  role,
-  src,
-  href,
-  description,
-  command,
-  capture,
-  aspectClassName,
-  compact = false,
-}: ScreenshotSlotProps) {
-  const [missing, setMissing] = React.useState(false);
+function MediaFrame({ alt, href, src, frameClassName }: MediaFrameProps) {
   const shotSrc = useBaseUrl(src);
+  const [missing, setMissing] = React.useState(false);
 
   return (
-    <article className={`home-shot${compact ? ' home-shot--compact' : ''}`}>
-      <Link className="home-shot__frame-link" to={href} aria-label={`Open ${title} showcase page`}>
-        <div className={`home-shot__frame ${aspectClassName ?? ''}`}>
-          {missing ? (
-            <div className="home-shot__placeholder" role="img" aria-label={alt}>
-              <span className="home-shot__placeholder-badge">{role}</span>
-              <strong>{title}</strong>
-              <p>{description}</p>
-              <code>{capture}</code>
-            </div>
-          ) : (
-            <img className="home-shot__image" src={shotSrc} alt={alt} onError={() => setMissing(true)} />
-          )}
-        </div>
-      </Link>
-      <div className="home-shot__meta">
-        <div className="home-shot__copy">
-          <span className="home-shot__eyebrow">{role}</span>
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-        <div className="home-shot__foot">
-          <code>{command}</code>
-          <span>{capture}</span>
-        </div>
+    <Link className="home-media__link" to={href} aria-label={`Open ${alt}`}>
+      <div className={`home-media__frame ${frameClassName ?? ''}`}>
+        {missing ? (
+          <div className="home-media__placeholder" role="img" aria-label={alt}>
+            <span>Screenshot unavailable</span>
+          </div>
+        ) : (
+          <img className="home-media__image" src={shotSrc} alt={alt} onError={() => setMissing(true)} />
+        )}
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -129,34 +81,72 @@ function HomepageHero() {
             <h1 className="home-hero__title">
               Terminal UI
               <br />
-              for dashboards,
+              for product
               <br />
-              workflows, and
+              surfaces that
               <br />
-              workbenches.
+              get dense fast.
             </h1>
             <p className="home-hero__subtitle">
-              Build product-grade terminal surfaces in C# without a host-heavy stack, placeholder
-              chrome, or a starter path that collapses under real complexity.
+              Build dashboards, workflows, and workbenches in C# without a host-heavy stack or a
+              starter path that falls apart once the UI stops being simple.
             </p>
             <div className="home-hero__actions">
               <Link className="button button--primary button--lg" to="/docs/getting-started">
                 Get Started
               </Link>
               <Link className="button button--secondary button--lg" to="/docs/showcase">
-                Browse Showcase
+                See Flagships
+              </Link>
+              <Link className="home-link" to="/docs/api-reference">
+                API Reference
               </Link>
             </div>
             <p className="home-hero__proofline">
-              Small public surface. Real seeded apps. Same mental model from first screen to
-              flagship shell.
+              Three starter apps. Three flagship shells. Same public path.
             </p>
           </div>
-          <ScreenshotSlot {...heroShot} aspectClassName="home-shot__frame--hero" />
+          <MediaFrame {...heroShot} frameClassName="home-media__frame--hero" />
         </div>
-        <div className="home-proof-rail" aria-label="Homepage proof points">
-          {proofItems.map((item) => (
-            <span key={item}>{item}</span>
+      </div>
+    </section>
+  );
+}
+
+function HomepageFlagships() {
+  return (
+    <section className="home-section home-section--flagships">
+      <div className="container">
+        <div className="home-section__lead">
+          <div className="home-section__header home-section__header--compact">
+            <span className="home-section__eyebrow">Flagship proof</span>
+            <h2>See two different kinds of product pressure.</h2>
+          </div>
+          <p className="home-section__summary">
+            OpsWatch proves dense dashboard composition. GitConsole proves workflow-heavy review
+            surfaces. Both stay on the same public path.
+          </p>
+        </div>
+        <div className="home-flagship-grid">
+          {flagshipShots.map((item, index) => (
+            <article
+              key={item.title}
+              className={`home-flagship-card${index === 0 ? ' home-flagship-card--primary' : ' home-flagship-card--secondary'}`}>
+              <MediaFrame
+                alt={item.alt}
+                href={item.href}
+                src={item.src}
+                frameClassName={item.frameClassName}
+              />
+              <div className="home-flagship-card__copy">
+                <span className="home-pill">{item.label}</span>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <Link className="home-link" to={item.href}>
+                  Open the showcase
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
       </div>
@@ -164,64 +154,38 @@ function HomepageHero() {
   );
 }
 
-function HomepageContent() {
+function HomepagePaths() {
   return (
-    <main>
-      <section className="home-section home-section--tight">
-        <div className="container">
-          <div className="home-section__lead">
-            <div className="home-section__header home-section__header--compact">
-              <span className="home-section__eyebrow">Flagship surfaces</span>
-              <h2>Open the dense apps early.</h2>
-            </div>
-            <p className="home-section__summary">
-              The landing page should prove the flagship shells fast. Docs can explain the path
-              afterward.
+    <section className="home-paths">
+      <div className="container">
+        <div className="home-paths__frame">
+          <div className="home-paths__intro">
+            <span className="home-section__eyebrow">Next step</span>
+            <h2>Start with the guide or jump straight into the surface map.</h2>
+            <p>
+              The homepage should prove the product quickly. The docs should then give you a clear
+              next door instead of repeating the same pitch.
             </p>
           </div>
-          <div className="home-flagship-grid">
-            {flagshipShots.map((item) => (
-              <ScreenshotSlot key={item.title} {...item} compact aspectClassName="home-shot__frame--card" />
+          <div className="home-paths__grid">
+            {pathCards.map((item) => (
+              <Link key={item.title} className="home-path-card" to={item.href}>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <span className="home-path-card__cta">{item.cta}</span>
+              </Link>
             ))}
           </div>
+          <p className="home-paths__aside">
+            Need more product proof first?{' '}
+            <Link className="home-link" to="/docs/showcase">
+              Browse the full showcase
+            </Link>
+            .
+          </p>
         </div>
-      </section>
-
-      <section className="home-eval-band">
-        <div className="container">
-          <div className="home-eval-band__frame">
-            <div className="home-eval-band__header">
-              <div className="home-eval-band__intro">
-                <span className="home-section__eyebrow">Evaluate in order</span>
-                <h2>Overview. Starters. Flagships.</h2>
-                <p>
-                  Keep the homepage short. Read the contract, run the starter ladder, then decide
-                  on the flagship apps.
-                </p>
-              </div>
-              <div className="home-eval-band__actions">
-                <Link className="button button--primary button--lg" to="/docs/getting-started">
-                  Get Started
-                </Link>
-                <Link className="button button--secondary button--lg" to="/docs/showcase">
-                  View Showcase
-                </Link>
-              </div>
-            </div>
-            <div className="home-steps">
-              {evaluationSteps.map((item) => (
-                <article key={item.step} className="home-step">
-                  <span className="home-step__index">{item.step}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                  <Link to={item.href}>Open</Link>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+      </div>
+    </section>
   );
 }
 
@@ -231,7 +195,10 @@ export default function Home(): React.JSX.Element {
       title="Terminal UI for .NET"
       description="Tessera is a C#-first terminal UI framework for serious application surfaces.">
       <HomepageHero />
-      <HomepageContent />
+      <main>
+        <HomepageFlagships />
+        <HomepagePaths />
+      </main>
     </Layout>
   );
 }
