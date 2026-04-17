@@ -324,6 +324,8 @@ code {
   max-width: 46rem;
   justify-self: end;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
   border: 1px solid var(--ifm-color-emphasis-200);
   border-radius: 1.1rem;
   background:
@@ -485,7 +487,7 @@ code {
 }
 
 .home-terminal__status {
-  width: fit-content;
+  width: 100%;
   display: grid;
   gap: 0.55rem;
   margin-top: 0.85rem;
@@ -558,7 +560,6 @@ code {
 
 .home-terminal__status p {
   margin: 0;
-  max-width: 23rem;
   color: #9aa8c1;
   font-size: 0.95rem;
   line-height: 1.55;
