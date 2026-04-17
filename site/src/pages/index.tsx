@@ -1,28 +1,6 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-
-const flagshipShots = [
-  {
-    title: 'OpsWatch',
-    alt: 'OpsWatch operator dashboard screenshot',
-    label: 'Operator dashboard',
-    src: 'img/home/opswatch-card.png',
-    href: '/docs/showcase',
-    description: 'Telemetry panels, alert pressure, and operator actions in one dense surface.',
-    frameClassName: 'home-media__frame--wide',
-  },
-  {
-    title: 'GitConsole',
-    alt: 'GitConsole workflow shell screenshot',
-    label: 'Workflow shell',
-    src: 'img/home/gitconsole-card.png',
-    href: '/docs/showcase',
-    description: 'Patch review, commit flow, and worktree context without leaving the shell.',
-    frameClassName: 'home-media__frame--narrow',
-  },
-];
 
 const pathCards = [
   {
@@ -39,31 +17,69 @@ const pathCards = [
   },
 ];
 
-type MediaFrameProps = {
-  alt: string;
-  href: string;
-  src: string;
-  frameClassName?: string;
-};
+const capabilityNotes = [
+  {
+    title: 'App shells to dense workbenches',
+    description:
+      'Starter flows, dashboards, workflow shells, and multi-pane investigation surfaces stay on the same public API.',
+  },
+  {
+    title: 'Theme-first defaults',
+    description:
+      'Semantic tokens, shipped palettes, and override layers go from global theme to control state without hidden styling seams.',
+  },
+  {
+    title: 'Examples with pressure',
+    description:
+      'The starter ladder and flagship apps show the same model holding from first screen to real software-shaped terminals.',
+  },
+];
 
-function MediaFrame({ alt, href, src, frameClassName }: MediaFrameProps) {
-  const shotSrc = useBaseUrl(src);
-  const [missing, setMissing] = React.useState(false);
+const capabilityStats = [
+  {
+    value: '+34',
+    label: 'widgets landed',
+    detail: 'four roadmap waves completed',
+  },
+  {
+    value: '7',
+    label: 'plotting controls',
+    detail: 'sparkline to plot panels',
+  },
+  {
+    value: '3',
+    label: 'starter apps',
+    detail: 'HelloWorld to WorkspaceApp',
+  },
+  {
+    value: '3',
+    label: 'flagship apps',
+    detail: 'OpsWatch, GitConsole, DataWorkbench',
+  },
+];
 
-  return (
-    <Link className="home-media__link" to={href} aria-label={`Open ${alt}`}>
-      <div className={`home-media__frame ${frameClassName ?? ''}`}>
-        {missing ? (
-          <div className="home-media__placeholder" role="img" aria-label={alt}>
-            <span>Screenshot unavailable</span>
-          </div>
-        ) : (
-          <img className="home-media__image" src={shotSrc} alt={alt} onError={() => setMissing(true)} />
-        )}
-      </div>
-    </Link>
-  );
-}
+const installConsoleLines = [
+  {
+    kind: 'command',
+    prefix: '$',
+    text: 'dotnet add package Tessera',
+  },
+  {
+    kind: 'output',
+    prefix: 'info',
+    text: 'Determining projects to restore...',
+  },
+  {
+    kind: 'output',
+    prefix: 'ok',
+    text: "PackageReference for package 'Tessera' version '1.0.0-alpha.1' added.",
+  },
+  {
+    kind: 'output',
+    prefix: 'ok',
+    text: 'Restored my-app.csproj (in 1.21 sec).',
+  },
+];
 
 function HomepageHeroTerminal() {
   return (
@@ -162,6 +178,35 @@ function HomepageHeroTerminal() {
   );
 }
 
+function HomepageInstallConsole() {
+  return (
+    <article className="home-console-card home-console-card--install" aria-label="Simulated package install">
+      <div className="home-console-card__chrome">
+        <div className="home-console-card__dots" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        <span className="home-console-card__path">~/my-app</span>
+      </div>
+      <div className="home-console-card__body">
+        {installConsoleLines.map((line) => (
+          <div
+            key={`${line.prefix}-${line.text}`}
+            className={`home-console-card__line home-console-card__line--${line.kind}`}>
+            <span className="home-console-card__prefix">{line.prefix}</span>
+            <span>{line.text}</span>
+          </div>
+        ))}
+      </div>
+      <div className="home-console-card__footer">
+        <span className="home-pill home-pill--soft">Package install</span>
+        <strong>Minimal setup, real API path.</strong>
+      </div>
+    </article>
+  );
+}
+
 function HomepageHero() {
   return (
     <section className="home-hero">
@@ -204,39 +249,40 @@ function HomepageHero() {
   );
 }
 
-function HomepageFlagships() {
+function HomepageCapabilities() {
   return (
-    <section className="home-section home-section--flagships">
+    <section className="home-section home-section--capabilities">
       <div className="container">
-        <div className="home-section__lead">
-          <div className="home-section__header home-section__header--compact">
-            <span className="home-section__eyebrow">Flagship proof</span>
-            <h2>See two different kinds of product pressure.</h2>
+        <div className="home-capability-grid">
+          <div className="home-capability-copy">
+            <div className="home-section__header home-section__header--compact">
+              <span className="home-section__eyebrow">What Tessera ships</span>
+              <h2>One public path, broad terminal surface area.</h2>
+            </div>
+            <p className="home-section__summary">
+              Tessera covers forms, overlays, logs, traces, plotting, dashboards, and workspace
+              composition without moving teams onto a second authoring model once the UI gets real.
+            </p>
+            <div className="home-capability-notes">
+              {capabilityNotes.map((item) => (
+                <article key={item.title} className="home-capability-note">
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </article>
+              ))}
+            </div>
+            <Link className="home-link" to="/docs/showcase">
+              Explore the showcase
+            </Link>
           </div>
-          <p className="home-section__summary">
-            OpsWatch proves dense dashboard composition. GitConsole proves workflow-heavy review
-            surfaces. Both stay on the same public path.
-          </p>
+          <HomepageInstallConsole />
         </div>
-        <div className="home-flagship-grid">
-          {flagshipShots.map((item, index) => (
-            <article
-              key={item.title}
-              className={`home-flagship-card${index === 0 ? ' home-flagship-card--primary' : ' home-flagship-card--secondary'}`}>
-              <MediaFrame
-                alt={item.alt}
-                href={item.href}
-                src={item.src}
-                frameClassName={item.frameClassName}
-              />
-              <div className="home-flagship-card__copy">
-                <span className="home-pill">{item.label}</span>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <Link className="home-link" to={item.href}>
-                  Open the showcase
-                </Link>
-              </div>
+        <div className="home-stat-grid" aria-label="Tessera selling points">
+          {capabilityStats.map((item) => (
+            <article key={item.label} className="home-stat-card">
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+              <p>{item.detail}</p>
             </article>
           ))}
         </div>
@@ -287,7 +333,7 @@ export default function Home(): React.JSX.Element {
       description="Tessera is a C#-first terminal UI framework for serious application surfaces.">
       <HomepageHero />
       <main>
-        <HomepageFlagships />
+        <HomepageCapabilities />
         <HomepagePaths />
       </main>
     </Layout>

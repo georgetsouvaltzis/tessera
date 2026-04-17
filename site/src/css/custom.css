@@ -113,8 +113,7 @@ body {
 .docs-link-card,
 .card,
 .pagination-nav__link,
-.home-link,
-.home-media__frame {
+.home-link {
   transition:
     color 180ms ease,
     background-color 180ms ease,
@@ -145,8 +144,7 @@ body {
 .button:focus-visible,
 .navbar__link:focus-visible,
 .docs-link-card:focus-visible,
-.home-link:focus-visible,
-.home-media__link:focus-visible .home-media__frame {
+.home-link:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(255, 122, 162, 0.22);
 }
@@ -275,7 +273,6 @@ code {
 
 .home-hero__subtitle,
 .home-section__header p,
-.home-flagship-card__copy p,
 .home-path-card p,
 .home-paths__intro p,
 .home-paths__aside {
@@ -566,82 +563,6 @@ code {
   line-height: 1.55;
 }
 
-.home-media__link {
-  display: block;
-  color: inherit;
-  text-decoration: none;
-}
-
-.home-media__frame {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 16 / 10;
-  background: #15171c;
-  border: 1px solid var(--ifm-color-emphasis-200);
-  border-radius: 0.95rem;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
-}
-
-.home-media__frame::after {
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: inherit;
-  content: '';
-  pointer-events: none;
-}
-
-.home-media__frame--hero {
-  aspect-ratio: 16 / 10;
-  border-radius: 1.1rem;
-}
-
-.home-media__frame--wide {
-  aspect-ratio: 16 / 10;
-}
-
-.home-media__frame--narrow {
-  aspect-ratio: 4 / 3;
-}
-
-.home-media__image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-}
-
-.home-media__frame--narrow .home-media__image {
-  object-position: left top;
-}
-
-.home-media__link:hover .home-media__frame {
-  border-color: rgba(255, 122, 162, 0.34);
-  box-shadow: 0 30px 74px rgba(0, 0, 0, 0.28);
-}
-
-.home-media__link:hover .home-media__image {
-  transform: scale(1.018);
-}
-
-.home-media__placeholder {
-  display: grid;
-  place-items: end start;
-  height: 100%;
-  padding: 1rem;
-  background:
-    radial-gradient(circle at top right, rgba(255, 122, 162, 0.1), transparent 34%),
-    #15171c;
-  color: var(--ifm-color-content-secondary);
-}
-
-.home-flagship-card__copy {
-  display: grid;
-  gap: 0.45rem;
-}
-
-.home-flagship-card__copy h3,
 .home-path-card h3 {
   margin: 0;
   font-size: 1.35rem;
@@ -651,7 +572,7 @@ code {
   padding: 4rem 0;
 }
 
-.home-section--flagships {
+.home-section--capabilities {
   padding-top: 3.2rem;
 }
 
@@ -689,33 +610,159 @@ code {
   line-height: 0.98;
 }
 
-.home-flagship-grid {
+.home-capability-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.16fr) minmax(0, 0.84fr);
-  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 1.5rem;
 }
 
-.home-flagship-card {
+.home-capability-copy {
   display: grid;
-  gap: 0.95rem;
+  gap: 1.2rem;
 }
 
-.home-flagship-card--primary {
-  align-content: start;
+.home-capability-notes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
 }
 
-.home-flagship-card--primary .home-media__frame {
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.24);
+.home-capability-note,
+.home-stat-card {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.02);
 }
 
-.home-flagship-card--secondary {
-  align-content: end;
-  max-width: 26rem;
-  margin-left: auto;
+.home-capability-note h3 {
+  margin: 0;
+  font-size: 1rem;
 }
 
-.home-flagship-card--secondary .home-flagship-card__copy h3 {
-  font-size: 1.18rem;
+.home-capability-note p,
+.home-stat-card p,
+.home-console-card__footer {
+  margin: 0;
+  color: var(--ifm-color-content-secondary);
+  line-height: 1.65;
+}
+
+.home-console-card {
+  display: grid;
+  overflow: hidden;
+  align-self: start;
+  user-select: none;
+  -webkit-user-select: none;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+    #13161c;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+}
+
+.home-console-card__chrome,
+.home-console-card__body,
+.home-console-card__footer {
+  position: relative;
+}
+
+.home-console-card__chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  background: rgba(20, 23, 29, 0.94);
+}
+
+.home-console-card__dots {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.home-console-card__dots span {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+}
+
+.home-console-card__dots span:nth-child(1) {
+  background: #ff5f57;
+}
+
+.home-console-card__dots span:nth-child(2) {
+  background: #febc2e;
+}
+
+.home-console-card__dots span:nth-child(3) {
+  background: #28c840;
+}
+
+.home-console-card__path {
+  color: #9aa8c1;
+  font-size: 0.84rem;
+}
+
+.home-console-card__body {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1.1rem 1rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+
+.home-console-card__line {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.home-console-card__line--command {
+  color: #f3f5f8;
+}
+
+.home-console-card__line--output {
+  color: #9aa8c1;
+}
+
+.home-console-card__prefix {
+  min-width: 2.75rem;
+  color: #ff7ac6;
+}
+
+.home-console-card__line--output .home-console-card__prefix {
+  color: #7ee7d8;
+}
+
+.home-console-card__footer {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0 1rem 1rem;
+}
+
+.home-console-card__footer strong,
+.home-stat-card strong {
+  font-size: 1.08rem;
+}
+
+.home-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1.25rem;
+}
+
+.home-stat-card span {
+  color: var(--ifm-heading-color);
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 .home-paths {
@@ -778,7 +825,9 @@ code {
 
 @media (max-width: 1100px) {
   .home-hero__grid,
-  .home-flagship-grid,
+  .home-capability-grid,
+  .home-capability-notes,
+  .home-stat-grid,
   .home-paths__grid {
     grid-template-columns: 1fr;
   }
@@ -827,6 +876,15 @@ code {
     grid-column: 1 / -1;
   }
 
+  .home-console-card__line {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .home-console-card__prefix {
+    min-width: 0;
+  }
+
   .home-path-card__cta {
     width: 100%;
   }
@@ -853,8 +911,6 @@ code {
   }
 
   .home-terminal__cursor,
-  .home-media__image,
-  .home-media__frame,
   .button,
   .card,
   .pagination-nav__link,
