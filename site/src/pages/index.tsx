@@ -79,28 +79,66 @@ function HomepageHeroTerminal() {
       <div className="home-terminal__body">
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--first">
           <span className="home-terminal__gutter">01</span>
-          <span className="home-terminal__text">using Tessera;</span>
+          <span className="home-terminal__text">
+            <span className="home-terminal__token home-terminal__token--keyword">using</span>{' '}
+            <span className="home-terminal__token home-terminal__token--namespace">Tessera</span>
+            <span className="home-terminal__token home-terminal__token--punctuation">;</span>
+          </span>
         </div>
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--second">
           <span className="home-terminal__gutter">02</span>
-          <span className="home-terminal__text">using Tessera.Examples.WorkspaceApp;</span>
+          <span className="home-terminal__text">
+            <span className="home-terminal__token home-terminal__token--keyword">using</span>{' '}
+            <span className="home-terminal__token home-terminal__token--namespace">
+              Tessera.Examples.WorkspaceApp
+            </span>
+            <span className="home-terminal__token home-terminal__token--punctuation">;</span>
+          </span>
         </div>
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--third">
           <span className="home-terminal__gutter">03</span>
-          <span className="home-terminal__text">var app = TesseraApplication.CreateBuilder()</span>
+          <span className="home-terminal__text">
+            <span className="home-terminal__token home-terminal__token--keyword">var</span>{' '}
+            <span className="home-terminal__token home-terminal__token--identifier">app</span>{' '}
+            <span className="home-terminal__token home-terminal__token--operator">=</span>{' '}
+            <span className="home-terminal__token home-terminal__token--type">
+              TesseraApplication
+            </span>
+            <span className="home-terminal__token home-terminal__token--punctuation">.</span>
+            <span className="home-terminal__token home-terminal__token--method">
+              CreateBuilder
+            </span>
+            <span className="home-terminal__token home-terminal__token--punctuation">()</span>
+          </span>
         </div>
-        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fourth">
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fourth home-terminal__line--chained">
           <span className="home-terminal__gutter">04</span>
-          <span className="home-terminal__text">    .UseApp&lt;WorkspaceApp&gt;()</span>
+          <span className="home-terminal__text">
+            <span className="home-terminal__indent" aria-hidden="true" />
+            <span className="home-terminal__token home-terminal__token--punctuation">.</span>
+            <span className="home-terminal__token home-terminal__token--method">UseApp</span>
+            <span className="home-terminal__token home-terminal__token--punctuation">&lt;</span>
+            <span className="home-terminal__token home-terminal__token--type">WorkspaceApp</span>
+            <span className="home-terminal__token home-terminal__token--punctuation">&gt;()</span>
+          </span>
         </div>
-        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fifth">
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fifth home-terminal__line--chained">
           <span className="home-terminal__gutter">05</span>
-          <span className="home-terminal__text">    .Build();</span>
+          <span className="home-terminal__text">
+            <span className="home-terminal__indent" aria-hidden="true" />
+            <span className="home-terminal__token home-terminal__token--punctuation">.</span>
+            <span className="home-terminal__token home-terminal__token--method">Build</span>
+            <span className="home-terminal__token home-terminal__token--punctuation">();</span>
+          </span>
         </div>
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--sixth">
           <span className="home-terminal__gutter">06</span>
           <span className="home-terminal__text">
-            await app.RunAsync();
+            <span className="home-terminal__token home-terminal__token--keyword">await</span>{' '}
+            <span className="home-terminal__token home-terminal__token--identifier">app</span>
+            <span className="home-terminal__token home-terminal__token--punctuation">.</span>
+            <span className="home-terminal__token home-terminal__token--method">RunAsync</span>
+            <span className="home-terminal__token home-terminal__token--punctuation">();</span>
             <span className="home-terminal__cursor" aria-hidden="true" />
           </span>
         </div>
