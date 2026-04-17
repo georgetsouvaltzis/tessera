@@ -90,7 +90,7 @@ function HomepageHeroTerminal() {
           <span className="home-terminal__text">
             <span className="home-terminal__token home-terminal__token--keyword">using</span>{' '}
             <span className="home-terminal__token home-terminal__token--namespace">
-              Tessera.Examples.WorkspaceApp
+              Tessera.Examples.OpsWatch
             </span>
             <span className="home-terminal__token home-terminal__token--punctuation">;</span>
           </span>
@@ -118,7 +118,7 @@ function HomepageHeroTerminal() {
             <span className="home-terminal__token home-terminal__token--punctuation">.</span>
             <span className="home-terminal__token home-terminal__token--method">UseApp</span>
             <span className="home-terminal__token home-terminal__token--punctuation">&lt;</span>
-            <span className="home-terminal__token home-terminal__token--type">WorkspaceApp</span>
+            <span className="home-terminal__token home-terminal__token--type">OpsWatchApp</span>
             <span className="home-terminal__token home-terminal__token--punctuation">&gt;()</span>
           </span>
         </div>
@@ -143,29 +143,29 @@ function HomepageHeroTerminal() {
           </span>
         </div>
         <div className="home-terminal__status">
-          <span className="home-pill home-pill--soft">First surface</span>
-          <strong>Tessera shell ready</strong>
+          <span className="home-pill home-pill--soft">Flagship shell</span>
+          <strong>OpsWatch ready</strong>
           <div className="home-terminal__surface" aria-hidden="true">
             <div className="home-terminal__surface-bar">
-              <span>Workspace</span>
-              <span>Citrine</span>
+              <span>Fleet Pulse</span>
+              <span>Veridian</span>
             </div>
             <div className="home-terminal__surface-grid">
               <div className="home-terminal__surface-card">
-                <span>Orders</span>
-                <strong>127</strong>
+                <span>Nodes</span>
+                <strong>05</strong>
               </div>
               <div className="home-terminal__surface-card">
-                <span>Latency</span>
-                <strong>18ms</strong>
+                <span>Health</span>
+                <strong>04/05</strong>
               </div>
               <div className="home-terminal__surface-card">
-                <span>Queue</span>
-                <strong>03</strong>
+                <span>Ack</span>
+                <strong>02</strong>
               </div>
             </div>
           </div>
-          <p>Same public path from the first screen into WorkspaceApp, OpsWatch, and DataWorkbench.</p>
+          <p>Same public path from starter apps into OpsWatch, GitConsole, and DataWorkbench.</p>
         </div>
       </div>
     </div>
