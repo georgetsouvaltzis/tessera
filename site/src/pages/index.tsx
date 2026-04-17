@@ -4,12 +4,16 @@ import Link from '@docusaurus/Link';
 
 const pathCards = [
   {
+    eyebrow: 'Fastest path',
+    accent: 'guide',
     title: 'Getting Started',
     description: 'Take the shortest guided path from overview to starter examples and the first flagship apps.',
     href: '/docs/getting-started',
     cta: 'Follow the guide',
   },
   {
+    eyebrow: 'Surface map',
+    accent: 'reference',
     title: 'API Reference',
     description: 'Jump straight into runtime, controls, layout, styling, and terminal capability details.',
     href: '/docs/api-reference',
@@ -214,15 +218,7 @@ function HomepageHero() {
         <div className="home-hero__grid">
           <div className="home-hero__copy">
             <span className="home-badge">Public alpha • .NET 10 • C#-first</span>
-            <h1 className="home-hero__title">
-              Terminal UI
-              <br />
-              for product
-              <br />
-              surfaces that
-              <br />
-              get dense fast.
-            </h1>
+            <h1 className="home-hero__title">Terminal UI for serious product surfaces that get dense fast.</h1>
             <p className="home-hero__subtitle">
               Build dashboards, workflows, and workbenches in C# without a host-heavy stack or a
               starter path that falls apart once the UI stops being simple.
@@ -238,8 +234,16 @@ function HomepageHero() {
                 API Reference
               </Link>
             </div>
+            <div className="home-hero__signalbar" aria-label="Product proof points">
+              {capabilityStats.slice(0, 3).map((item) => (
+                <article key={item.label} className="home-hero__signal">
+                  <strong>{item.value}</strong>
+                  <span>{item.label}</span>
+                </article>
+              ))}
+            </div>
             <p className="home-hero__proofline">
-              Three starter apps. Three flagship shells. Same public path.
+              Three starter apps. Three flagship shells. One public path that keeps its shape.
             </p>
           </div>
           <HomepageHeroTerminal />
@@ -249,77 +253,86 @@ function HomepageHero() {
   );
 }
 
-function HomepageCapabilities() {
+function HomepageProof() {
   return (
-    <section className="home-section home-section--capabilities">
+    <section className="home-section home-section--proof">
       <div className="container">
-        <div className="home-capability-grid">
-          <div className="home-capability-copy">
+        <div className="home-proof-shell">
+          <div className="home-proof-story">
             <div className="home-section__header home-section__header--compact">
-              <span className="home-section__eyebrow">What Tessera ships</span>
-              <h2>One public path, broad terminal surface area.</h2>
+              <span className="home-section__eyebrow">Why it sells</span>
+              <h2>Start on the guide. Still hold up when the terminal turns into real software.</h2>
             </div>
             <p className="home-section__summary">
               Tessera covers forms, overlays, logs, traces, plotting, dashboards, and workspace
-              composition without moving teams onto a second authoring model once the UI gets real.
+              composition without pushing teams onto a second authoring model once the UI gets operational.
             </p>
-            <div className="home-capability-notes">
+            <div className="home-proof-stats" aria-label="Tessera selling points">
+              {capabilityStats.map((item) => (
+                <article key={item.label} className="home-proof-stat">
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                  <p>{item.detail}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+          <div className="home-proof-stack">
+            <HomepageInstallConsole />
+            <div className="home-proof-notes">
               {capabilityNotes.map((item) => (
-                <article key={item.title} className="home-capability-note">
+                <article key={item.title} className="home-proof-note">
                   <h3>{item.title}</h3>
                   <p>{item.description}</p>
                 </article>
               ))}
             </div>
-            <Link className="home-link" to="/docs/showcase">
+            <Link className="home-link home-proof-stack__link" to="/docs/showcase">
               Explore the showcase
             </Link>
           </div>
-          <HomepageInstallConsole />
-        </div>
-        <div className="home-stat-grid" aria-label="Tessera selling points">
-          {capabilityStats.map((item) => (
-            <article key={item.label} className="home-stat-card">
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
-              <p>{item.detail}</p>
-            </article>
-          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function HomepagePaths() {
+function HomepageRoutes() {
   return (
-    <section className="home-paths">
+    <section className="home-routes">
       <div className="container">
-        <div className="home-paths__frame">
-          <div className="home-paths__intro">
-            <span className="home-section__eyebrow">Next step</span>
-            <h2>Start with the guide or jump straight into the surface map.</h2>
+        <div className="home-routes__frame">
+          <div className="home-routes__intro">
+            <span className="home-section__eyebrow">Choose a lane</span>
+            <h2>Keep the pitch short. Move into docs with intent.</h2>
             <p>
-              The homepage should prove the product quickly. The docs should then give you a clear
-              next door instead of repeating the same pitch.
+              The homepage should prove the product quickly, then hand off to a clear next door
+              instead of repeating the same story in a flatter layout.
             </p>
           </div>
-          <div className="home-paths__grid">
+          <div className="home-routes__grid">
             {pathCards.map((item) => (
-              <Link key={item.title} className="home-path-card" to={item.href}>
+              <Link
+                key={item.title}
+                className={`home-route-card home-route-card--${item.accent}`}
+                to={item.href}>
+                <span className="home-route-card__eyebrow">{item.eyebrow}</span>
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>
-                <span className="home-path-card__cta">{item.cta}</span>
+                <span className="home-route-card__cta">{item.cta}</span>
               </Link>
             ))}
           </div>
-          <p className="home-paths__aside">
-            Need more product proof first?{' '}
-            <Link className="home-link" to="/docs/showcase">
-              Browse the full showcase
-            </Link>
-            .
-          </p>
+          <div className="home-routes__aside">
+            <span className="home-pill home-pill--soft">Still evaluating?</span>
+            <p>
+              Need more product proof first?{' '}
+              <Link className="home-link" to="/docs/showcase">
+                Browse the full showcase
+              </Link>
+              .
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -333,8 +346,8 @@ export default function Home(): React.JSX.Element {
       description="Tessera is a C#-first terminal UI framework for serious application surfaces.">
       <HomepageHero />
       <main>
-        <HomepageCapabilities />
-        <HomepagePaths />
+        <HomepageProof />
+        <HomepageRoutes />
       </main>
     </Layout>
   );
