@@ -428,15 +428,11 @@ code {
 }
 
 .home-terminal__line--fourth {
-  animation-delay: 2.95s;
+  animation-delay: 2.9s;
 }
 
 .home-terminal__line--fifth {
-  animation-delay: 3.85s;
-}
-
-.home-terminal__line--sixth {
-  animation-delay: 4.8s;
+  animation-delay: 3.8s;
 }
 
 .home-terminal__gutter {
@@ -501,7 +497,7 @@ code {
   opacity: 0.16;
   transform: translateY(0) scale(0.985);
   animation: home-terminal-status 1.2s forwards;
-  animation-delay: 5.2s;
+  animation-delay: 4.8s;
 }
 
 .home-pill--soft {

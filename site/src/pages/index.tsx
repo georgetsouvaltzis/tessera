@@ -88,16 +88,6 @@ function HomepageHeroTerminal() {
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--second">
           <span className="home-terminal__gutter">02</span>
           <span className="home-terminal__text">
-            <span className="home-terminal__token home-terminal__token--keyword">using</span>{' '}
-            <span className="home-terminal__token home-terminal__token--namespace">
-              Tessera.Examples.OpsWatch
-            </span>
-            <span className="home-terminal__token home-terminal__token--punctuation">;</span>
-          </span>
-        </div>
-        <div className="home-terminal__line home-terminal__line--command home-terminal__line--third">
-          <span className="home-terminal__gutter">03</span>
-          <span className="home-terminal__text">
             <span className="home-terminal__token home-terminal__token--keyword">var</span>{' '}
             <span className="home-terminal__token home-terminal__token--identifier">app</span>{' '}
             <span className="home-terminal__token home-terminal__token--operator">=</span>{' '}
@@ -111,19 +101,19 @@ function HomepageHeroTerminal() {
             <span className="home-terminal__token home-terminal__token--punctuation">()</span>
           </span>
         </div>
-        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fourth home-terminal__line--chained">
-          <span className="home-terminal__gutter">04</span>
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--third home-terminal__line--chained">
+          <span className="home-terminal__gutter">03</span>
           <span className="home-terminal__text">
             <span className="home-terminal__indent" aria-hidden="true" />
             <span className="home-terminal__token home-terminal__token--punctuation">.</span>
             <span className="home-terminal__token home-terminal__token--method">UseApp</span>
             <span className="home-terminal__token home-terminal__token--punctuation">&lt;</span>
-            <span className="home-terminal__token home-terminal__token--type">OpsWatchApp</span>
+            <span className="home-terminal__token home-terminal__token--type">OrdersApp</span>
             <span className="home-terminal__token home-terminal__token--punctuation">&gt;()</span>
           </span>
         </div>
-        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fifth home-terminal__line--chained">
-          <span className="home-terminal__gutter">05</span>
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fourth home-terminal__line--chained">
+          <span className="home-terminal__gutter">04</span>
           <span className="home-terminal__text">
             <span className="home-terminal__indent" aria-hidden="true" />
             <span className="home-terminal__token home-terminal__token--punctuation">.</span>
@@ -131,8 +121,8 @@ function HomepageHeroTerminal() {
             <span className="home-terminal__token home-terminal__token--punctuation">();</span>
           </span>
         </div>
-        <div className="home-terminal__line home-terminal__line--command home-terminal__line--sixth">
-          <span className="home-terminal__gutter">06</span>
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fifth">
+          <span className="home-terminal__gutter">05</span>
           <span className="home-terminal__text">
             <span className="home-terminal__token home-terminal__token--keyword">await</span>{' '}
             <span className="home-terminal__token home-terminal__token--identifier">app</span>
@@ -143,29 +133,29 @@ function HomepageHeroTerminal() {
           </span>
         </div>
         <div className="home-terminal__status">
-          <span className="home-pill home-pill--soft">Flagship shell</span>
-          <strong>OpsWatch ready</strong>
+          <span className="home-pill home-pill--soft">UseApp sample</span>
+          <strong>OrdersApp ready</strong>
           <div className="home-terminal__surface" aria-hidden="true">
             <div className="home-terminal__surface-bar">
-              <span>Fleet Pulse</span>
-              <span>Veridian</span>
+              <span>Orders</span>
+              <span>Starter theme</span>
             </div>
             <div className="home-terminal__surface-grid">
               <div className="home-terminal__surface-card">
-                <span>Nodes</span>
-                <strong>05</strong>
+                <span>Orders</span>
+                <strong>127</strong>
               </div>
               <div className="home-terminal__surface-card">
-                <span>Health</span>
-                <strong>04/05</strong>
+                <span>Latency</span>
+                <strong>18ms</strong>
               </div>
               <div className="home-terminal__surface-card">
-                <span>Ack</span>
-                <strong>02</strong>
+                <span>Queue</span>
+                <strong>03</strong>
               </div>
             </div>
           </div>
-          <p>Same public path from starter apps into OpsWatch, GitConsole, and DataWorkbench.</p>
+          <p>Minimal startup lane reused across the docs before you move into the denser showcase apps.</p>
         </div>
       </div>
     </div>

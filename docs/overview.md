@@ -31,19 +31,19 @@ using Tessera.Controls;
 using Tessera.Layout;
 
 var app = TesseraApplication.CreateBuilder()
-    .UseApp<WorkspaceApp>()
+    .UseApp<OrdersApp>()
     .Build();
 
 await app.RunAsync();
 
-internal sealed class WorkspaceApp : TesseraApp
+internal sealed class OrdersApp : TesseraApp
 {
     public override Screen Build(ScreenContext context)
         => Screen.Build(window =>
         {
             window.Padding(1);
             window.Body(body => body.Center(
-                new Button { Text = "Launch" },
+                new Button { Text = "Open orders" },
                 width: 20,
                 height: 3));
         });
