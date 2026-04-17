@@ -1,71 +1,125 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
-const proofItems = [
-  {
-    title: '.NET 10',
-    description: 'Small public surface. C# first.',
-  },
-  {
-    title: 'Starter Ladder',
-    description: 'HelloWorld -> CounterForm -> WorkspaceApp.',
-  },
-  {
-    title: 'Flagship Apps',
-    description: 'GitConsole, OpsWatch, DataWorkbench.',
-  },
-];
+const proofItems = ['.NET 10', 'C#-first API', 'Starter ladder', 'Flagship apps'];
 
-const showcaseItems = [
-  {
-    title: 'GitConsole',
-    eyebrow: 'Workflow shell',
-    description:
-      'Command-heavy review flows, diff rails, focused actions, and denser editing surfaces.',
-    command: 'dotnet run --project examples/GitConsole/GitConsole.csproj',
-  },
+const heroShot = {
+  title: 'DataWorkbench',
+  alt: 'DataWorkbench flagship workbench screenshot',
+  role: 'Hero screenshot',
+  src: 'img/home/dataworkbench-hero.png',
+  href: '/docs/showcase',
+  description: 'Investigation workspace with rails, tabs, result grid, and inspector.',
+  command: 'dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build',
+  capture: '176x48 terminal • 16:10 crop',
+};
+
+const flagshipShots = [
   {
     title: 'OpsWatch',
-    eyebrow: 'Operational dashboard',
-    description:
-      'Alert-heavy telemetry panels, status cards, health rails, and operator actions in one shell.',
-    command: 'dotnet run --project examples/OpsWatch/OpsWatch.csproj',
+    alt: 'OpsWatch operator dashboard screenshot',
+    role: 'Operator dashboard',
+    src: 'img/home/opswatch-card.png',
+    href: '/docs/showcase',
+    description: 'Telemetry cards, charts, and incident feed in one operator surface.',
+    command: 'dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build',
+    capture: '176x48 terminal • 16:10 crop',
   },
   {
-    title: 'DataWorkbench',
-    eyebrow: 'Multi-pane workbench',
-    description:
-      'Investigation-focused layout with panes, inspectors, tabs, and execution lanes under pressure.',
-    command: 'dotnet run --project examples/DataWorkbench/DataWorkbench.csproj',
+    title: 'GitConsole',
+    alt: 'GitConsole workflow shell screenshot',
+    role: 'Workflow shell',
+    src: 'img/home/gitconsole-card.png',
+    href: '/docs/showcase',
+    description: 'Patch deck, commit flow, and worktree review in a denser command surface.',
+    command: 'dotnet run --project examples/GitConsole/GitConsole.csproj --no-build',
+    capture: '176x48 terminal • 4:3 crop',
   },
 ];
 
 const evaluationSteps = [
   {
     step: '01',
-    title: 'Overview',
-    description: 'Framework model, boundaries, and public path.',
+    title: 'Read the overview',
+    description: 'Boundaries, app model, and the public path.',
     href: '/docs/overview',
   },
   {
     step: '02',
-    title: 'Starter apps',
+    title: 'Run the starters',
     description: 'HelloWorld, CounterForm, then WorkspaceApp.',
     href: '/docs/getting-started',
   },
   {
     step: '03',
-    title: 'Flagships',
-    description: 'Open the denser shells and judge the same API under pressure.',
+    title: 'Pressure-test the flagships',
+    description: 'Open DataWorkbench, OpsWatch, and GitConsole on the same API model.',
     href: '/docs/showcase',
   },
 ];
 
-function HomepageHero() {
-  const { siteConfig } = useDocusaurusContext();
+type ScreenshotSlotProps = {
+  title: string;
+  alt: string;
+  role: string;
+  src: string;
+  href: string;
+  description: string;
+  command: string;
+  capture: string;
+  aspectClassName?: string;
+  compact?: boolean;
+};
 
+function ScreenshotSlot({
+  title,
+  alt,
+  role,
+  src,
+  href,
+  description,
+  command,
+  capture,
+  aspectClassName,
+  compact = false,
+}: ScreenshotSlotProps) {
+  const [missing, setMissing] = React.useState(false);
+  const shotSrc = useBaseUrl(src);
+
+  return (
+    <article className={`home-shot${compact ? ' home-shot--compact' : ''}`}>
+      <Link className="home-shot__frame-link" to={href} aria-label={`Open ${title} showcase page`}>
+        <div className={`home-shot__frame ${aspectClassName ?? ''}`}>
+          {missing ? (
+            <div className="home-shot__placeholder" role="img" aria-label={alt}>
+              <span className="home-shot__placeholder-badge">{role}</span>
+              <strong>{title}</strong>
+              <p>{description}</p>
+              <code>{capture}</code>
+            </div>
+          ) : (
+            <img className="home-shot__image" src={shotSrc} alt={alt} onError={() => setMissing(true)} />
+          )}
+        </div>
+      </Link>
+      <div className="home-shot__meta">
+        <div className="home-shot__copy">
+          <span className="home-shot__eyebrow">{role}</span>
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+        <div className="home-shot__foot">
+          <code>{command}</code>
+          <span>{capture}</span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function HomepageHero() {
   return (
     <section className="home-hero">
       <div className="container">
@@ -73,83 +127,37 @@ function HomepageHero() {
           <div className="home-hero__copy">
             <span className="home-badge">Public alpha • .NET 10 • C#-first</span>
             <h1 className="home-hero__title">
-              C# terminal UI
+              Terminal UI
               <br />
-              for real product
+              for dashboards,
               <br />
-              shells.
+              workflows, and
+              <br />
+              workbenches.
             </h1>
             <p className="home-hero__subtitle">
-              Build dashboards, workflows, and workbenches in C# without a host-heavy stack,
-              framework glue, or a toy-widget first impression.
+              Build product-grade terminal surfaces in C# without a host-heavy stack, placeholder
+              chrome, or a starter path that collapses under real complexity.
             </p>
             <div className="home-hero__actions">
               <Link className="button button--primary button--lg" to="/docs/getting-started">
                 Get Started
               </Link>
               <Link className="button button--secondary button--lg" to="/docs/showcase">
-                View Examples
+                Browse Showcase
               </Link>
             </div>
-            <div className="home-proof-strip">
-              {proofItems.map((item) => (
-                <div key={item.title} className="home-proof-strip__item">
-                  <strong>{item.title}</strong>
-                  <span>{item.description}</span>
-                </div>
-              ))}
-            </div>
+            <p className="home-hero__proofline">
+              Small public surface. Real seeded apps. Same mental model from first screen to
+              flagship shell.
+            </p>
           </div>
-          <div className="home-preview">
-            <div className="home-preview__frame">
-              <div className="home-preview__bar">
-                <span />
-                <span />
-                <span />
-                <em>{siteConfig.title} Preview</em>
-              </div>
-              <div className="home-preview__body">
-                <aside className="home-preview__nav">
-                  <span className="home-preview__label">Starter path</span>
-                  <strong>HelloWorld</strong>
-                  <strong>CounterForm</strong>
-                  <strong className="is-active">WorkspaceApp</strong>
-                  <span className="home-preview__label">Evaluation</span>
-                  <strong>GitConsole</strong>
-                  <strong>OpsWatch</strong>
-                  <strong>DataWorkbench</strong>
-                </aside>
-                <div className="home-preview__content">
-                  <div className="home-preview__toolbar">
-                    <span>Workspace</span>
-                    <span>Inspect</span>
-                    <span>Actions</span>
-                  </div>
-                  <div className="home-preview__panes">
-                    <div className="home-preview__pane home-preview__pane--primary">
-                      <div className="home-preview__card">
-                        <b>Orders</b>
-                        <span>127 open</span>
-                      </div>
-                      <div className="home-preview__card">
-                        <b>Latency</b>
-                        <span>p95 18ms</span>
-                      </div>
-                      <div className="home-preview__card">
-                        <b>Incidents</b>
-                        <span>2 active</span>
-                      </div>
-                    </div>
-                    <div className="home-preview__pane">
-                      <div className="home-preview__log">$ run WorkspaceApp</div>
-                      <div className="home-preview__log">$ inspect OpsWatch</div>
-                      <div className="home-preview__log is-accent">$ pressure-test DataWorkbench</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ScreenshotSlot {...heroShot} aspectClassName="home-shot__frame--hero" />
+        </div>
+        <div className="home-proof-rail" aria-label="Homepage proof points">
+          {proofItems.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
         </div>
       </div>
     </section>
@@ -159,27 +167,21 @@ function HomepageHero() {
 function HomepageContent() {
   return (
     <main>
-      <section className="home-section">
+      <section className="home-section home-section--tight">
         <div className="container">
           <div className="home-section__lead">
             <div className="home-section__header home-section__header--compact">
-              <span className="home-section__eyebrow">Flagship examples</span>
-              <h2>Flagship apps. Same public API.</h2>
+              <span className="home-section__eyebrow">Flagship surfaces</span>
+              <h2>Open the dense apps early.</h2>
             </div>
             <p className="home-section__summary">
-              Start with the smaller path, then open the denser shells. The point is not extra
-              surface area. The point is that the same mental model still holds when the UI starts
-              feeling like software.
+              The landing page should prove the flagship shells fast. Docs can explain the path
+              afterward.
             </p>
           </div>
-          <div className="home-showcase-grid">
-            {showcaseItems.map((item) => (
-              <article key={item.title} className="home-showcase-card">
-                <span className="home-showcase-card__eyebrow">{item.eyebrow}</span>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <code>{item.command}</code>
-              </article>
+          <div className="home-flagship-grid">
+            {flagshipShots.map((item) => (
+              <ScreenshotSlot key={item.title} {...item} compact aspectClassName="home-shot__frame--card" />
             ))}
           </div>
         </div>
@@ -193,8 +195,8 @@ function HomepageContent() {
                 <span className="home-section__eyebrow">Evaluate in order</span>
                 <h2>Overview. Starters. Flagships.</h2>
                 <p>
-                  Read the contract, run the starter ladder, then pressure-test the flagship apps.
-                  That is the fastest way to decide whether Tessera fits a real product surface.
+                  Keep the homepage short. Read the contract, run the starter ladder, then decide
+                  on the flagship apps.
                 </p>
               </div>
               <div className="home-eval-band__actions">
@@ -202,7 +204,7 @@ function HomepageContent() {
                   Get Started
                 </Link>
                 <Link className="button button--secondary button--lg" to="/docs/showcase">
-                  Browse Showcase
+                  View Showcase
                 </Link>
               </div>
             </div>
