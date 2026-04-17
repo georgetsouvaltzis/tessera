@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Required so IDE0005 can run when code style is enforced during build. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>
