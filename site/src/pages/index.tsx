@@ -3,12 +3,6 @@ import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-const heroShot = {
-  alt: 'DataWorkbench flagship workbench screenshot',
-  src: 'img/home/dataworkbench-hero.png',
-  href: '/docs/showcase',
-};
-
 const flagshipShots = [
   {
     title: 'OpsWatch',
@@ -71,6 +65,67 @@ function MediaFrame({ alt, href, src, frameClassName }: MediaFrameProps) {
   );
 }
 
+function HomepageHeroTerminal() {
+  return (
+    <div className="home-terminal" aria-label="Animated terminal setup example">
+      <div className="home-terminal__chrome">
+        <div className="home-terminal__dots" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        <span className="home-terminal__path">Program.cs</span>
+      </div>
+      <div className="home-terminal__body">
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--first">
+          <span className="home-terminal__gutter">01</span>
+          <span className="home-terminal__text">var app = TesseraApp.CreateBuilder(args).Build();</span>
+        </div>
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--second">
+          <span className="home-terminal__gutter">02</span>
+          <span className="home-terminal__text">var screen = Screen.Build(() =&gt; new Stack(</span>
+        </div>
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--third">
+          <span className="home-terminal__gutter">03</span>
+          <span className="home-terminal__text">    new TextBlock(&quot;Orders ready&quot;)));</span>
+        </div>
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fourth">
+          <span className="home-terminal__gutter">04</span>
+          <span className="home-terminal__text">
+            app.Run(screen);
+            <span className="home-terminal__cursor" aria-hidden="true" />
+          </span>
+        </div>
+        <div className="home-terminal__status">
+          <span className="home-pill home-pill--soft">First surface</span>
+          <strong>Tessera shell ready</strong>
+          <div className="home-terminal__surface" aria-hidden="true">
+            <div className="home-terminal__surface-bar">
+              <span>Workspace</span>
+              <span>Citrine</span>
+            </div>
+            <div className="home-terminal__surface-grid">
+              <div className="home-terminal__surface-card">
+                <span>Orders</span>
+                <strong>127</strong>
+              </div>
+              <div className="home-terminal__surface-card">
+                <span>Latency</span>
+                <strong>18ms</strong>
+              </div>
+              <div className="home-terminal__surface-card">
+                <span>Queue</span>
+                <strong>03</strong>
+              </div>
+            </div>
+          </div>
+          <p>Same public path from the first screen into WorkspaceApp, OpsWatch, and DataWorkbench.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HomepageHero() {
   return (
     <section className="home-hero">
@@ -106,7 +161,7 @@ function HomepageHero() {
               Three starter apps. Three flagship shells. Same public path.
             </p>
           </div>
-          <MediaFrame {...heroShot} frameClassName="home-media__frame--hero" />
+          <HomepageHeroTerminal />
         </div>
       </div>
     </section>
