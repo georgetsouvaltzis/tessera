@@ -248,7 +248,7 @@ The intended beginner path is:
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - keep configuration in `TesseraRuntimeOptions` and `ScreenOptions`
-- follow the public onboarding path in [getting-started.md](getting-started.md), starting with `HelloWorld`, `CounterForm`, and `WorkspaceApp` before the flagship showcases in [examples.md](examples.md)
+- follow the public onboarding path in [getting-started.md](getting-started.md), starting with `HelloWorld`, `CounterForm`, and `WorkspaceApp` in [examples.md](examples.md) before the flagship showcases in [showcase.md](showcase.md)
 - treat `Tessera.Core` as the low-level advanced lane, not default onboarding
 - use semantic theme tokens and palette-driven styling on the default path
 

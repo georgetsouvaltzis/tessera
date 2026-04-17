@@ -1,15 +1,19 @@
 # Getting Started With Tessera
 
-This guide is the default onboarding path for Tessera public alpha.
+This page is the default onboarding map for Tessera public alpha.
 
-If you are evaluating Tessera for a product, follow this order:
+If you are evaluating Tessera for a real product, follow this order:
 
 1. read [overview.md](overview.md)
-2. run `HelloWorld`
-3. run `CounterForm`
-4. run `WorkspaceApp`
+2. complete [install-and-prerequisites.md](install-and-prerequisites.md)
+3. build [first-app.md](first-app.md)
+4. run the starter ladder from [examples.md](examples.md)
 5. open [showcase.md](showcase.md) for the flagship shells
-6. read [theme-system.md](theme-system.md) when visuals and overrides start to matter
+6. use the concept pages when you need deeper understanding:
+   - [app-model.md](app-model.md)
+   - [layout-and-screen-composition.md](layout-and-screen-composition.md)
+   - [runtime-and-screen-options.md](runtime-and-screen-options.md)
+   - [controls-overview.md](controls-overview.md)
 
 ## Before You Begin
 
@@ -22,16 +26,51 @@ If you are evaluating Tessera for a product, follow this order:
 
 Tessera is a library-first framework. You do not need ASP.NET hosting, dependency injection, or Generic Host wiring for the normal app path.
 
-## The Public App Model
+## Fastest onboarding path
 
-The public path is intentionally small:
+If you want the shortest path from zero to a running app:
 
-1. derive from `TesseraApp`
-2. build screens with `Screen.Build(...)`
-3. use controls from `Tessera.Controls`
-4. use layouts from `Tessera.Layout`
-5. handle domain/runtime messages in `Update(Message)`
-6. run with `TesseraApplication.RunAsync(...)` or `TesseraApplication.CreateBuilder()`
+1. create a `net10.0` console app
+2. `dotnet add package Tessera`
+3. paste the sample from [first-app.md](first-app.md)
+4. run it
+5. move into the starter examples
+
+## Recommended docs path
+
+### 1. Install and prerequisites
+
+Start here if you have not added Tessera to a project yet:
+
+- [install-and-prerequisites.md](install-and-prerequisites.md)
+
+### 2. Your first app
+
+Use this page for the first runnable app and the first explanation of the public app shape:
+
+- [first-app.md](first-app.md)
+
+### 3. Starter ladder
+
+Run these examples in order:
+
+- `HelloWorld`
+- `CounterForm`
+- `WorkspaceApp`
+
+The full commands and “what to look for” checklist live in [examples.md](examples.md).
+
+### 4. Flagship evaluation
+
+Once the starter path feels coherent, move into:
+
+- `GitConsole`
+- `OpsWatch`
+- `DataWorkbench`
+
+Use [showcase.md](showcase.md) for the commands and evaluation goals.
+
+## The public app model
 
 Preferred imports:
 
@@ -41,55 +80,24 @@ using Tessera.Controls;
 using Tessera.Layout;
 ```
 
-## Run The Starter Ladder
+The default story stays intentionally small:
 
-### `HelloWorld`
-
-Use this first to confirm the terminal, theme, and button/message loop all read clearly.
-
-```bash
-dotnet run --project examples/HelloWorld/HelloWorld.csproj
-```
-
-Look for:
-
-- centered layout and clean default spacing
-- a direct `TesseraApp` -> `Screen.Build(...)` loop
-- button activation and status text without extra host setup
-
-### `CounterForm`
-
-Use this second for the first real form surface.
-
-```bash
-dotnet run --project examples/CounterForm/CounterForm.csproj
-```
-
-Look for:
-
-- text input, numeric input, and choice controls
-- message-driven state updates instead of hidden framework magic
-- a small but realistic app shell
-
-### `WorkspaceApp`
-
-Use this third when you want the first denser layout.
-
-```bash
-dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj
-```
-
-Look for:
-
-- multi-pane composition on the default public path
-- preview, editing, and action flow in one screen
-- the same mental model as the smaller starters
+1. derive from `TesseraApp`
+2. build screens with `Screen.Build(...)`
+3. use controls from `Tessera.Controls`
+4. use layouts from `Tessera.Layout`
+5. handle domain/runtime messages in `Update(Message)`
+6. run with `TesseraApplication.RunAsync(...)` or `TesseraApplication.CreateBuilder()`
 
 ## Where To Go Next
 
+- install and package setup: [install-and-prerequisites.md](install-and-prerequisites.md)
+- first runnable app: [first-app.md](first-app.md)
 - starter example catalog: [examples.md](examples.md)
 - flagship and supporting demos: [showcase.md](showcase.md)
-- product contract: [spec.md](spec.md)
+- lifecycle and message flow: [app-model.md](app-model.md)
+- composition model: [layout-and-screen-composition.md](layout-and-screen-composition.md)
+- runtime and screen knobs: [runtime-and-screen-options.md](runtime-and-screen-options.md)
+- control families: [controls-overview.md](controls-overview.md)
 - theme model: [theme-system.md](theme-system.md)
 - API surface map: [api-reference.mdx](api-reference.mdx)
-- contributor path: [architecture-overview.md](architecture-overview.md)

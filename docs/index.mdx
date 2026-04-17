@@ -5,43 +5,67 @@ slug: /
 
 import Link from '@docusaurus/Link';
 
-Tessera has one public path: learn the app model, run the starter ladder, then pressure-test the flagship shells.
+Tessera documentation is organized around one public path: install the package, build a first app, run the starter ladder, then pressure-test the flagship shells.
 
 <div className="row margin-top--lg">
-  <div className="col col--4 margin-bottom--lg">
-    <Link className="card padding--lg docs-link-card" to="/docs/getting-started">
-      <h2>Get Started</h2>
-      <p>Install the prerequisites, learn the default app shape, and run the first starter apps.</p>
+  <div className="col col--3 margin-bottom--lg">
+    <Link className="card padding--lg docs-link-card" to="/docs/install-and-prerequisites">
+      <h2>Install</h2>
+      <p>Get the SDK, terminal, package reference, and default namespaces in place.</p>
     </Link>
   </div>
-  <div className="col col--4 margin-bottom--lg">
-    <Link className="card padding--lg docs-link-card" to="/docs/showcase">
-      <h2>Evaluate The Examples</h2>
-      <p>Use the flagship apps to judge whether the same public API still holds under denser product surfaces.</p>
+  <div className="col col--3 margin-bottom--lg">
+    <Link className="card padding--lg docs-link-card" to="/docs/first-app">
+      <h2>First App</h2>
+      <p>Paste a minimal but real Tessera app and understand every moving part.</p>
     </Link>
   </div>
-  <div className="col col--4 margin-bottom--lg">
+  <div className="col col--3 margin-bottom--lg">
+    <Link className="card padding--lg docs-link-card" to="/docs/examples">
+      <h2>Starter Ladder</h2>
+      <p>Run the canonical examples in order before you judge the denser showcases.</p>
+    </Link>
+  </div>
+  <div className="col col--3 margin-bottom--lg">
     <Link className="card padding--lg docs-link-card" to="/docs/api-reference">
       <h2>API Reference</h2>
-      <p>Jump into the public surface map, naming rules, and terminal capability notes when you need exact answers.</p>
+      <p>Use the exact surface map, guidelines, and terminal notes when you need specifics.</p>
     </Link>
   </div>
 </div>
 
-## Recommended path
+## Use this order
 
 1. Read [Overview](overview.md) for the product posture and public app model.
-2. Follow [Getting Started](getting-started.md) to run the starter ladder in order.
-3. Use [Starter Examples](examples.md) as the quick catalog for `HelloWorld`, `CounterForm`, and `WorkspaceApp`.
-4. Open [Showcase](showcase.md) when you want the flagship and supporting demos.
-5. Keep [API Reference](api-reference.mdx) nearby for exact surface names and capability details.
+2. Follow [Install and Prerequisites](install-and-prerequisites.md).
+3. Build [Your First App](first-app.md).
+4. Run the [Starter Examples](examples.md) in order.
+5. Open [Showcase](showcase.md) when you want product-shaped proof.
+6. Use the concept pages for the details that usually go missing in alpha docs:
+   - [App Model](app-model.md)
+   - [Screen and Layout Composition](layout-and-screen-composition.md)
+   - [Runtime and Screen Options](runtime-and-screen-options.md)
+   - [Controls Overview](controls-overview.md)
 
-## Core concepts
+## What Tessera is good at
 
-- [Theme System](theme-system.md): semantic tokens, override hierarchy, and control-level hooks.
-- [Custom Components](custom-components.md): widget authoring on the public path.
-- [Design Contract](spec.md): the product rules that shape the public API.
+- form-heavy and workflow-heavy terminal apps
+- dashboards, telemetry panels, and operational surfaces
+- multi-pane workspaces and investigation shells
+- semantic theming and control-level styling without inventing a second framework story
+- starting small without throwing away the same public model later
+
+## Choose the right lane
+
+- Evaluating Tessera for a product:
+  Follow [Getting Started](getting-started.md), then [Showcase](showcase.md), then [Controls Overview](controls-overview.md).
+- Building an app right now:
+  Start with [Install and Prerequisites](install-and-prerequisites.md) and [Your First App](first-app.md).
+- Looking for exact type names:
+  Jump to [API Reference](api-reference.mdx) and [Public API Inventory](public-api-inventory.md).
+- Hitting friction:
+  Use [Troubleshooting](troubleshooting.md) and [FAQ](faq.md).
 
 :::note Maintainer Docs
-Release and repo-management documents stay in the `Maintainers` section of the sidebar. That includes [Performance](performance.md), [Widget Roadmap](widget-roadmap.md), and the [Alpha Release Checklist](alpha-release-checklist.md).
+Release and repo-management pages stay under the `Maintainers` sidebar category. End-users should not need them to get productive with Tessera.
 :::

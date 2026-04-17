@@ -2,6 +2,13 @@
 
 Tessera is a C#-first terminal UI framework for teams that want deliberate application structure, product-grade visuals, and built-in controls without committing to a host-heavy stack.
 
+It is designed for real terminal software:
+
+- dashboards and operator surfaces
+- forms and workflow shells
+- multi-pane workspaces and data tools
+- theme-aware terminal products that need more than a demo-quality control set
+
 ## Product-first terminal UI
 
 The public path stays intentionally compact:
@@ -50,6 +57,19 @@ internal sealed class OrdersApp : TesseraApp
 }
 ```
 
+## Two startup lanes
+
+Use the startup lane that matches your app:
+
+- `Minimal`
+  - `await TesseraApplication.RunAsync(new MyApp());`
+  - best for tiny apps, experiments, and the smallest possible entry point
+- `Configured`
+  - `TesseraApplication.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
+  - best when you need theme, screen options, pointer policy, or a reusable built application instance
+
+For most real applications, the configured builder is the more useful public path because it keeps startup explicit without introducing DI or Generic Host complexity.
+
 ## Why teams evaluate it
 
 Tessera is not trying to be the smallest widget sandbox. It is trying to be the best default path for real terminal software in C#.
@@ -57,3 +77,11 @@ Tessera is not trying to be the smallest widget sandbox. It is trying to be the 
 - `Polished starter ladder`: `HelloWorld`, `CounterForm`, and `WorkspaceApp` teach the framework without dumping the whole catalog at once
 - `Flagship evaluation apps`: `GitConsole`, `OpsWatch`, and `DataWorkbench` show how the public path scales into denser surfaces
 - `Contributor-friendly shape`: the repo is organized around public API boundaries, examples, tests, docs, and release checklists instead of hidden internal magic
+
+## Recommended next reads
+
+1. [Install and Prerequisites](install-and-prerequisites.md)
+2. [Your First App](first-app.md)
+3. [Starter Examples](examples.md)
+4. [App Model](app-model.md)
+5. [Controls Overview](controls-overview.md)

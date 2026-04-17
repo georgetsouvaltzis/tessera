@@ -26,11 +26,13 @@ Tessera is in public alpha. It is ready for evaluation, experimentation, and con
 
 ## Start Here
 
-1. Read [docs/getting-started.md](docs/getting-started.md).
-2. Run the onboarding ladder from [docs/examples.md](docs/examples.md): `HelloWorld`, `CounterForm`, `WorkspaceApp`.
-3. Use [docs/theme-system.md](docs/theme-system.md) for theming and [docs/custom-components.md](docs/custom-components.md) for custom controls.
-4. Then open the flagship showcases to see larger product-like surfaces.
-5. If you want to contribute, read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/architecture-overview.md](docs/architecture-overview.md).
+1. Read [docs/overview.md](docs/overview.md).
+2. Follow [docs/install-and-prerequisites.md](docs/install-and-prerequisites.md).
+3. Build the sample from [docs/first-app.md](docs/first-app.md).
+4. Run the onboarding ladder from [docs/examples.md](docs/examples.md): `HelloWorld`, `CounterForm`, `WorkspaceApp`.
+5. Open [docs/showcase.md](docs/showcase.md) for the flagship evaluation path.
+6. Use [docs/app-model.md](docs/app-model.md), [docs/layout-and-screen-composition.md](docs/layout-and-screen-composition.md), and [docs/runtime-and-screen-options.md](docs/runtime-and-screen-options.md) when you need the deeper concepts.
+7. If you want to contribute, read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/architecture-overview.md](docs/architecture-overview.md).
 
 ## Quick Start
 
@@ -163,8 +165,19 @@ The full guide lives in [docs/examples.md](docs/examples.md).
 
 ## Docs
 
+- docs home: [docs/index.mdx](docs/index.mdx)
+- overview: [docs/overview.md](docs/overview.md)
 - onboarding guide: [docs/getting-started.md](docs/getting-started.md)
+- install and prerequisites: [docs/install-and-prerequisites.md](docs/install-and-prerequisites.md)
+- first app guide: [docs/first-app.md](docs/first-app.md)
 - example guide: [docs/examples.md](docs/examples.md)
+- showcase guide: [docs/showcase.md](docs/showcase.md)
+- app model: [docs/app-model.md](docs/app-model.md)
+- screen and layout composition: [docs/layout-and-screen-composition.md](docs/layout-and-screen-composition.md)
+- runtime and screen options: [docs/runtime-and-screen-options.md](docs/runtime-and-screen-options.md)
+- controls overview: [docs/controls-overview.md](docs/controls-overview.md)
+- troubleshooting: [docs/troubleshooting.md](docs/troubleshooting.md)
+- faq: [docs/faq.md](docs/faq.md)
 - architecture overview: [docs/architecture-overview.md](docs/architecture-overview.md)
 - design contract: [docs/spec.md](docs/spec.md)
 - public API guidelines: [docs/public-api-guidelines.md](docs/public-api-guidelines.md)

@@ -12,7 +12,6 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: [
         'overview',
-        'spec',
       ],
     },
     {
@@ -24,6 +23,8 @@ const sidebars: SidebarsConfig = {
       },
       collapsed: false,
       items: [
+        'install-and-prerequisites',
+        'first-app',
         'examples',
         'showcase',
       ],
@@ -32,6 +33,10 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Core Concepts',
       items: [
+        'app-model',
+        'layout-and-screen-composition',
+        'runtime-and-screen-options',
+        'controls-overview',
         'theme-system',
         'custom-components',
       ],
@@ -51,14 +56,24 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Help',
+      items: [
+        'troubleshooting',
+        'faq',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Advanced',
       items: [
+        'spec',
         'architecture-overview',
       ],
     },
     {
       type: 'category',
       label: 'Maintainers',
+      collapsed: true,
       items: [
         'performance',
         'widget-roadmap',

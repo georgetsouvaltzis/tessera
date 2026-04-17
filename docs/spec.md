@@ -141,8 +141,10 @@ Default app shape:
 Canonical learning path:
 
 1. [overview.md](overview.md)
-2. [getting-started.md](getting-started.md)
-3. [examples.md](examples.md)
+2. [install-and-prerequisites.md](install-and-prerequisites.md)
+3. [first-app.md](first-app.md)
+4. [examples.md](examples.md)
+5. [showcase.md](showcase.md)
 
 ### Interaction Contract
 

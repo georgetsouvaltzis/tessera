@@ -65,9 +65,10 @@ await app.RunAsync();
 Public onboarding should teach one story:
 
 1. start with [overview.md](overview.md)
-2. follow [getting-started.md](getting-started.md)
-3. use the starter example order in [examples.md](examples.md): `HelloWorld` -> `CounterForm` -> `WorkspaceApp`
-4. use the flagship examples only after the starter ladder is clear
+2. complete [install-and-prerequisites.md](install-and-prerequisites.md)
+3. build [first-app.md](first-app.md)
+4. use the starter example order in [examples.md](examples.md): `HelloWorld` -> `CounterForm` -> `WorkspaceApp`
+5. use the flagship evaluation path in [showcase.md](showcase.md) only after the starter ladder is clear
 
 Keep examples in `Tessera` namespaces. `Tessera.Core` is the low-level advanced lane and should not appear in the starter or flagship public examples.
 

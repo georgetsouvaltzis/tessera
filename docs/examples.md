@@ -12,42 +12,70 @@ These are the three examples to run before you judge the flagship shells. They s
 2. `CounterForm`
 3. `WorkspaceApp`
 
+## What the starter ladder proves
+
+- the basic app loop is easy to understand
+- the same public path holds as layout density increases
+- you can stay in `Tessera`, `Tessera.Controls`, and `Tessera.Layout`
+- the framework reads like ordinary C#, not like a hidden DSL
+
+## Quick reference
+
+| Example | Run it when you want to learn | Command |
+| --- | --- | --- |
+| `HelloWorld` | the smallest polished entry point | `dotnet run --project examples/HelloWorld/HelloWorld.csproj` |
+| `CounterForm` | the first interactive form surface | `dotnet run --project examples/CounterForm/CounterForm.csproj` |
+| `WorkspaceApp` | the first denser starter shell | `dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj` |
+
 ## `HelloWorld`
 
-The smallest polished entry point.
-
-- confirms your terminal baseline
-- shows the basic `TesseraApp` loop
-- keeps the screen intentionally sparse
+Use this first to confirm the terminal, theme, and button/message loop all read clearly.
 
 ```bash
 dotnet run --project examples/HelloWorld/HelloWorld.csproj
 ```
 
+Look for:
+
+- centered layout and clean default spacing
+- a direct `TesseraApp` -> `Screen.Build(...)` loop
+- button activation and status text without extra host setup
+
 ## `CounterForm`
 
-The first interactive form surface.
-
-- introduces text input, numeric input, and choice
-- keeps updates message-driven and easy to trace
-- proves the default path can already feel like software, not a toy
+Use this second for the first real form surface.
 
 ```bash
 dotnet run --project examples/CounterForm/CounterForm.csproj
 ```
 
+Look for:
+
+- text input, numeric input, and choice controls
+- a small message-driven app shell
+- form interaction without extra host configuration
+
 ## `WorkspaceApp`
 
-The first denser starter shell.
-
-- combines navigation, editing, preview, and actions
-- shows how multiple panes still fit the same app model
-- is the handoff point into the flagship demos
+Use this third when you want the first denser layout.
 
 ```bash
 dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj
 ```
 
-## Next Step
+Look for:
+
+- multi-pane composition on the default public path
+- preview, editing, and action flow in one screen
+- the same mental model as the smaller starters
+
+## Questions to ask before moving on
+
+- Does the startup story still feel small?
+- Does `Build(...)` stay readable as the screen gets denser?
+- Do you understand where state changes happen?
+- Do the controls feel like product surfaces rather than isolated widgets?
+
+## Next step
 
 Once the starter ladder feels coherent, continue to [showcase.md](showcase.md) for `GitConsole`, `OpsWatch`, `DataWorkbench`, and the supporting demos.
