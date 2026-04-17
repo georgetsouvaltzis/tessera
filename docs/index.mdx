@@ -1,0 +1,47 @@
+---
+title: Docs
+slug: /
+---
+
+import Link from '@docusaurus/Link';
+
+Tessera has one public path: learn the app model, run the starter ladder, then pressure-test the flagship shells.
+
+<div className="row margin-top--lg">
+  <div className="col col--4 margin-bottom--lg">
+    <Link className="card padding--lg docs-link-card" to="/docs/getting-started">
+      <h2>Get Started</h2>
+      <p>Install the prerequisites, learn the default app shape, and run the first starter apps.</p>
+    </Link>
+  </div>
+  <div className="col col--4 margin-bottom--lg">
+    <Link className="card padding--lg docs-link-card" to="/docs/showcase">
+      <h2>Evaluate The Examples</h2>
+      <p>Use the flagship apps to judge whether the same public API still holds under denser product surfaces.</p>
+    </Link>
+  </div>
+  <div className="col col--4 margin-bottom--lg">
+    <Link className="card padding--lg docs-link-card" to="/docs/api-reference">
+      <h2>API Reference</h2>
+      <p>Jump into the public surface map, naming rules, and terminal capability notes when you need exact answers.</p>
+    </Link>
+  </div>
+</div>
+
+## Recommended path
+
+1. Read [Overview](overview.md) for the product posture and public app model.
+2. Follow [Getting Started](getting-started.md) to run the starter ladder in order.
+3. Use [Starter Examples](examples.md) as the quick catalog for `HelloWorld`, `CounterForm`, and `WorkspaceApp`.
+4. Open [Showcase](showcase.md) when you want the flagship and supporting demos.
+5. Keep [API Reference](api-reference.mdx) nearby for exact surface names and capability details.
+
+## Core concepts
+
+- [Theme System](theme-system.md): semantic tokens, override hierarchy, and control-level hooks.
+- [Custom Components](custom-components.md): widget authoring on the public path.
+- [Design Contract](spec.md): the product rules that shape the public API.
+
+:::note Maintainer Docs
+Release and repo-management documents stay in the `Maintainers` section of the sidebar. That includes [Performance](performance.md), [Widget Roadmap](widget-roadmap.md), and the [Alpha Release Checklist](alpha-release-checklist.md).
+:::

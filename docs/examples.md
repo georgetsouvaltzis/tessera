@@ -1,60 +1,53 @@
-# Tessera Example Guide
+---
+sidebar_label: Starter Examples
+---
 
-Tessera ships three example groups:
+# Starter Examples
 
-- starter examples: the main public learning path
-- flagship examples: the main public evaluation path after the starter ladder
-- supporting demos: narrower domain-focused showcase apps
+These are the three examples to run before you judge the flagship shells. They stay on the default public path and teach the app model in increasing density.
 
-## Starter Ladder
-
-| Example | Run | What It Teaches |
-| --- | --- | --- |
-| `HelloWorld` | `dotnet run --project examples/HelloWorld/HelloWorld.csproj` | smallest centered app, button activation, status text, visual theme intent |
-| `CounterForm` | `dotnet run --project examples/CounterForm/CounterForm.csproj` | inputs, choice, progress, and message-driven state changes |
-| `WorkspaceApp` | `dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj` | multi-pane composition, editing, preview, and action flow in one shell |
-
-## Flagship Examples
-
-| Example | Run | What It Teaches |
-| --- | --- | --- |
-| `GitConsole` | `dotnet run --project examples/GitConsole/GitConsole.csproj` | command-driven workflow surfaces, navigation, editing, diff review, action history |
-| `OpsWatch` | `dotnet run --project examples/OpsWatch/OpsWatch.csproj` | dashboard composition, telemetry cards, status surfaces, operator actions |
-| `DataWorkbench` | `dotnet run --project examples/DataWorkbench/DataWorkbench.csproj` | multi-pane workbench shells, richer state orchestration, pointer-ready runtime configuration |
-
-Recommended order:
+## Recommended Order
 
 1. `HelloWorld`
 2. `CounterForm`
 3. `WorkspaceApp`
-4. `GitConsole`
-5. `OpsWatch`
-6. `DataWorkbench`
 
-## Supporting Demos
+## `HelloWorld`
 
-| Example | Run | Focus |
-| --- | --- | --- |
-| `DownloadCenter` | `dotnet run --project examples/DownloadCenter/DownloadCenter.csproj` | transfer dashboard, grouped jobs, throughput/status surfaces |
-| `IncidentDesk` | `dotnet run --project examples/IncidentDesk/IncidentDesk.csproj` | incident triage, queue-like workflows, action-heavy layouts |
-| `MusicDeck` | `dotnet run --project examples/MusicDeck/MusicDeck.csproj` | media-oriented dashboard styling and browse/playback flows |
-| `TransitBoard` | `dotnet run --project examples/TransitBoard/TransitBoard.csproj` | dense board-style presentation and schedule surfaces |
+The smallest polished entry point.
 
-## Example Rules
+- confirms your terminal baseline
+- shows the basic `TesseraApp` loop
+- keeps the screen intentionally sparse
 
-Examples in this repository should:
+```bash
+dotnet run --project examples/HelloWorld/HelloWorld.csproj
+```
 
-- stay in `Tessera` namespaces on the default path
-- avoid leaking `Tessera.Core.*` into public onboarding
-- teach one clear idea per example
-- remain visually intentional, not default-terminal placeholders
-- update docs when the public learning path changes
+## `CounterForm`
 
-If a new example becomes part of the public learning path, update:
+The first interactive form surface.
 
-- [overview.md](overview.md)
-- [getting-started.md](getting-started.md)
-- [public-api-guidelines.md](public-api-guidelines.md)
-- [spec.md](spec.md)
-- `examples/Tessera.Examples.slnx`
-- [alpha-release-checklist.md](alpha-release-checklist.md)
+- introduces text input, numeric input, and choice
+- keeps updates message-driven and easy to trace
+- proves the default path can already feel like software, not a toy
+
+```bash
+dotnet run --project examples/CounterForm/CounterForm.csproj
+```
+
+## `WorkspaceApp`
+
+The first denser starter shell.
+
+- combines navigation, editing, preview, and actions
+- shows how multiple panes still fit the same app model
+- is the handoff point into the flagship demos
+
+```bash
+dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj
+```
+
+## Next Step
+
+Once the starter ladder feels coherent, continue to [showcase.md](showcase.md) for `GitConsole`, `OpsWatch`, `DataWorkbench`, and the supporting demos.

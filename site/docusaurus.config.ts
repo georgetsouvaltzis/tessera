@@ -47,10 +47,18 @@ const config: Config = {
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'docsSidebar',
+          to: '/docs',
           position: 'left',
           label: 'Docs',
+          activeBaseRegex:
+            '^/(?:teasharp/)?docs(?:$|/(overview|getting-started|examples|showcase|theme-system|custom-components|architecture-overview|performance|widget-roadmap|alpha-release-checklist|spec))',
+        },
+        {
+          to: '/docs/api-reference',
+          label: 'API',
+          position: 'left',
+          activeBaseRegex:
+            '^/(?:teasharp/)?docs/(api-reference|public-api-guidelines|public-api-inventory|terminal-font-capability-matrix)(?:$|/)',
         },
         {
           to: '/docs/showcase',
@@ -60,7 +68,7 @@ const config: Config = {
         {
           to: '/changelog',
           label: 'Changelog',
-          position: 'left',
+          position: 'right',
         },
         {
           href: 'https://github.com/georgetsouvaltzis/teasharp',
@@ -76,16 +84,33 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Overview',
-              to: '/docs/overview',
+              label: 'Docs Home',
+              to: '/docs',
             },
             {
               label: 'Getting Started',
               to: '/docs/getting-started',
             },
             {
+              label: 'API Reference',
+              to: '/docs/api-reference',
+            },
+          ],
+        },
+        {
+          title: 'Examples',
+          items: [
+            {
+              label: 'Starter Examples',
+              to: '/docs/examples',
+            },
+            {
               label: 'Showcase',
               to: '/docs/showcase',
+            },
+            {
+              label: 'GitHub',
+              href: 'https://github.com/georgetsouvaltzis/teasharp',
             },
           ],
         },
@@ -103,23 +128,6 @@ const config: Config = {
             {
               label: 'Security',
               to: '/security',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Support',
-              to: '/support',
-            },
-            {
-              label: 'Code of Conduct',
-              to: '/code-of-conduct',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/georgetsouvaltzis/teasharp',
             },
           ],
         },

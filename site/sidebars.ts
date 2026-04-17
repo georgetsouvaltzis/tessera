@@ -2,38 +2,63 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 const sidebars: SidebarsConfig = {
   docsSidebar: [
-    'overview',
     {
       type: 'category',
-      label: 'Start Here',
+      label: 'Introduction',
+      link: {
+        type: 'doc',
+        id: 'index',
+      },
+      collapsed: false,
       items: [
-        'getting-started',
+        'overview',
+        'spec',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Getting Started',
+      link: {
+        type: 'doc',
+        id: 'getting-started',
+      },
+      collapsed: false,
+      items: [
         'examples',
         'showcase',
       ],
     },
     {
       type: 'category',
-      label: 'Guides',
+      label: 'Core Concepts',
       items: [
         'theme-system',
         'custom-components',
-        'architecture-overview',
       ],
     },
     {
       type: 'category',
       label: 'Reference',
+      link: {
+        type: 'doc',
+        id: 'api-reference',
+      },
       items: [
         'public-api-guidelines',
         'public-api-inventory',
-        'spec',
         'terminal-font-capability-matrix',
       ],
     },
     {
       type: 'category',
-      label: 'Project',
+      label: 'Advanced',
+      items: [
+        'architecture-overview',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Maintainers',
       items: [
         'performance',
         'widget-roadmap',

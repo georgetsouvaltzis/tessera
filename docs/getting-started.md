@@ -4,15 +4,14 @@ This guide is the default onboarding path for Tessera public alpha.
 
 If you are evaluating Tessera for a product, follow this order:
 
-1. read the framework overview in [overview.md](overview.md)
+1. read [overview.md](overview.md)
 2. run `HelloWorld`
 3. run `CounterForm`
 4. run `WorkspaceApp`
-5. read [theme-system.md](theme-system.md) if you care about look and feel
-6. then open the flagship showcases
-7. read [architecture-overview.md](architecture-overview.md) if you want to contribute or extend the framework
+5. open [showcase.md](showcase.md) for the flagship shells
+6. read [theme-system.md](theme-system.md) when visuals and overrides start to matter
 
-## Prerequisites
+## Before You Begin
 
 - `.NET 10.0.103` SDK
 - a terminal with solid ANSI/CSI support
@@ -42,44 +41,55 @@ using Tessera.Controls;
 using Tessera.Layout;
 ```
 
-## Choose Your First Example
+## Run The Starter Ladder
 
-Recommended learning order:
+### `HelloWorld`
 
-1. `examples/HelloWorld`
-   - smallest visual starter
-   - teaches the basic `TesseraApp` loop, centered layout, button events, and status text
-2. `examples/CounterForm`
-   - first interactive app
-   - teaches text input, numeric input, choice, progress, and message-driven updates
-3. `examples/WorkspaceApp`
-   - first multi-pane starter
-   - teaches navigation, editing, preview, and action flow inside one centered shell
-4. `examples/GitConsole`
-   - first larger workflow app
-5. `examples/OpsWatch`
-   - first larger dashboard app
-6. `examples/DataWorkbench`
-   - first richer workbench shell
-
-Supporting demos such as `DownloadCenter`, `IncidentDesk`, `MusicDeck`, and `TransitBoard` are useful after the flagship path.
-
-## Run The Examples
+Use this first to confirm the terminal, theme, and button/message loop all read clearly.
 
 ```bash
 dotnet run --project examples/HelloWorld/HelloWorld.csproj
-dotnet run --project examples/CounterForm/CounterForm.csproj
-dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj
-dotnet run --project examples/GitConsole/GitConsole.csproj
-dotnet run --project examples/OpsWatch/OpsWatch.csproj
-dotnet run --project examples/DataWorkbench/DataWorkbench.csproj
 ```
+
+Look for:
+
+- centered layout and clean default spacing
+- a direct `TesseraApp` -> `Screen.Build(...)` loop
+- button activation and status text without extra host setup
+
+### `CounterForm`
+
+Use this second for the first real form surface.
+
+```bash
+dotnet run --project examples/CounterForm/CounterForm.csproj
+```
+
+Look for:
+
+- text input, numeric input, and choice controls
+- message-driven state updates instead of hidden framework magic
+- a small but realistic app shell
+
+### `WorkspaceApp`
+
+Use this third when you want the first denser layout.
+
+```bash
+dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj
+```
+
+Look for:
+
+- multi-pane composition on the default public path
+- preview, editing, and action flow in one screen
+- the same mental model as the smaller starters
 
 ## Where To Go Next
 
+- starter example catalog: [examples.md](examples.md)
+- flagship and supporting demos: [showcase.md](showcase.md)
 - product contract: [spec.md](spec.md)
 - theme model: [theme-system.md](theme-system.md)
-- public API boundaries: [public-api-guidelines.md](public-api-guidelines.md)
-- API surface map: [public-api-inventory.md](public-api-inventory.md)
-- custom controls: [custom-components.md](custom-components.md)
-- contributing: [CONTRIBUTING.md](/contributing)
+- API surface map: [api-reference.mdx](api-reference.mdx)
+- contributor path: [architecture-overview.md](architecture-overview.md)
