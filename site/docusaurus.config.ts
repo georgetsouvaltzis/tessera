@@ -136,10 +136,11 @@ const config: Config = {
     },
     colorMode: {
       defaultMode: 'dark',
-      respectPrefersColorScheme: true,
+      disableSwitch: true,
+      respectPrefersColorScheme: false,
     },
     prism: {
-      theme: prismThemes.oneLight,
+      theme: prismThemes.oneDark,
       darkTheme: prismThemes.oneDark,
       additionalLanguages: ['bash', 'csharp'],
     },
