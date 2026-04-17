@@ -79,20 +79,28 @@ function HomepageHeroTerminal() {
       <div className="home-terminal__body">
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--first">
           <span className="home-terminal__gutter">01</span>
-          <span className="home-terminal__text">var app = TesseraApp.CreateBuilder(args).Build();</span>
+          <span className="home-terminal__text">using Tessera;</span>
         </div>
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--second">
           <span className="home-terminal__gutter">02</span>
-          <span className="home-terminal__text">var screen = Screen.Build(() =&gt; new Stack(</span>
+          <span className="home-terminal__text">using Tessera.Examples.WorkspaceApp;</span>
         </div>
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--third">
           <span className="home-terminal__gutter">03</span>
-          <span className="home-terminal__text">    new TextBlock(&quot;Orders ready&quot;)));</span>
+          <span className="home-terminal__text">var app = TesseraApplication.CreateBuilder()</span>
         </div>
         <div className="home-terminal__line home-terminal__line--command home-terminal__line--fourth">
           <span className="home-terminal__gutter">04</span>
+          <span className="home-terminal__text">    .UseApp&lt;WorkspaceApp&gt;()</span>
+        </div>
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--fifth">
+          <span className="home-terminal__gutter">05</span>
+          <span className="home-terminal__text">    .Build();</span>
+        </div>
+        <div className="home-terminal__line home-terminal__line--command home-terminal__line--sixth">
+          <span className="home-terminal__gutter">06</span>
           <span className="home-terminal__text">
-            app.Run(screen);
+            await app.RunAsync();
             <span className="home-terminal__cursor" aria-hidden="true" />
           </span>
         </div>
