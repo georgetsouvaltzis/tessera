@@ -13,7 +13,7 @@ Implemented in code already:
 - visual polish pass
 - API cleanup and naming convergence
 - benchmark harness and perf gate foundation
-- MkDocs Material site scaffold
+- Docusaurus public docs site scaffold
 
 Tessera is close to public alpha, but it is not release-closed until the repo contract, verification evidence, and signoff are all tied to the same candidate SHA.
 

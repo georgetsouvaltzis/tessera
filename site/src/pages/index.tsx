@@ -180,11 +180,11 @@ export default function Home(): React.JSX.Element {
           <div className="lumina-home__section-inner">
             <header className="lumina-home__section-header">
               <span className="lumina-home__section-kicker">Everything you need on one path</span>
-              <h2>The Lovable shell, wired to Tessera&apos;s real docs and real product surface.</h2>
+              <h2>From first screen to flagship shell, one public surface area.</h2>
               <p>
-                The front end now follows the Lumina portal design language, while the content stays
-                anchored to the repo&apos;s actual docs, widgets, recipes, architecture notes, and
-                evaluation flow.
+                Tessera keeps install, app model, widgets, theming, recipes, architecture, and
+                flagship proof on the same docs path so teams can move from evaluation into real
+                product work without switching frameworks or relearning the surface.
               </p>
             </header>
             <div className="lumina-home__feature-grid">
@@ -207,9 +207,9 @@ export default function Home(): React.JSX.Element {
                 <span className="lumina-home__section-kicker">Choose a lane</span>
                 <h2>Keep the pitch short. Move straight into the docs that matter.</h2>
                 <p>
-                  The homepage should prove the product quickly, then hand off to the exact guide,
-                  API map, or showcase lane you need next. No second framework story. No dead-end
-                  starter content.
+                  Use the guided lane when you want the shortest path to a working app, the API map
+                  when you need exact type names, and the showcase when you want product-shaped
+                  proof before committing deeper.
                 </p>
               </div>
               <div className="lumina-home__route-grid">
