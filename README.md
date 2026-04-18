@@ -31,7 +31,7 @@ Tessera is in public alpha. It is ready for evaluation, experimentation, and con
 3. Build the sample from [docs/first-app.md](docs/first-app.md).
 4. Run the onboarding ladder from [docs/examples.md](docs/examples.md): `HelloWorld`, `CounterForm`, `WorkspaceApp`.
 5. Open [docs/showcase.md](docs/showcase.md) for the flagship evaluation path.
-6. Use [docs/app-model.md](docs/app-model.md), [docs/layout-and-screen-composition.md](docs/layout-and-screen-composition.md), and [docs/runtime-and-screen-options.md](docs/runtime-and-screen-options.md) when you need the deeper concepts.
+6. Use [docs/app-model.md](docs/app-model.md), [docs/layout-and-screen-composition.md](docs/layout-and-screen-composition.md), [docs/runtime-and-screen-options.md](docs/runtime-and-screen-options.md), and [docs/architectural-review.md](docs/architectural-review.md) when you need the deeper concepts.
 7. If you want to contribute, read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/architecture-overview.md](docs/architecture-overview.md).
 
 ## Quick Start
@@ -175,7 +175,10 @@ The full guide lives in [docs/examples.md](docs/examples.md).
 - app model: [docs/app-model.md](docs/app-model.md)
 - screen and layout composition: [docs/layout-and-screen-composition.md](docs/layout-and-screen-composition.md)
 - runtime and screen options: [docs/runtime-and-screen-options.md](docs/runtime-and-screen-options.md)
-- controls overview: [docs/controls-overview.md](docs/controls-overview.md)
+- architectural review: [docs/architectural-review.md](docs/architectural-review.md)
+- widgets overview: [docs/controls-overview.md](docs/controls-overview.md)
+- widgets: [docs/widgets-inputs-and-forms.md](docs/widgets-inputs-and-forms.md), [docs/widgets-navigation-and-workflow.md](docs/widgets-navigation-and-workflow.md), [docs/widgets-data-and-inspection.md](docs/widgets-data-and-inspection.md), [docs/widgets-dashboards-and-plots.md](docs/widgets-dashboards-and-plots.md), [docs/widgets-shells-and-overlays.md](docs/widgets-shells-and-overlays.md)
+- recipes: [docs/recipes.md](docs/recipes.md), [docs/recipes-app-shells.md](docs/recipes-app-shells.md), [docs/recipes-effects-and-refresh.md](docs/recipes-effects-and-refresh.md), [docs/recipes-data-and-workspaces.md](docs/recipes-data-and-workspaces.md)
 - troubleshooting: [docs/troubleshooting.md](docs/troubleshooting.md)
 - faq: [docs/faq.md](docs/faq.md)
 - architecture overview: [docs/architecture-overview.md](docs/architecture-overview.md)

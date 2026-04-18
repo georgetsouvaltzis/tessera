@@ -83,5 +83,6 @@ Tessera is not trying to be the smallest widget sandbox. It is trying to be the 
 1. [Install and Prerequisites](install-and-prerequisites.md)
 2. [Your First App](first-app.md)
 3. [Starter Examples](examples.md)
-4. [App Model](app-model.md)
-5. [Controls Overview](controls-overview.md)
+4. [Architectural Review](architectural-review.md)
+5. [Widgets Overview](controls-overview.md)
+6. [Recipes Overview](recipes.md)

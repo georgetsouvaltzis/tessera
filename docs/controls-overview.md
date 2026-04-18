@@ -1,133 +1,32 @@
 ---
-sidebar_label: Controls Overview
+sidebar_label: Widgets Overview
 ---
 
-# Controls Overview
+# Widgets Overview
 
-Tessera ships a broad control surface, but end-users should learn it by problem domain instead of by one giant inventory list.
+Tessera ships a broad widget surface. End-users should learn it by problem domain, not by one giant alphabetical dump.
 
 Use this page as the bridge between the starter examples and the full [public-api-inventory.md](public-api-inventory.md).
 
-## Start with the controls you will actually use first
+## Read the widget docs in this order
 
-For most apps, learn these families in roughly this order:
+| Family | Use it when you need | Best examples | Page |
+| --- | --- | --- | --- |
+| Inputs & forms | data entry, validation, pickers, and model editing | `CounterForm` | [widgets-inputs-and-forms.md](widgets-inputs-and-forms.md) |
+| Navigation & workflow | tabs, rails, commands, search, file/workflow movement | `WorkspaceApp`, `GitConsole` | [widgets-navigation-and-workflow.md](widgets-navigation-and-workflow.md) |
+| Data & inspection | tables, logs, diffs, inspectors, traces, record-heavy surfaces | `DataWorkbench`, `GitConsole` | [widgets-data-and-inspection.md](widgets-data-and-inspection.md) |
+| Dashboards, planning & plots | metrics, charts, boards, schedules, visual density | `OpsWatch`, `DataWorkbench` | [widgets-dashboards-and-plots.md](widgets-dashboards-and-plots.md) |
+| Shells & overlays | dialogs, notifications, pane systems, shell chrome | `WorkspaceApp`, `DataWorkbench` | [widgets-shells-and-overlays.md](widgets-shells-and-overlays.md) |
 
-1. buttons, labels, status bars, tabs
-2. text input, choice, combo box, sliders, toggles
-3. list and tree navigation
-4. table/grid data surfaces
-5. overlays and command surfaces
-6. charts and dashboard widgets
+## Start with the widgets you will actually use first
 
-## Inputs and forms
+For most product apps, learn the widget surface in roughly this order:
 
-Use these when the app collects or edits data:
-
-- `TextInput`
-- `TextArea`
-- `NumberInput`
-- `Choice`
-- `ComboBox`
-- `DatePicker`
-- `TimePicker`
-- `RadioGroup`
-- `Toggle`
-- `Slider`
-- `DataForm<TModel>`
-- `Form`
-- `FieldSet`
-- `ValidationSummary`
-
-Best example to see them in context:
-
-- [examples.md](examples.md) -> `CounterForm`
-
-## Navigation and workflow
-
-Use these when the user moves through commands, sections, or records:
-
-- `Button`
-- `Tabs`
-- `Breadcrumb`
-- `SideNavRail`
-- `JumpList`
-- `CommandPalette`
-- `QuickOpenOverlay`
-- `MenuBar`
-- `ContextMenu`
-- `SearchBox`
-- `SearchResultsView`
-- `TreeView`
-- `ListView<T>`
-
-Best examples:
-
-- `WorkspaceApp`
-- `GitConsole`
-
-## Data surfaces
-
-Use these when the UI is record-heavy or inspection-heavy:
-
-- `Table`
-- `DataGrid`
-- `TreeTable`
-- `KeyValueList`
-- `Timeline`
-- `MarkdownView`
-- `LogView`
-- `LogTailPanel`
-- `TraceViewer`
-- `CommandOutput`
-- `ActivityFeed`
-
-Best examples:
-
-- `DataWorkbench`
-- `GitConsole`
-- `OpsWatch`
-
-## Dashboards and plotting
-
-Use these when the surface needs metrics, telemetry, or compact visuals:
-
-- `StatsCard`
-- `Gauge`
-- `ProgressBar`
-- `BarChart`
-- `LineChart`
-- `Sparkline`
-- `TelemetryChart`
-- `Histogram`
-- `LinePlot`
-- `PlotPanel`
-- `Heatmap`
-- `TreeMapChart`
-- `HealthBoard`
-
-Best examples:
-
-- `OpsWatch`
-- `DataWorkbench`
-
-## Composition and overlays
-
-Use these when the app is turning into a shell or workspace:
-
-- `SplitView`
-- `ResizablePaneGroup`
-- `DockWorkspace`
-- `PaneTabs`
-- `InspectorPanel`
-- `Dialog`
-- `Modal`
-- `Notifications`
-
-Best examples:
-
-- `WorkspaceApp`
-- `DataWorkbench`
-- `GitConsole`
+1. inputs and forms
+2. navigation and workflow
+3. data and inspection
+4. dashboards and planning surfaces
+5. shells, panes, and overlays
 
 ## How to choose a control
 
@@ -142,12 +41,13 @@ If you still need the exact type name after that, open [public-api-inventory.md]
 
 ## What this page does not replace
 
-This page is for discovery. Use the reference pages when you need:
+The Widgets section is for discovery and capability mapping. Use the reference pages when you need:
 
 - exact public type names
 - naming policy
 - terminal-specific caveats
 - theming hook details
+- helper records, glyph sets, options, and event args
 
 For those, use:
 

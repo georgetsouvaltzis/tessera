@@ -36,9 +36,44 @@ const sidebars: SidebarsConfig = {
         'app-model',
         'layout-and-screen-composition',
         'runtime-and-screen-options',
-        'controls-overview',
         'theme-system',
         'custom-components',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Architecture',
+      items: [
+        'architectural-review',
+        'architecture-overview',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Widgets',
+      link: {
+        type: 'doc',
+        id: 'controls-overview',
+      },
+      items: [
+        'widgets-inputs-and-forms',
+        'widgets-navigation-and-workflow',
+        'widgets-data-and-inspection',
+        'widgets-dashboards-and-plots',
+        'widgets-shells-and-overlays',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Recipes',
+      link: {
+        type: 'doc',
+        id: 'recipes',
+      },
+      items: [
+        'recipes-app-shells',
+        'recipes-effects-and-refresh',
+        'recipes-data-and-workspaces',
       ],
     },
     {
@@ -67,7 +102,6 @@ const sidebars: SidebarsConfig = {
       label: 'Advanced',
       items: [
         'spec',
-        'architecture-overview',
       ],
     },
     {

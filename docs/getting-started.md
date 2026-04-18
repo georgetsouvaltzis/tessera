@@ -13,7 +13,9 @@ If you are evaluating Tessera for a real product, follow this order:
    - [app-model.md](app-model.md)
    - [layout-and-screen-composition.md](layout-and-screen-composition.md)
    - [runtime-and-screen-options.md](runtime-and-screen-options.md)
+   - [architectural-review.md](architectural-review.md)
    - [controls-overview.md](controls-overview.md)
+   - [recipes.md](recipes.md)
 
 ## Before You Begin
 
@@ -99,5 +101,7 @@ The default story stays intentionally small:
 - composition model: [layout-and-screen-composition.md](layout-and-screen-composition.md)
 - runtime and screen knobs: [runtime-and-screen-options.md](runtime-and-screen-options.md)
 - control families: [controls-overview.md](controls-overview.md)
+- architecture map: [architectural-review.md](architectural-review.md)
+- common recipes: [recipes.md](recipes.md)
 - theme model: [theme-system.md](theme-system.md)
 - API surface map: [api-reference.mdx](api-reference.mdx)

@@ -51,7 +51,7 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
           activeBaseRegex:
-            '^/(?:teasharp/)?docs(?:$|/(overview|getting-started|install-and-prerequisites|first-app|examples|showcase|app-model|layout-and-screen-composition|runtime-and-screen-options|controls-overview|theme-system|custom-components|troubleshooting|faq|architecture-overview|performance|widget-roadmap|alpha-release-checklist|spec))',
+            '^/(?:teasharp/)?docs(?:$|/(overview|getting-started|install-and-prerequisites|first-app|examples|showcase|app-model|layout-and-screen-composition|runtime-and-screen-options|controls-overview|widgets-inputs-and-forms|widgets-navigation-and-workflow|widgets-data-and-inspection|widgets-dashboards-and-plots|widgets-shells-and-overlays|recipes|recipes-app-shells|recipes-effects-and-refresh|recipes-data-and-workspaces|theme-system|custom-components|troubleshooting|faq|architectural-review|architecture-overview|performance|widget-roadmap|alpha-release-checklist|spec))',
         },
         {
           to: '/docs/api-reference',
