@@ -36,22 +36,22 @@ export default function FooterLayout({
   const items = pickFooterItems(footer);
 
   return (
-    <footer className="border-t border-[rgba(255,255,255,0.08)] py-8">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 text-sm text-[var(--tessera-text-soft)] sm:flex-row sm:px-6 lg:px-8">
-        <div>{copyright}</div>
-        <div className="flex flex-wrap items-center gap-5">
+    <footer className="lumina-footer">
+      <div className="lumina-footer__inner">
+        <div className="lumina-footer__copyright">{copyright}</div>
+        <div className="lumina-footer__links">
           {items.map((item) =>
             item.to ? (
               <Link
                 key={`${item.label}-${item.to}`}
-                className="transition-colors hover:text-[var(--tessera-text)]"
+                className="lumina-footer__link"
                 to={item.to}>
                 {item.label}
               </Link>
             ) : item.href ? (
               <Link
                 key={`${item.label}-${item.href}`}
-                className="transition-colors hover:text-[var(--tessera-text)]"
+                className="lumina-footer__link"
                 href={item.href}>
                 {item.label}
               </Link>

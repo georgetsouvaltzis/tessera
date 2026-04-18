@@ -15,22 +15,22 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  font-size: clamp(2.5rem, 4vw, 3.4rem);
-  line-height: 0.94;
-  letter-spacing: -0.055em;
-  text-shadow: 0 0 24px rgba(255, 127, 197, 0.16);
+  font-size: clamp(2.35rem, 3.5vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-shadow: 0 0 16px rgba(255, 127, 197, 0.12);
 }
 
 .theme-doc-markdown h2,
 .markdown h2 {
-  margin-top: 3rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.7rem;
+  margin-top: 2.75rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.65rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--tessera-text);
-  font-size: clamp(1.7rem, 2.6vw, 2.2rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.6rem, 2.2vw, 2rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
 .theme-doc-markdown h3,
@@ -38,8 +38,8 @@
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   color: var(--tessera-text);
-  font-size: 1.25rem;
-  letter-spacing: -0.03em;
+  font-size: 1.125rem;
+  letter-spacing: -0.02em;
 }
 
 .theme-doc-markdown h4,
@@ -55,7 +55,7 @@
 .markdown li {
   color: var(--tessera-text-muted);
   font-size: 1rem;
-  line-height: 1.78;
+  line-height: 1.7;
 }
 
 .theme-doc-markdown strong,
@@ -103,11 +103,12 @@
 
 .theme-doc-markdown code:not(.theme-code-block code),
 .markdown code:not(.theme-code-block code) {
-  padding: 0.14rem 0.42rem;
-  border: 1px solid rgba(255, 127, 197, 0.2);
-  border-radius: 0.55rem;
-  background: rgba(255, 127, 197, 0.08);
-  color: #ffb2dc;
+  padding: 0.12rem 0.42rem;
+  border: 1px solid rgba(255, 127, 197, 0.18);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ff9fd1;
+  font-size: 0.9em;
 }
 
 .theme-code-block,
@@ -297,11 +298,36 @@ pre code {
 }
 
 .lumina-docs-article {
-  max-width: 56rem;
+  max-width: 58rem;
 }
 
-.theme-doc-breadcrumbs {
-  margin-bottom: 1.25rem;
+.lumina-docs-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1.5rem;
+  color: var(--tessera-text-soft);
+  font-size: 0.78rem;
+}
+
+.lumina-docs-breadcrumbs__link {
+  color: var(--tessera-text-soft);
+  text-decoration: none;
+}
+
+.lumina-docs-breadcrumbs__link:hover {
+  color: var(--tessera-text);
+  text-decoration: none;
+}
+
+.lumina-docs-breadcrumbs__link--current {
+  color: var(--tessera-text);
+  font-weight: 500;
+}
+
+.lumina-docs-breadcrumbs__sep {
+  color: var(--tessera-text-soft);
 }
 
 .repo-markdown-page__shell {
@@ -351,10 +377,6 @@ pre code {
 
 .theme-doc-footer {
   display: none;
-}
-
-.theme-doc-version-badge {
-  border-radius: 999px;
 }
 
 .pagination-nav {

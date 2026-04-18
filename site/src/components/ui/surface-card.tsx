@@ -13,7 +13,7 @@ export const SurfaceCard = React.forwardRef<HTMLDivElement, SurfaceCardProps>(
     return (
       <Comp
         className={cn(
-          'lumina-panel rounded-[var(--tessera-radius-xl)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0)),var(--tessera-surface)]',
+          'lumina-panel ui-surface-card',
           className,
         )}
         ref={ref}

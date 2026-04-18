@@ -9,6 +9,19 @@
   background: var(--tessera-gradient-hero);
 }
 
+.lumina-home__hero-shell {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lumina-home__hero-backdrop,
+.lumina-home__hero-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
 .lumina-home__hero::before,
 .lumina-home__hero::after,
 .lumina-home__cta::before {
@@ -50,6 +63,94 @@
   padding-top: 6.2rem;
   padding-bottom: 5.6rem;
   text-align: center;
+}
+
+.lumina-home__hero-content {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 6rem 1rem 6rem;
+  text-align: center;
+}
+
+.lumina-home__launch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--tessera-border-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffbddf;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.lumina-home__launch-ping-wrap {
+  position: relative;
+  display: inline-flex;
+  width: 0.4rem;
+  height: 0.4rem;
+}
+
+.lumina-home__launch-ping,
+.lumina-home__launch-ping-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+}
+
+.lumina-home__launch-ping {
+  background: var(--ifm-color-primary);
+  opacity: 0.3;
+  animation: pulse-glow 2.2s ease-in-out infinite;
+}
+
+.lumina-home__launch-ping-core {
+  background: var(--ifm-color-primary);
+}
+
+.lumina-home__hero-title {
+  margin: 1.5rem auto 0;
+  font-size: clamp(4rem, 10vw, 6.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.075em;
+}
+
+.lumina-home__hero-title-top {
+  color: var(--tessera-text);
+}
+
+.lumina-home__hero-title-bottom {
+  background: linear-gradient(135deg, #ffd8ec, #ff7fc5 56%, #c28dff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 30px rgba(255, 127, 197, 0.18);
+}
+
+.lumina-home__hero-copy {
+  max-width: 46rem;
+  margin: 1.5rem auto 0;
+  color: var(--tessera-text-muted);
+  font-size: 1.12rem;
+  line-height: 1.75;
+}
+
+.lumina-home__hero-copy-strong {
+  color: var(--tessera-text);
+}
+
+.lumina-home__hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
 }
 
 .lumina-home__announcement,
@@ -131,6 +232,44 @@
   transform: translateX(2px);
 }
 
+.lumina-home__search-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--tessera-border);
+  border-radius: 0.9rem;
+  background: rgba(18, 21, 28, 0.76);
+  color: var(--tessera-text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.lumina-home__search-cta:hover {
+  border-color: var(--tessera-border-strong);
+  background: rgba(255, 127, 197, 0.08);
+}
+
+.lumina-home__search-cta-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lumina-home__search-cta-key {
+  border: 1px solid var(--tessera-border);
+  border-radius: 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.1rem 0.35rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 10px;
+  color: var(--tessera-text-soft);
+}
+
 .lumina-home__stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -162,6 +301,84 @@
 .lumina-home__terminal {
   max-width: 52rem;
   margin: 2.5rem auto 0;
+}
+
+.lumina-home__hero-terminal-wrap {
+  max-width: 52rem;
+  margin: 4rem auto 0;
+}
+
+.lumina-home__hero-terminal {
+  overflow: hidden;
+  border-radius: var(--tessera-radius-2xl);
+}
+
+.lumina-home__hero-terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lumina-home__hero-terminal-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+}
+
+.lumina-home__hero-terminal-dot--red {
+  background: #ff6262;
+}
+
+.lumina-home__hero-terminal-dot--yellow {
+  background: #ffcb6b;
+}
+
+.lumina-home__hero-terminal-dot--green {
+  background: #73fbd3;
+}
+
+.lumina-home__hero-terminal-path {
+  margin-left: 0.45rem;
+  color: var(--tessera-text-soft);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.84rem;
+}
+
+.lumina-home__hero-terminal-code {
+  overflow-x: auto;
+  margin: 0;
+  padding: 1.5rem;
+  background: rgba(22, 18, 28, 0.68);
+  color: #f5eef4;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.96rem;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.lumina-home__hero-terminal-muted {
+  color: var(--tessera-text-soft);
+}
+
+.lumina-home__hero-terminal-strong {
+  color: #f5eef4;
+}
+
+.lumina-home__hero-terminal-ok {
+  color: var(--tessera-green);
+}
+
+.lumina-home__hero-terminal-cyan {
+  color: var(--tessera-cyan);
+}
+
+.lumina-home__hero-terminal-pink {
+  color: var(--ifm-color-primary);
+  text-shadow: 0 0 18px rgba(255, 127, 197, 0.52);
 }
 
 .lumina-home__terminal-shell {
@@ -271,6 +488,11 @@
 }
 
 @media (max-width: 996px) {
+  .lumina-home__hero-content {
+    padding-top: 4.75rem;
+    padding-bottom: 4.5rem;
+  }
+
   .lumina-home__hero-inner {
     padding-top: 4.6rem;
     padding-bottom: 4.2rem;
@@ -282,6 +504,10 @@
 }
 
 @media (max-width: 768px) {
+  .lumina-home__hero-title {
+    font-size: clamp(3rem, 14vw, 4.6rem);
+  }
+
   .lumina-home__title {
     max-width: 12ch;
   }

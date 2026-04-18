@@ -47,52 +47,52 @@ const featureCards = [
 
 function HeroTerminal(): React.JSX.Element {
   return (
-    <div className="mx-auto mt-16 max-w-4xl">
-      <div className="overflow-hidden rounded-2xl neon-border animate-pulse-glow">
-        <div className="flex items-center gap-2 border-b border-border/60 bg-secondary/40 px-4 py-2.5">
-          <span className="h-3 w-3 rounded-full bg-red-500/80" />
-          <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
-          <span className="h-3 w-3 rounded-full bg-green-500/80" />
-          <span className="ml-3 font-mono text-xs text-muted-foreground">
+    <div className="lumina-home__hero-terminal-wrap">
+      <div className="lumina-home__hero-terminal neon-border animate-pulse-glow">
+        <div className="lumina-home__hero-terminal-bar">
+          <span className="lumina-home__hero-terminal-dot lumina-home__hero-terminal-dot--red" />
+          <span className="lumina-home__hero-terminal-dot lumina-home__hero-terminal-dot--yellow" />
+          <span className="lumina-home__hero-terminal-dot lumina-home__hero-terminal-dot--green" />
+          <span className="lumina-home__hero-terminal-path">
             ~/projects/my-app — tessera run
           </span>
         </div>
-        <pre className="overflow-x-auto bg-card/40 p-6 text-left font-mono text-sm leading-relaxed text-foreground/90">
-          <span className="text-muted-foreground">$ </span>
-          <span className="text-foreground">dotnet add package Tessera</span>
+        <pre className="lumina-home__hero-terminal-code">
+          <span className="lumina-home__hero-terminal-muted">$ </span>
+          <span className="lumina-home__hero-terminal-strong">dotnet add package Tessera</span>
           {'\n'}
-          <span className="text-muted-foreground">info </span>
-          <span className="text-foreground">Determining projects to restore...</span>
+          <span className="lumina-home__hero-terminal-muted">info </span>
+          <span className="lumina-home__hero-terminal-strong">Determining projects to restore...</span>
           {'\n'}
-          <span className="text-[var(--tessera-green)]">ok   </span>
-          <span className="text-foreground">
+          <span className="lumina-home__hero-terminal-ok">ok   </span>
+          <span className="lumina-home__hero-terminal-strong">
             PackageReference for package &apos;Tessera&apos; version &apos;1.0.0-alpha.1&apos; added.
           </span>
           {'\n'}
-          <span className="text-[var(--tessera-green)]">ok   </span>
-          <span className="text-foreground">Restored my-app.csproj in 1.21 sec.</span>
+          <span className="lumina-home__hero-terminal-ok">ok   </span>
+          <span className="lumina-home__hero-terminal-strong">Restored my-app.csproj in 1.21 sec.</span>
           {'\n\n'}
-          <span className="text-[var(--tessera-cyan)]">┌─ Ops floor ────────────────────────────────┐</span>
+          <span className="lumina-home__hero-terminal-cyan">┌─ Ops floor ────────────────────────────────┐</span>
           {'\n'}
-          <span className="text-[var(--tessera-cyan)]">│</span>{'  '}
-          <span className="text-primary text-glow">●</span>{' '}
-          <span className="text-foreground">Build status</span>{'      '}
-          <span className="text-[var(--tessera-green)]">passing</span>{'   '}
-          <span className="text-[var(--tessera-cyan)]">│</span>
+          <span className="lumina-home__hero-terminal-cyan">│</span>{'  '}
+          <span className="lumina-home__hero-terminal-pink">●</span>{' '}
+          <span className="lumina-home__hero-terminal-strong">Build status</span>{'      '}
+          <span className="lumina-home__hero-terminal-ok">passing</span>{'   '}
+          <span className="lumina-home__hero-terminal-cyan">│</span>
           {'\n'}
-          <span className="text-[var(--tessera-cyan)]">│</span>{'  '}
-          <span className="text-primary text-glow">●</span>{' '}
-          <span className="text-foreground">Active alerts</span>{'     '}
-          <span className="text-foreground">03</span>{'        '}
-          <span className="text-[var(--tessera-cyan)]">│</span>
+          <span className="lumina-home__hero-terminal-cyan">│</span>{'  '}
+          <span className="lumina-home__hero-terminal-pink">●</span>{' '}
+          <span className="lumina-home__hero-terminal-strong">Active alerts</span>{'     '}
+          <span className="lumina-home__hero-terminal-strong">03</span>{'        '}
+          <span className="lumina-home__hero-terminal-cyan">│</span>
           {'\n'}
-          <span className="text-[var(--tessera-cyan)]">│</span>{'  '}
-          <span className="text-primary text-glow">●</span>{' '}
-          <span className="text-foreground">Latency p95</span>{'       '}
-          <span className="text-foreground">18 ms</span>{'     '}
-          <span className="text-[var(--tessera-cyan)]">│</span>
+          <span className="lumina-home__hero-terminal-cyan">│</span>{'  '}
+          <span className="lumina-home__hero-terminal-pink">●</span>{' '}
+          <span className="lumina-home__hero-terminal-strong">Latency p95</span>{'       '}
+          <span className="lumina-home__hero-terminal-strong">18 ms</span>{'     '}
+          <span className="lumina-home__hero-terminal-cyan">│</span>
           {'\n'}
-          <span className="text-[var(--tessera-cyan)]">└───────────────────────────────────────────┘</span>
+          <span className="lumina-home__hero-terminal-cyan">└───────────────────────────────────────────┘</span>
         </pre>
       </div>
     </div>
@@ -104,48 +104,46 @@ export default function Home(): React.JSX.Element {
     <Layout
       title="Terminal UI for serious .NET apps"
       description="Tessera is a C#-first terminal UI framework for dashboards, workflows, and workbenches that stay on one public path.">
-      <main className="relative">
-        <section className="relative overflow-hidden border-b border-border/60">
-          <div className="absolute inset-0 -z-10" style={{background: 'var(--tessera-gradient-hero)'}} aria-hidden />
-          <div className="absolute inset-0 -z-10 grid-bg" aria-hidden />
+      <main className="lumina-home">
+        <section className="lumina-home__hero-shell">
+          <div className="lumina-home__hero-backdrop" style={{background: 'var(--tessera-gradient-hero)'}} aria-hidden />
+          <div className="lumina-home__hero-grid grid-bg" aria-hidden />
 
-          <div className="mx-auto max-w-5xl px-4 pb-24 pt-24 text-center sm:px-6 sm:pt-32 lg:px-8">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur transition-colors">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+          <div className="lumina-home__hero-content">
+            <span className="lumina-home__launch-pill">
+              <span className="lumina-home__launch-ping-wrap">
+                <span className="lumina-home__launch-ping" />
+                <span className="lumina-home__launch-ping-core" />
               </span>
               public alpha • .NET 10 • c#-first
             </span>
 
-            <h1 className="mt-6 text-balance text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-              <span className="text-foreground">Terminal UI,</span>
+            <h1 className="lumina-home__hero-title">
+              <span className="lumina-home__hero-title-top">Terminal UI,</span>
               <br />
-              <span className="text-gradient text-glow">but product-shaped.</span>
+              <span className="lumina-home__hero-title-bottom">but product-shaped.</span>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-3xl text-balance text-lg text-muted-foreground sm:text-xl">
-              <strong className="text-foreground">Tessera</strong> is a C#-first terminal UI
+            <p className="lumina-home__hero-copy">
+              <strong className="lumina-home__hero-copy-strong">Tessera</strong> is a C#-first terminal UI
               framework for dashboards, workflows, and workbenches. Start simple, get dense fast,
               keep the same authoring model.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <div className="lumina-home__hero-actions">
               <Button asChild size="lg">
                 <Link to="/docs/getting-started">
                   Read the docs
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight />
                 </Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
                 <Link to="/docs/showcase">Browse examples</Link>
               </Button>
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/60 px-5 py-2.5 text-sm font-medium text-foreground backdrop-blur transition-colors hover:border-primary/40">
-                <Search className="h-4 w-4" />
+              <button type="button" className="lumina-home__search-cta">
+                <Search className="lumina-home__search-cta-icon" />
                 Search docs
-                <kbd className="rounded border border-border bg-secondary/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                <kbd className="lumina-home__search-cta-key">
                   ⌘K
                 </kbd>
               </button>
@@ -155,53 +153,53 @@ export default function Home(): React.JSX.Element {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              <span className="text-gradient">Everything</span>{' '}
-              <span className="text-foreground">you need to evaluate it fast.</span>
+        <section className="lumina-home__feature-section">
+          <div className="lumina-home__feature-heading">
+            <h2 className="lumina-home__section-title">
+              <span className="lumina-home__section-title-accent">Everything</span>{' '}
+              <span className="lumina-home__section-title-main">you need to evaluate it fast.</span>
             </h2>
-            <p className="mt-3 text-muted-foreground">
+            <p className="lumina-home__section-copy">
               Widgets, architecture, recipes, theming, and flagship proof. One docs path.
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="lumina-home__feature-grid">
             {featureCards.map((feature) => (
               <div
                 key={feature.title}
-                className="group relative rounded-2xl neon-border p-6 transition-transform hover:-translate-y-0.5">
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary transition-shadow group-hover:glow-primary-sm">
-                  <feature.icon className="h-5 w-5" />
+                className="lumina-home__feature-card neon-border">
+                <div className="lumina-home__feature-icon">
+                  <feature.icon className="lumina-home__feature-icon-glyph" />
                 </div>
-                <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{feature.text}</p>
+                <h3 className="lumina-home__feature-card-title">{feature.title}</h3>
+                <p className="lumina-home__feature-card-copy">{feature.text}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="mx-auto max-w-4xl px-4 pb-32 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl neon-border p-10 text-center sm:p-14">
+        <section className="lumina-home__final-cta-wrap">
+          <div className="lumina-home__final-cta neon-border">
             <div
-              className="absolute inset-0 -z-10 opacity-60"
+              className="lumina-home__final-cta-backdrop"
               style={{background: 'var(--tessera-gradient-hero)'}}
               aria-hidden
             />
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              <span className="text-foreground">Ready to </span>
-              <span className="text-gradient text-glow">ship</span>
-              <span className="text-foreground">?</span>
+            <h2 className="lumina-home__final-cta-title">
+              <span className="lumina-home__final-cta-title-main">Ready to </span>
+              <span className="lumina-home__final-cta-title-accent">ship</span>
+              <span className="lumina-home__final-cta-title-main">?</span>
             </h2>
-            <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+            <p className="lumina-home__final-cta-copy">
               Start with the guided docs lane, jump straight into the widget map, or pressure-test
               the flagship examples before committing deeper.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <div className="lumina-home__final-cta-actions">
               <Button asChild size="lg">
                 <Link to="/docs/getting-started">
                   Get started
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight />
                 </Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
