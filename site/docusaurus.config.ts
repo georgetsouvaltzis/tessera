@@ -4,7 +4,7 @@ import { themes as prismThemes } from 'prism-react-renderer';
 
 const config: Config = {
   title: 'Tessera',
-  tagline: 'Terminal UI for .NET',
+  tagline: 'Terminal UI for serious .NET apps',
   favicon: 'img/favicon.svg',
   url: 'https://georgetsouvaltzis.github.io',
   baseUrl: '/teasharp/',
@@ -68,7 +68,7 @@ const config: Config = {
         {
           to: '/changelog',
           label: 'Changelog',
-          position: 'right',
+          position: 'left',
         },
         {
           href: 'https://github.com/georgetsouvaltzis/teasharp',

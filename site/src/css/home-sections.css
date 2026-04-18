@@ -1,0 +1,212 @@
+.lumina-home__section {
+  padding: 5rem 0;
+}
+
+.lumina-home__section-header {
+  max-width: 42rem;
+  margin: 0 auto 2.3rem;
+  text-align: center;
+}
+
+.lumina-home__section-header h2 {
+  margin: 0;
+  color: var(--tessera-text);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.96;
+  letter-spacing: -0.06em;
+}
+
+.lumina-home__section-header p {
+  margin: 1rem 0 0;
+  color: var(--tessera-text-muted);
+  line-height: 1.75;
+}
+
+.lumina-home__feature-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lumina-home__feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-height: 100%;
+  padding: 1.4rem;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.lumina-home__feature-card:hover {
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-3px);
+  box-shadow:
+    var(--tessera-shadow-card),
+    var(--tessera-shadow-glow);
+}
+
+.lumina-home__feature-kicker {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 127, 197, 0.1);
+  color: #ffbadf;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lumina-home__feature-card h3 {
+  margin: 0;
+  color: var(--tessera-text);
+  font-size: 1.2rem;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.lumina-home__feature-card p {
+  margin: 0;
+  color: var(--tessera-text-muted);
+  line-height: 1.7;
+}
+
+.lumina-home__feature-link {
+  margin-top: auto;
+  color: var(--ifm-link-color);
+  font-weight: 600;
+}
+
+.lumina-home__feature-link::after {
+  content: ' ->';
+}
+
+.lumina-home__cta {
+  position: relative;
+  padding: 0 0 5.25rem;
+}
+
+.lumina-home__cta::before {
+  inset: 0 0 auto;
+  height: 100%;
+  background:
+    radial-gradient(circle at top, rgba(255, 127, 197, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 127, 197, 0.04), rgba(255, 255, 255, 0));
+}
+
+.lumina-home__cta-shell {
+  padding: 2rem;
+  background:
+    linear-gradient(180deg, rgba(255, 127, 197, 0.1), rgba(255, 255, 255, 0)),
+    rgba(15, 16, 23, 0.92);
+}
+
+.lumina-home__cta-copy {
+  max-width: 38rem;
+}
+
+.lumina-home__cta-copy h2 {
+  margin: 0.9rem 0 0;
+  color: var(--tessera-text);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.lumina-home__cta-copy p {
+  margin: 1rem 0 0;
+  color: var(--tessera-text-muted);
+  line-height: 1.78;
+}
+
+.lumina-home__route-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1.8rem;
+}
+
+.lumina-home__route-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.35rem;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.lumina-home__route-card:hover {
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow:
+    var(--tessera-shadow-card),
+    var(--tessera-shadow-glow);
+}
+
+.lumina-home__route-card--featured {
+  background:
+    linear-gradient(180deg, rgba(255, 127, 197, 0.16), rgba(255, 255, 255, 0)),
+    rgba(21, 14, 22, 0.92);
+}
+
+.lumina-home__route-card h3 {
+  margin: 0;
+  color: var(--tessera-text);
+  font-size: 1.25rem;
+  letter-spacing: -0.035em;
+}
+
+.lumina-home__route-card p {
+  margin: 0;
+  color: var(--tessera-text-muted);
+  line-height: 1.7;
+}
+
+.lumina-home__route-link {
+  margin-top: auto;
+  color: var(--tessera-text);
+  font-weight: 700;
+}
+
+.lumina-home__route-link::after {
+  content: ' ->';
+}
+
+.lumina-home__cta-foot {
+  margin-top: 1.5rem;
+  color: var(--tessera-text-soft);
+  text-align: center;
+}
+
+.lumina-home__cta-foot a {
+  font-weight: 600;
+}
+
+@media (max-width: 996px) {
+  .lumina-home__feature-grid,
+  .lumina-home__route-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .lumina-home__feature-grid,
+  .lumina-home__route-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lumina-home__section,
+  .lumina-home__cta {
+    padding-bottom: 4rem;
+  }
+}

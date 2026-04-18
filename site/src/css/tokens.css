@@ -1,0 +1,113 @@
+:root {
+  --ifm-color-primary: #ff7fc5;
+  --ifm-color-primary-dark: #ff63b8;
+  --ifm-color-primary-darker: #ff55b1;
+  --ifm-color-primary-darkest: #ff259b;
+  --ifm-color-primary-light: #ff9bd2;
+  --ifm-color-primary-lighter: #ffa9d8;
+  --ifm-color-primary-lightest: #ffd0ea;
+
+  --ifm-background-color: #0b0d12;
+  --ifm-background-surface-color: #11141a;
+  --ifm-navbar-background-color: rgba(11, 13, 18, 0.78);
+  --ifm-footer-background-color: #0b0e14;
+  --ifm-color-content: #ebe6ee;
+  --ifm-font-color-base: #ebe6ee;
+  --ifm-color-content-secondary: #a79fb0;
+  --ifm-heading-color: #fff7fb;
+  --ifm-link-color: #ff8fcc;
+  --ifm-link-hover-color: #ffb0dc;
+  --ifm-menu-color: #bdb4c5;
+  --ifm-menu-color-active: #ff7fc5;
+  --ifm-menu-color-background-active: rgba(255, 127, 197, 0.12);
+  --ifm-breadcrumb-color-active: #ff7fc5;
+  --ifm-code-background: rgba(255, 255, 255, 0.06);
+  --ifm-code-font-size: 94%;
+  --ifm-font-family-base:
+    'Inter', 'SF Pro Display', 'SF Pro Text', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ifm-font-family-monospace:
+    'JetBrains Mono', 'SFMono-Regular', ui-monospace, 'Cascadia Code', 'Source Code Pro',
+    Menlo, Monaco, Consolas, monospace;
+
+  --tessera-bg: #0b0d12;
+  --tessera-bg-elevated: #0f1218;
+  --tessera-surface: rgba(18, 21, 28, 0.86);
+  --tessera-surface-strong: rgba(22, 26, 35, 0.94);
+  --tessera-surface-muted: rgba(17, 20, 27, 0.72);
+  --tessera-border: rgba(255, 127, 197, 0.14);
+  --tessera-border-strong: rgba(255, 127, 197, 0.24);
+  --tessera-border-muted: rgba(255, 255, 255, 0.08);
+  --tessera-text: #fff7fb;
+  --tessera-text-muted: #b9b1c2;
+  --tessera-text-soft: #958ca0;
+  --tessera-cyan: #7fdcff;
+  --tessera-gold: #ffd27f;
+  --tessera-green: #7ff0c5;
+  --tessera-violet: #c28dff;
+  --tessera-gradient-primary: linear-gradient(135deg, #ff7fc5 0%, #ff54ab 55%, #ff2d94 100%);
+  --tessera-gradient-glow:
+    radial-gradient(circle at top, rgba(255, 127, 197, 0.3), transparent 56%);
+  --tessera-gradient-hero:
+    radial-gradient(circle at 16% 10%, rgba(255, 127, 197, 0.28), transparent 28%),
+    radial-gradient(circle at 82% 12%, rgba(194, 141, 255, 0.16), transparent 26%),
+    radial-gradient(circle at 50% -8%, rgba(255, 255, 255, 0.08), transparent 34%),
+    linear-gradient(180deg, #120913 0%, #0f0c13 34%, #0b0d12 100%);
+  --tessera-gradient-border:
+    linear-gradient(
+      135deg,
+      rgba(255, 127, 197, 0.58),
+      rgba(194, 141, 255, 0.26),
+      rgba(127, 220, 255, 0.18)
+    );
+  --tessera-shadow-card: 0 22px 70px rgba(0, 0, 0, 0.38);
+  --tessera-shadow-glow: 0 0 28px rgba(255, 127, 197, 0.28);
+  --tessera-radius-lg: 1rem;
+  --tessera-radius-xl: 1.4rem;
+  --tessera-radius-2xl: 1.85rem;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(255, 127, 197, 0.08), transparent 28%),
+    radial-gradient(circle at 90% 12%, rgba(194, 141, 255, 0.08), transparent 24%),
+    var(--tessera-bg);
+  color: var(--tessera-text);
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+body,
+.main-wrapper {
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgba(255, 127, 197, 0.28);
+  color: var(--tessera-text);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 127, 197, 0.2);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 127, 197, 0.34);
+}

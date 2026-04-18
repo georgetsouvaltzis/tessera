@@ -1,0 +1,305 @@
+.lumina-home {
+  position: relative;
+}
+
+.lumina-home__hero {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--tessera-border);
+  background: var(--tessera-gradient-hero);
+}
+
+.lumina-home__hero::before,
+.lumina-home__hero::after,
+.lumina-home__cta::before {
+  position: absolute;
+  content: '';
+  pointer-events: none;
+}
+
+.lumina-home__hero::before {
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 127, 197, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 127, 197, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 82% 60% at 50% 20%, black, transparent 88%);
+}
+
+.lumina-home__hero::after {
+  top: 4rem;
+  right: -6rem;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 127, 197, 0.22), transparent 68%);
+  filter: blur(18px);
+}
+
+.lumina-home__hero-inner,
+.lumina-home__section-inner,
+.lumina-home__cta-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding-inline: var(--ifm-spacing-horizontal);
+}
+
+.lumina-home__hero-inner {
+  padding-top: 6.2rem;
+  padding-bottom: 5.6rem;
+  text-align: center;
+}
+
+.lumina-home__announcement,
+.lumina-home__section-kicker,
+.lumina-home__route-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--tessera-border-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffbddf;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.lumina-home__announcement-dot {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 999px;
+  background: var(--ifm-color-primary);
+  box-shadow: 0 0 12px rgba(255, 127, 197, 0.72);
+}
+
+.lumina-home__title {
+  max-width: 16ch;
+  margin: 1.3rem auto 0;
+  color: var(--tessera-text);
+  font-size: clamp(3.2rem, 8vw, 5.6rem);
+  line-height: 0.9;
+  letter-spacing: -0.07em;
+}
+
+.lumina-home__title-highlight {
+  display: block;
+  background: linear-gradient(135deg, #ffd8ec, #ff7fc5 56%, #c28dff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 24px rgba(255, 127, 197, 0.16);
+}
+
+.lumina-home__subtitle {
+  max-width: 44rem;
+  margin: 1.5rem auto 0;
+  color: var(--tessera-text-muted);
+  font-size: 1.12rem;
+  line-height: 1.75;
+}
+
+.lumina-home__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.lumina-home__ghost-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.85rem 0.2rem;
+  color: var(--tessera-text-muted);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.lumina-home__ghost-link:hover {
+  color: var(--tessera-text);
+  text-decoration: none;
+  transform: translateX(2px);
+}
+
+.lumina-home__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  max-width: 56rem;
+  margin: 2.1rem auto 0;
+}
+
+.lumina-home__stat {
+  padding: 1rem 1.05rem;
+  text-align: left;
+}
+
+.lumina-home__stat strong {
+  display: block;
+  color: var(--tessera-text);
+  font-size: 1.5rem;
+  letter-spacing: -0.05em;
+}
+
+.lumina-home__stat span {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--tessera-text-soft);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.lumina-home__terminal {
+  max-width: 52rem;
+  margin: 2.5rem auto 0;
+}
+
+.lumina-home__terminal-shell {
+  padding: 0;
+}
+
+.lumina-home__terminal-chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lumina-home__terminal-dots {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.lumina-home__terminal-dots span {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+}
+
+.lumina-home__terminal-dots span:nth-child(1) {
+  background: #ff6262;
+}
+
+.lumina-home__terminal-dots span:nth-child(2) {
+  background: #ffcb6b;
+}
+
+.lumina-home__terminal-dots span:nth-child(3) {
+  background: #73fbd3;
+}
+
+.lumina-home__terminal-path {
+  color: var(--tessera-text-soft);
+  font-size: 0.84rem;
+  letter-spacing: 0.02em;
+}
+
+.lumina-home__terminal-body {
+  padding: 1.5rem 1.6rem 1.7rem;
+}
+
+.lumina-home__terminal-line {
+  display: flex;
+  gap: 0.8rem;
+  align-items: baseline;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.95rem;
+  line-height: 1.72;
+  color: #f5eef4;
+}
+
+.lumina-home__prompt {
+  color: var(--ifm-color-primary);
+}
+
+.lumina-home__terminal-note {
+  color: var(--tessera-cyan);
+}
+
+.lumina-home__terminal-ok {
+  color: var(--tessera-green);
+}
+
+.lumina-home__terminal-preview {
+  margin-top: 1rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid rgba(255, 127, 197, 0.16);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lumina-home__terminal-preview pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #e7e1eb;
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+
+.lumina-home__terminal-preview .accent {
+  color: var(--tessera-cyan);
+}
+
+.lumina-home__terminal-preview .ok {
+  color: var(--tessera-green);
+}
+
+.lumina-home__terminal-preview .metric {
+  color: var(--tessera-gold);
+}
+
+.lumina-home__terminal-foot {
+  margin-top: 1rem;
+  color: var(--tessera-text-soft);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 996px) {
+  .lumina-home__hero-inner {
+    padding-top: 4.6rem;
+    padding-bottom: 4.2rem;
+  }
+
+  .lumina-home__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .lumina-home__title {
+    max-width: 12ch;
+  }
+
+  .lumina-home__stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lumina-home__cta-shell {
+    padding: 1.3rem;
+  }
+
+  .lumina-home__terminal-body {
+    padding: 1.2rem 1rem 1.25rem;
+  }
+
+  .lumina-home__terminal-line,
+  .lumina-home__terminal-preview pre {
+    font-size: 0.88rem;
+  }
+}
