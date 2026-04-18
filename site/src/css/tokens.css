@@ -35,9 +35,9 @@
   --tessera-surface: color-mix(in oklab, oklch(0.18 0.03 340) 86%, transparent);
   --tessera-surface-strong: color-mix(in oklab, oklch(0.18 0.03 340) 94%, transparent);
   --tessera-surface-muted: color-mix(in oklab, oklch(0.18 0.03 340) 72%, transparent);
-  --tessera-border: color-mix(in oklab, oklch(0.28 0.04 340) 60%, transparent);
+  --tessera-border: rgba(121, 71, 104, 0.36);
   --tessera-border-strong: rgba(255, 127, 197, 0.28);
-  --tessera-border-muted: color-mix(in oklab, white 8%, transparent);
+  --tessera-border-muted: rgba(255, 255, 255, 0.08);
   --tessera-text: oklch(0.97 0.01 340);
   --tessera-text-muted: oklch(0.7 0.04 340);
   --tessera-text-soft: oklch(0.7 0.04 340);
@@ -60,7 +60,7 @@
       transparent
     );
   --tessera-shadow-card: 0 8px 32px -12px rgba(0, 0, 0, 0.6);
-  --tessera-shadow-glow: 0 0 18px -4px rgba(255, 127, 197, 0.55);
+  --tessera-shadow-glow: 0 0 14px -4px rgba(255, 127, 197, 0.45);
   --tessera-radius-lg: 1rem;
   --tessera-radius-xl: 1.4rem;
   --tessera-radius-2xl: 1.85rem;

@@ -15,9 +15,9 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  font-size: clamp(2.05rem, 2.8vw, 2.55rem);
+  font-size: 2.25rem;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   text-shadow: 0 0 8px rgba(255, 127, 197, 0.06);
 }
 
@@ -55,7 +55,7 @@
 .markdown li {
   color: var(--tessera-text-muted);
   font-size: 1rem;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 .theme-doc-markdown strong,
@@ -118,10 +118,11 @@ pre {
   background:
     linear-gradient(180deg, rgba(255, 127, 197, 0.04), rgba(255, 255, 255, 0)),
     color-mix(in oklab, oklch(0.18 0.03 340) 82%, transparent);
+  box-shadow: none;
 }
 
 .theme-code-block > div:first-child {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid color-mix(in srgb, var(--tessera-border) 60%, transparent);
   background: rgba(255, 255, 255, 0.025);
 }
 
@@ -306,9 +307,9 @@ pre code {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.45rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.4rem;
   color: var(--tessera-text-soft);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
 }
 
 .lumina-docs-breadcrumbs__link {
