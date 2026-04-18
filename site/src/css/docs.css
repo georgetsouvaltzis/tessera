@@ -284,6 +284,49 @@ pre code {
   margin: 0;
 }
 
+.repo-markdown-page {
+  padding: 2rem 0 4rem;
+}
+
+.repo-markdown-page__shell {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 62rem;
+  margin: 0 auto;
+}
+
+.repo-markdown-page__hero,
+.repo-markdown-page__content {
+  padding: 1.5rem;
+}
+
+.repo-markdown-page__hero {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.repo-markdown-page__hero h1 {
+  margin: 0;
+  color: var(--tessera-text);
+  font-size: clamp(2.35rem, 4vw, 3.1rem);
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+}
+
+.repo-markdown-page__hero p {
+  margin: 0;
+  color: var(--tessera-text-muted);
+  line-height: 1.75;
+}
+
+.repo-markdown-page__content {
+  padding-top: 1.1rem;
+}
+
+.repo-markdown-page__content > .markdown > :first-child {
+  margin-top: 0;
+}
+
 .alert a,
 .markdown a code,
 .theme-doc-markdown a code {
@@ -323,5 +366,14 @@ pre code {
   .docs-hub__grid--3,
   .docs-hub__grid--4 {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .repo-markdown-page {
+    padding-top: 1.2rem;
+  }
+
+  .repo-markdown-page__hero,
+  .repo-markdown-page__content {
+    padding: 1.15rem;
   }
 }
