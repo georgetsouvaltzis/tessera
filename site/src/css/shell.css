@@ -4,7 +4,7 @@
   border-bottom: 1px solid var(--tessera-border);
   background: var(--ifm-navbar-background-color);
   backdrop-filter: blur(18px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  box-shadow: none;
 }
 
 .navbar-sidebar {
@@ -161,7 +161,7 @@
   overflow: hidden;
   border-radius: 0.55rem;
   background: var(--tessera-gradient-primary);
-  box-shadow: 0 0 18px rgba(255, 127, 197, 0.26);
+  box-shadow: 0 0 12px rgba(255, 127, 197, 0.22);
 }
 
 .lumina-navbar__brand-icon {
@@ -176,7 +176,7 @@
 
 .lumina-navbar__brand-text-accent {
   color: var(--ifm-color-primary);
-  text-shadow: 0 0 20px rgba(255, 127, 197, 0.52);
+  text-shadow: 0 0 16px rgba(255, 127, 197, 0.42);
 }
 
 .lumina-navbar__links {
@@ -221,7 +221,7 @@
   justify-content: center;
   border: 1px solid var(--tessera-border);
   border-radius: 0.75rem;
-  background: rgba(18, 21, 28, 0.76);
+  background: color-mix(in oklab, oklch(0.18 0.03 340) 60%, transparent);
   color: var(--tessera-text-soft);
   transition:
     border-color 180ms ease,
@@ -257,7 +257,7 @@
 .lumina-navbar__search-key {
   border: 1px solid var(--tessera-border);
   border-radius: 0.35rem;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.03);
   padding: 0.1rem 0.35rem;
   font-family: var(--ifm-font-family-monospace);
   font-size: 10px;
@@ -426,7 +426,7 @@
 }
 
 .lumina-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--tessera-border);
   padding: 2rem 0;
 }
 
@@ -483,7 +483,7 @@
   border-right: 1px solid var(--tessera-border);
   background:
     linear-gradient(180deg, rgba(255, 127, 197, 0.03), rgba(255, 255, 255, 0)),
-    rgba(10, 12, 18, 0.82);
+    color-mix(in oklab, oklch(0.12 0.025 340) 92%, transparent);
   backdrop-filter: blur(14px);
 }
 
@@ -571,9 +571,9 @@
 }
 
 .lumina-docs-sidebar__link--active {
-  background: rgba(255, 127, 197, 0.14);
+  background: rgba(255, 127, 197, 0.15);
   color: var(--ifm-color-primary);
-  text-shadow: 0 0 16px rgba(255, 127, 197, 0.4);
+  text-shadow: 0 0 12px rgba(255, 127, 197, 0.3);
 }
 
 .collapseSidebarButton_PEFL,

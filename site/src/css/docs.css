@@ -15,10 +15,10 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  font-size: clamp(2.35rem, 3.5vw, 3rem);
+  font-size: clamp(2.05rem, 2.8vw, 2.55rem);
   line-height: 1;
-  letter-spacing: -0.045em;
-  text-shadow: 0 0 16px rgba(255, 127, 197, 0.12);
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 8px rgba(255, 127, 197, 0.06);
 }
 
 .theme-doc-markdown h2,
@@ -26,7 +26,7 @@
   margin-top: 2.75rem;
   margin-bottom: 0.9rem;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--tessera-text);
   font-size: clamp(1.6rem, 2.2vw, 2rem);
   line-height: 1.1;
@@ -106,7 +106,7 @@
   padding: 0.12rem 0.42rem;
   border: 1px solid rgba(255, 127, 197, 0.18);
   border-radius: 0.45rem;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.035);
   color: #ff9fd1;
   font-size: 0.9em;
 }
@@ -116,13 +116,13 @@ pre {
   margin: 1.5rem 0;
   border-color: var(--tessera-border);
   background:
-    linear-gradient(180deg, rgba(255, 127, 197, 0.06), rgba(255, 255, 255, 0)),
-    rgba(13, 16, 23, 0.94);
+    linear-gradient(180deg, rgba(255, 127, 197, 0.04), rgba(255, 255, 255, 0)),
+    color-mix(in oklab, oklch(0.18 0.03 340) 82%, transparent);
 }
 
 .theme-code-block > div:first-child {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .theme-code-block code,
@@ -143,7 +143,7 @@ pre code {
 
 .theme-doc-markdown thead,
 .markdown thead {
-  background: rgba(255, 127, 197, 0.08);
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .theme-doc-markdown th,
@@ -327,7 +327,7 @@ pre code {
 }
 
 .lumina-docs-breadcrumbs__sep {
-  color: var(--tessera-text-soft);
+  color: rgba(255, 255, 255, 0.32);
 }
 
 .repo-markdown-page__shell {

@@ -7,21 +7,21 @@
   --ifm-color-primary-lighter: #ffa9d8;
   --ifm-color-primary-lightest: #ffd0ea;
 
-  --ifm-background-color: #0b0d12;
-  --ifm-background-surface-color: #11141a;
-  --ifm-navbar-background-color: rgba(11, 13, 18, 0.78);
-  --ifm-footer-background-color: #0b0e14;
-  --ifm-color-content: #ebe6ee;
-  --ifm-font-color-base: #ebe6ee;
-  --ifm-color-content-secondary: #a79fb0;
-  --ifm-heading-color: #fff7fb;
+  --ifm-background-color: oklch(0.14 0.025 340);
+  --ifm-background-surface-color: oklch(0.18 0.03 340);
+  --ifm-navbar-background-color: color-mix(in oklab, oklch(0.14 0.025 340) 70%, transparent);
+  --ifm-footer-background-color: oklch(0.14 0.025 340);
+  --ifm-color-content: oklch(0.97 0.01 340);
+  --ifm-font-color-base: oklch(0.97 0.01 340);
+  --ifm-color-content-secondary: oklch(0.7 0.04 340);
+  --ifm-heading-color: oklch(0.97 0.01 340);
   --ifm-link-color: #ff8fcc;
   --ifm-link-hover-color: #ffb0dc;
-  --ifm-menu-color: #bdb4c5;
+  --ifm-menu-color: oklch(0.92 0.01 340);
   --ifm-menu-color-active: #ff7fc5;
   --ifm-menu-color-background-active: rgba(255, 127, 197, 0.12);
   --ifm-breadcrumb-color-active: #ff7fc5;
-  --ifm-code-background: rgba(255, 255, 255, 0.06);
+  --ifm-code-background: color-mix(in oklab, white 4%, transparent);
   --ifm-code-font-size: 94%;
   --ifm-font-family-base:
     'Inter', 'SF Pro Display', 'SF Pro Text', ui-sans-serif, system-ui, -apple-system,
@@ -30,38 +30,37 @@
     'JetBrains Mono', 'SFMono-Regular', ui-monospace, 'Cascadia Code', 'Source Code Pro',
     Menlo, Monaco, Consolas, monospace;
 
-  --tessera-bg: #0b0d12;
-  --tessera-bg-elevated: #0f1218;
-  --tessera-surface: rgba(18, 21, 28, 0.86);
-  --tessera-surface-strong: rgba(22, 26, 35, 0.94);
-  --tessera-surface-muted: rgba(17, 20, 27, 0.72);
-  --tessera-border: rgba(255, 127, 197, 0.14);
-  --tessera-border-strong: rgba(255, 127, 197, 0.24);
-  --tessera-border-muted: rgba(255, 255, 255, 0.08);
-  --tessera-text: #fff7fb;
-  --tessera-text-muted: #b9b1c2;
-  --tessera-text-soft: #958ca0;
+  --tessera-bg: oklch(0.14 0.025 340);
+  --tessera-bg-elevated: oklch(0.16 0.03 340);
+  --tessera-surface: color-mix(in oklab, oklch(0.18 0.03 340) 86%, transparent);
+  --tessera-surface-strong: color-mix(in oklab, oklch(0.18 0.03 340) 94%, transparent);
+  --tessera-surface-muted: color-mix(in oklab, oklch(0.18 0.03 340) 72%, transparent);
+  --tessera-border: color-mix(in oklab, oklch(0.28 0.04 340) 60%, transparent);
+  --tessera-border-strong: rgba(255, 127, 197, 0.28);
+  --tessera-border-muted: color-mix(in oklab, white 8%, transparent);
+  --tessera-text: oklch(0.97 0.01 340);
+  --tessera-text-muted: oklch(0.7 0.04 340);
+  --tessera-text-soft: oklch(0.7 0.04 340);
   --tessera-cyan: #7fdcff;
   --tessera-gold: #ffd27f;
   --tessera-green: #7ff0c5;
   --tessera-violet: #c28dff;
-  --tessera-gradient-primary: linear-gradient(135deg, #ff7fc5 0%, #ff54ab 55%, #ff2d94 100%);
+  --tessera-gradient-primary: linear-gradient(135deg, #ff7fc5 0%, #ff8fd0 100%);
   --tessera-gradient-glow:
-    radial-gradient(circle at top, rgba(255, 127, 197, 0.3), transparent 56%);
+    radial-gradient(circle at top, rgba(255, 127, 197, 0.18), transparent 56%);
   --tessera-gradient-hero:
-    radial-gradient(circle at 16% 10%, rgba(255, 127, 197, 0.28), transparent 28%),
-    radial-gradient(circle at 82% 12%, rgba(194, 141, 255, 0.16), transparent 26%),
-    radial-gradient(circle at 50% -8%, rgba(255, 255, 255, 0.08), transparent 34%),
-    linear-gradient(180deg, #120913 0%, #0f0c13 34%, #0b0d12 100%);
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 127, 197, 0.12), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 30%, rgba(194, 141, 255, 0.08), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 60%, rgba(127, 220, 255, 0.05), transparent 60%);
   --tessera-gradient-border:
     linear-gradient(
       135deg,
-      rgba(255, 127, 197, 0.58),
-      rgba(194, 141, 255, 0.26),
-      rgba(127, 220, 255, 0.18)
+      rgba(255, 127, 197, 0.5),
+      rgba(194, 141, 255, 0.3),
+      transparent
     );
-  --tessera-shadow-card: 0 22px 70px rgba(0, 0, 0, 0.38);
-  --tessera-shadow-glow: 0 0 28px rgba(255, 127, 197, 0.28);
+  --tessera-shadow-card: 0 8px 32px -12px rgba(0, 0, 0, 0.6);
+  --tessera-shadow-glow: 0 0 18px -4px rgba(255, 127, 197, 0.55);
   --tessera-radius-lg: 1rem;
   --tessera-radius-xl: 1.4rem;
   --tessera-radius-2xl: 1.85rem;
@@ -77,8 +76,8 @@ html {
 
 body {
   background:
-    radial-gradient(circle at top, rgba(255, 127, 197, 0.08), transparent 28%),
-    radial-gradient(circle at 90% 12%, rgba(194, 141, 255, 0.08), transparent 24%),
+    radial-gradient(ellipse 100% 60% at 50% -10%, rgba(255, 127, 197, 0.12), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(194, 141, 255, 0.08), transparent 60%),
     var(--tessera-bg);
   color: var(--tessera-text);
   font-feature-settings: 'ss01', 'cv11';
