@@ -4,18 +4,6 @@ const sidebars: SidebarsConfig = {
   docsSidebar: [
     {
       type: 'category',
-      label: 'Introduction',
-      link: {
-        type: 'doc',
-        id: 'index',
-      },
-      collapsed: false,
-      items: [
-        'overview',
-      ],
-    },
-    {
-      type: 'category',
       label: 'Getting Started',
       link: {
         type: 'doc',
@@ -23,6 +11,7 @@ const sidebars: SidebarsConfig = {
       },
       collapsed: false,
       items: [
+        'overview',
         'install-and-prerequisites',
         'first-app',
         'examples',
