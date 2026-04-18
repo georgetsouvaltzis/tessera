@@ -18,7 +18,7 @@
   font-size: 2.25rem;
   line-height: 1;
   letter-spacing: -0.03em;
-  text-shadow: 0 0 8px rgba(255, 127, 197, 0.06);
+  text-shadow: 0 0 6px rgba(255, 127, 197, 0.04);
 }
 
 .theme-doc-markdown h2,
@@ -295,11 +295,13 @@ pre code {
 }
 
 .lumina-docs-page {
+  width: 100%;
   max-width: 100%;
+  padding: 2.5rem 1rem 4rem;
 }
 
 .lumina-docs-article {
-  max-width: 58rem;
+  max-width: none;
 }
 
 .lumina-docs-breadcrumbs {
@@ -400,6 +402,10 @@ pre code {
   .docs-hub__grid--4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .lumina-docs-page {
+    padding: 2rem 2rem 4rem;
+  }
 }
 
 @media (max-width: 640px) {
@@ -417,7 +423,17 @@ pre code {
     padding: 1.15rem;
   }
 
+  .lumina-docs-page {
+    padding: 1.35rem 1rem 3rem;
+  }
+
   .lumina-docs-article {
     max-width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lumina-docs-page {
+    padding: 2.5rem 3rem 4rem;
   }
 }
