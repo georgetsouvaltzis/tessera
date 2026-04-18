@@ -1,145 +1,100 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import { ArrowRight, BookOpen, Boxes, Palette, Rocket, Workflow } from 'lucide-react';
-import { Badge } from '@site/src/components/ui/badge';
-import { Button } from '@site/src/components/ui/button';
-import { SurfaceCard } from '@site/src/components/ui/surface-card';
-
-const heroStats = [
-  { value: '+34', label: 'widgets landed' },
-  { value: '7', label: 'plotting controls' },
-  { value: '3', label: 'starter apps' },
-  { value: '3', label: 'flagship apps' },
-];
+import {
+  ArrowRight,
+  BookOpen,
+  Boxes,
+  Palette,
+  Rocket,
+  Search,
+  Workflow,
+} from 'lucide-react';
+import {Button} from '@site/src/components/ui/button';
 
 const featureCards = [
   {
-    kicker: 'Public path',
-    title: 'Start with the minimal app model',
-    description:
-      'Install the package, wire one UseApp lane, and keep that same authoring path when the UI turns into dashboards, workflows, and workbenches.',
-    href: '/docs/first-app',
-    cta: 'Read first app',
     icon: Rocket,
+    title: 'Starter-first',
+    text: 'Install the package, wire one UseApp lane, and keep the same authoring path when the interface turns into a real product shell.',
   },
   {
-    kicker: 'Widgets',
-    title: 'Ship real surfaces, not toy demos',
-    description:
-      'Inputs, lists, tables, trees, dashboards, overlays, and plot widgets are documented by family so teams can map the control surface quickly.',
-    href: '/docs/controls-overview',
-    cta: 'Browse widgets',
     icon: Boxes,
+    title: 'Widget-rich',
+    text: 'Inputs, lists, tables, trees, overlays, dashboards, and plot controls are all documented by family instead of hidden inside demos.',
   },
   {
-    kicker: 'Theming',
-    title: 'Theme-first defaults and overrides',
-    description:
-      'Semantic tokens, control defaults, and instance overrides stay visible in the public API instead of hiding inside runtime glue.',
-    href: '/docs/theme-system',
-    cta: 'See theme system',
     icon: Palette,
+    title: 'Theme-first',
+    text: 'Semantic tokens, control defaults, and instance overrides stay explicit in the public API instead of leaking through runtime glue.',
   },
   {
-    kicker: 'Examples',
-    title: 'Starter ladder to flagship proof',
-    description:
-      'HelloWorld, CounterForm, and WorkspaceApp lead directly into DataWorkbench, OpsWatch, and GitConsole without changing the mental model.',
-    href: '/docs/showcase',
-    cta: 'Open showcase',
     icon: Workflow,
+    title: 'Flagship proof',
+    text: 'WorkspaceApp, OpsWatch, GitConsole, and DataWorkbench prove the same public path still holds when the shell gets dense fast.',
   },
   {
-    kicker: 'Architecture',
-    title: 'Clear layer ownership',
-    description:
-      'The docs now break down the app model, layout, runtime, widget layers, and message flow so contributors and adopters know where responsibilities live.',
-    href: '/docs/architectural-review',
-    cta: 'Review architecture',
     icon: BookOpen,
+    title: 'Docs-first',
+    text: 'Architecture, recipes, widgets, troubleshooting, and reference are grouped into one path that is easier to evaluate and easier to ship from.',
   },
   {
-    kicker: 'Recipes',
-    title: 'Common build patterns documented',
-    description:
-      'App shells, refresh loops, data workspaces, and effect-driven flows are documented as recipes instead of being scattered across examples alone.',
-    href: '/docs/recipes',
-    cta: 'Use recipes',
-    icon: ArrowRight,
-  },
-];
-
-const routeCards = [
-  {
-    kicker: 'Fastest lane',
-    title: 'Getting Started',
-    description:
-      'Use the guided path from overview to install, first app, starter examples, and the first flagship evaluation pass.',
-    href: '/docs/getting-started',
-    cta: 'Read the guide',
-    featured: true,
-  },
-  {
-    kicker: 'Surface map',
-    title: 'API Reference',
-    description:
-      'Jump directly into runtime, layout, controls, theming, terminal behavior, and the exact public surface inventory.',
-    href: '/docs/api-reference',
-    cta: 'Browse the API',
-  },
-  {
-    kicker: 'Product proof',
-    title: 'Showcase',
-    description:
-      'Open the flagship examples, evaluation notes, and concrete screenshots when you want to assess whether Tessera holds up under pressure.',
-    href: '/docs/showcase',
-    cta: 'See the showcases',
+    icon: Rocket,
+    title: '+34 widgets',
+    text: 'Four roadmap waves landed already, including seven plotting controls and the higher-pressure shells needed for public evaluation.',
   },
 ];
 
 function HeroTerminal(): React.JSX.Element {
   return (
-    <div className="lumina-home__terminal">
-      <SurfaceCard className="lumina-home__terminal-shell">
-        <div className="lumina-home__terminal-chrome">
-          <div className="lumina-home__terminal-dots" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-          <span className="lumina-home__terminal-path">~/my-app -- tessera run</span>
+    <div className="mx-auto mt-16 max-w-4xl">
+      <div className="overflow-hidden rounded-2xl neon-border animate-pulse-glow">
+        <div className="flex items-center gap-2 border-b border-border/60 bg-secondary/40 px-4 py-2.5">
+          <span className="h-3 w-3 rounded-full bg-red-500/80" />
+          <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
+          <span className="h-3 w-3 rounded-full bg-green-500/80" />
+          <span className="ml-3 font-mono text-xs text-muted-foreground">
+            ~/projects/my-app — tessera run
+          </span>
         </div>
-        <div className="lumina-home__terminal-body">
-          <div className="lumina-home__terminal-line">
-            <span className="lumina-home__prompt">$</span>
-            <span>dotnet add package Tessera</span>
-          </div>
-          <div className="lumina-home__terminal-line">
-            <span className="lumina-home__terminal-note">info</span>
-            <span>Determining projects to restore...</span>
-          </div>
-          <div className="lumina-home__terminal-line">
-            <span className="lumina-home__terminal-ok">ok</span>
-            <span>PackageReference for package &apos;Tessera&apos; version &apos;1.0.0-alpha.1&apos; added.</span>
-          </div>
-          <div className="lumina-home__terminal-line">
-            <span className="lumina-home__terminal-ok">ok</span>
-            <span>Restored my-app.csproj in 1.21 sec.</span>
-          </div>
-          <div className="lumina-home__terminal-preview" aria-label="Simulated Tessera surface preview">
-            <pre>{`┌─ ${'Ops floor'.padEnd(34, '─')}┐
-│ ${'Build status'.padEnd(18)} ${'passing'.padEnd(12)} │
-│ ${'Active alerts'.padEnd(18)} ${'03'.padEnd(12)} │
-│ ${'Latency p95'.padEnd(18)} ${'18 ms'.padEnd(12)} │
-└${'─'.repeat(36)}┘`}</pre>
-          </div>
-          <p className="lumina-home__terminal-foot">
-            Same public path from the first screen into dashboard panels, workflow shells, and
-            multi-pane workbenches.
-          </p>
-        </div>
-      </SurfaceCard>
+        <pre className="overflow-x-auto bg-card/40 p-6 text-left font-mono text-sm leading-relaxed text-foreground/90">
+          <span className="text-muted-foreground">$ </span>
+          <span className="text-foreground">dotnet add package Tessera</span>
+          {'\n'}
+          <span className="text-muted-foreground">info </span>
+          <span className="text-foreground">Determining projects to restore...</span>
+          {'\n'}
+          <span className="text-[var(--tessera-green)]">ok   </span>
+          <span className="text-foreground">
+            PackageReference for package &apos;Tessera&apos; version &apos;1.0.0-alpha.1&apos; added.
+          </span>
+          {'\n'}
+          <span className="text-[var(--tessera-green)]">ok   </span>
+          <span className="text-foreground">Restored my-app.csproj in 1.21 sec.</span>
+          {'\n\n'}
+          <span className="text-[var(--tessera-cyan)]">┌─ Ops floor ────────────────────────────────┐</span>
+          {'\n'}
+          <span className="text-[var(--tessera-cyan)]">│</span>{'  '}
+          <span className="text-primary text-glow">●</span>{' '}
+          <span className="text-foreground">Build status</span>{'      '}
+          <span className="text-[var(--tessera-green)]">passing</span>{'   '}
+          <span className="text-[var(--tessera-cyan)]">│</span>
+          {'\n'}
+          <span className="text-[var(--tessera-cyan)]">│</span>{'  '}
+          <span className="text-primary text-glow">●</span>{' '}
+          <span className="text-foreground">Active alerts</span>{'     '}
+          <span className="text-foreground">03</span>{'        '}
+          <span className="text-[var(--tessera-cyan)]">│</span>
+          {'\n'}
+          <span className="text-[var(--tessera-cyan)]">│</span>{'  '}
+          <span className="text-primary text-glow">●</span>{' '}
+          <span className="text-foreground">Latency p95</span>{'       '}
+          <span className="text-foreground">18 ms</span>{'     '}
+          <span className="text-[var(--tessera-cyan)]">│</span>
+          {'\n'}
+          <span className="text-[var(--tessera-cyan)]">└───────────────────────────────────────────┘</span>
+        </pre>
+      </div>
     </div>
   );
 }
@@ -148,106 +103,111 @@ export default function Home(): React.JSX.Element {
   return (
     <Layout
       title="Terminal UI for serious .NET apps"
-      description="Tessera is a C#-first terminal UI framework for product-grade dashboards, workflows, and workbenches.">
-      <main className="lumina-home">
-        <section className="lumina-home__hero">
-          <div className="lumina-home__hero-inner">
-            <Badge className="lumina-home__announcement">
-              <span className="lumina-home__announcement-dot" aria-hidden="true" />
-              Public alpha • .NET 10 • C#-first
-            </Badge>
-            <h1 className="lumina-home__title">
-              Terminal UI, <span className="lumina-home__title-highlight">but product-shaped.</span>
+      description="Tessera is a C#-first terminal UI framework for dashboards, workflows, and workbenches that stay on one public path.">
+      <main className="relative">
+        <section className="relative overflow-hidden border-b border-border/60">
+          <div className="absolute inset-0 -z-10" style={{background: 'var(--tessera-gradient-hero)'}} aria-hidden />
+          <div className="absolute inset-0 -z-10 grid-bg" aria-hidden />
+
+          <div className="mx-auto max-w-5xl px-4 pb-24 pt-24 text-center sm:px-6 sm:pt-32 lg:px-8">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur transition-colors">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+              </span>
+              public alpha • .NET 10 • c#-first
+            </span>
+
+            <h1 className="mt-6 text-balance text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
+              <span className="text-foreground">Terminal UI,</span>
+              <br />
+              <span className="text-gradient text-glow">but product-shaped.</span>
             </h1>
-            <p className="lumina-home__subtitle">
-              Tessera is the public .NET path for dashboards, workflows, and workbenches that need
-              to start simple, get dense fast, and stay on the same authoring model the whole time.
+
+            <p className="mx-auto mt-6 max-w-3xl text-balance text-lg text-muted-foreground sm:text-xl">
+              <strong className="text-foreground">Tessera</strong> is a C#-first terminal UI
+              framework for dashboards, workflows, and workbenches. Start simple, get dense fast,
+              keep the same authoring model.
             </p>
-            <div className="lumina-home__actions">
+
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg">
-                <Link to="/docs/getting-started">Read the docs</Link>
+                <Link to="/docs/getting-started">
+                  Read the docs
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
-                <Link to="/docs/showcase">Browse showcases</Link>
+                <Link to="/docs/showcase">Browse examples</Link>
               </Button>
-              <Link className="lumina-home__ghost-link" to="/docs/api-reference">
-                API reference
-              </Link>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/60 px-5 py-2.5 text-sm font-medium text-foreground backdrop-blur transition-colors hover:border-primary/40">
+                <Search className="h-4 w-4" />
+                Search docs
+                <kbd className="rounded border border-border bg-secondary/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                  ⌘K
+                </kbd>
+              </button>
             </div>
-            <div className="lumina-home__stats" aria-label="Tessera proof points">
-              {heroStats.map((item) => (
-                <SurfaceCard key={item.label} className="lumina-home__stat">
-                  <strong>{item.value}</strong>
-                  <span>{item.label}</span>
-                </SurfaceCard>
-              ))}
-            </div>
+
             <HeroTerminal />
           </div>
         </section>
 
-        <section className="lumina-home__section">
-          <div className="lumina-home__section-inner">
-            <header className="lumina-home__section-header">
-              <Badge className="lumina-home__section-kicker">Everything you need on one path</Badge>
-              <h2>From first screen to flagship shell, one public surface area.</h2>
-              <p>
-                Tessera keeps install, app model, widgets, theming, recipes, architecture, and
-                flagship proof on the same docs path so teams can move from evaluation into real
-                product work without switching frameworks or relearning the surface.
-              </p>
-            </header>
-            <div className="lumina-home__feature-grid">
-              {featureCards.map((item) => (
-                <SurfaceCard key={item.title} asChild className="lumina-home__feature-card">
-                  <Link to={item.href}>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="lumina-home__feature-kicker">{item.kicker}</span>
-                      <item.icon className="h-4 w-4 text-[var(--ifm-color-primary)]" aria-hidden="true" />
-                    </div>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
-                    <span className="lumina-home__feature-link">{item.cta}</span>
-                  </Link>
-                </SurfaceCard>
-              ))}
-            </div>
+        <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              <span className="text-gradient">Everything</span>{' '}
+              <span className="text-foreground">you need to evaluate it fast.</span>
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Widgets, architecture, recipes, theming, and flagship proof. One docs path.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {featureCards.map((feature) => (
+              <div
+                key={feature.title}
+                className="group relative rounded-2xl neon-border p-6 transition-transform hover:-translate-y-0.5">
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary transition-shadow group-hover:glow-primary-sm">
+                  <feature.icon className="h-5 w-5" />
+                </div>
+                <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{feature.text}</p>
+              </div>
+            ))}
           </div>
         </section>
 
-        <section className="lumina-home__cta">
-          <div className="lumina-home__cta-inner">
-            <SurfaceCard className="lumina-home__cta-shell">
-              <div className="lumina-home__cta-copy">
-                <Badge className="lumina-home__section-kicker">Choose a lane</Badge>
-                <h2>Keep the pitch short. Move straight into the docs that matter.</h2>
-                <p>
-                  Use the guided lane when you want the shortest path to a working app, the API map
-                  when you need exact type names, and the showcase when you want product-shaped
-                  proof before committing deeper.
-                </p>
-              </div>
-              <div className="lumina-home__route-grid">
-                {routeCards.map((item) => (
-                  <SurfaceCard
-                    key={item.title}
-                    className={`lumina-home__route-card ${
-                      item.featured ? 'lumina-home__route-card--featured' : ''
-                    }`}
-                    asChild>
-                    <Link to={item.href}>
-                      <Badge className="lumina-home__route-kicker">{item.kicker}</Badge>
-                      <h3>{item.title}</h3>
-                      <p>{item.description}</p>
-                      <span className="lumina-home__route-link">{item.cta}</span>
-                    </Link>
-                  </SurfaceCard>
-                ))}
-              </div>
-              <p className="lumina-home__cta-foot">
-                Need deeper product proof first? <Link to="/docs/showcase">Start with the full showcase.</Link>
-              </p>
-            </SurfaceCard>
+        <section className="mx-auto max-w-4xl px-4 pb-32 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-3xl neon-border p-10 text-center sm:p-14">
+            <div
+              className="absolute inset-0 -z-10 opacity-60"
+              style={{background: 'var(--tessera-gradient-hero)'}}
+              aria-hidden
+            />
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              <span className="text-foreground">Ready to </span>
+              <span className="text-gradient text-glow">ship</span>
+              <span className="text-foreground">?</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+              Start with the guided docs lane, jump straight into the widget map, or pressure-test
+              the flagship examples before committing deeper.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild size="lg">
+                <Link to="/docs/getting-started">
+                  Get started
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="secondary" size="lg">
+                <Link to="/docs/api-reference">Browse API surface</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>

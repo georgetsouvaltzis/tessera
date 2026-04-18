@@ -11,10 +11,14 @@
 .theme-doc-markdown h1,
 .markdown h1 {
   margin-bottom: 1rem;
-  color: var(--tessera-text);
+  background: linear-gradient(135deg, #ffd8ec, #ff7fc5 56%, #c28dff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   font-size: clamp(2.5rem, 4vw, 3.4rem);
   line-height: 0.94;
   letter-spacing: -0.055em;
+  text-shadow: 0 0 24px rgba(255, 127, 197, 0.16);
 }
 
 .theme-doc-markdown h2,
@@ -288,6 +292,18 @@ pre code {
   padding: 2rem 0 4rem;
 }
 
+.lumina-docs-page {
+  max-width: 100%;
+}
+
+.lumina-docs-article {
+  max-width: 56rem;
+}
+
+.theme-doc-breadcrumbs {
+  margin-bottom: 1.25rem;
+}
+
 .repo-markdown-page__shell {
   display: grid;
   gap: 1.25rem;
@@ -334,15 +350,16 @@ pre code {
 }
 
 .theme-doc-footer {
-  margin-top: 3rem;
-}
-
-.theme-doc-toc-mobile {
-  margin-bottom: 1.25rem;
+  display: none;
 }
 
 .theme-doc-version-badge {
   border-radius: 999px;
+}
+
+.pagination-nav {
+  gap: 0.9rem;
+  margin-top: 2rem;
 }
 
 @media (max-width: 996px) {
@@ -375,5 +392,9 @@ pre code {
   .repo-markdown-page__hero,
   .repo-markdown-page__content {
     padding: 1.15rem;
+  }
+
+  .lumina-docs-article {
+    max-width: 100%;
   }
 }

@@ -5,6 +5,11 @@
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
 }
 
+.navbar-sidebar {
+  background: rgba(11, 13, 18, 0.98);
+  backdrop-filter: blur(18px);
+}
+
 .navbar__inner {
   min-height: 3.9rem;
 }
@@ -189,6 +194,21 @@
   backdrop-filter: blur(14px);
 }
 
+.lumina-docs-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.lumina-docs-main__inner {
+  max-width: 64rem;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.lumina-docs-main--enhanced .lumina-docs-main__inner,
+.lumina-docs-main__inner--enhanced {
+  max-width: 72rem;
+}
+
 .menu {
   padding: 1rem 0.9rem 1.35rem;
 }
@@ -251,37 +271,11 @@
 }
 
 .table-of-contents {
-  position: relative;
-  padding: 1rem;
-  border: 1px solid var(--tessera-border);
-  border-radius: 1rem;
-  background:
-    linear-gradient(180deg, rgba(255, 127, 197, 0.06), rgba(255, 255, 255, 0)),
-    rgba(13, 16, 23, 0.78);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--tessera-shadow-card);
+  display: none;
 }
 
-.table-of-contents::before {
-  position: absolute;
-  inset: 0;
-  content: '';
-  border-radius: inherit;
-  padding: 1px;
-  background: var(--tessera-gradient-border);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.45;
-}
-
-.table-of-contents,
 .theme-doc-toc-desktop {
-  position: sticky;
-  top: calc(var(--ifm-navbar-height) + 1rem);
+  display: none;
 }
 
 .table-of-contents__link {
@@ -348,8 +342,8 @@
     background: rgba(10, 12, 18, 0.96);
   }
 
-  .table-of-contents {
-    position: relative;
-    top: auto;
+  .lumina-docs-main__inner {
+    padding-inline: 1rem;
+    padding-top: 1.35rem;
   }
 }
