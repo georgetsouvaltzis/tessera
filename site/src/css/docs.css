@@ -480,7 +480,7 @@ pre code {
   }
 
   .lumina-docs-page {
-    padding: 2rem 2rem 4rem;
+    padding: 2.5rem 2rem 4rem;
   }
 }
 
@@ -510,6 +510,6 @@ pre code {
 
 @media (min-width: 1024px) {
   .lumina-docs-page {
-    padding: 2.35rem 2rem 4rem;
+    padding: 2.5rem 3rem 4rem;
   }
 }
