@@ -8,6 +8,7 @@ export default function ChangelogPage(): React.JSX.Element {
       title="Changelog"
       description="Release notes and documentation updates for Tessera."
       Content={Content}
+      hideHero
     />
   );
 }

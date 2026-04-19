@@ -7,23 +7,27 @@ type RepoMarkdownPageProps = {
   title: string;
   description?: string;
   Content: ComponentType;
+  hideHero?: boolean;
 };
 
 export default function RepoMarkdownPage({
   title,
   description,
   Content,
+  hideHero = false,
 }: RepoMarkdownPageProps): React.JSX.Element {
   return (
     <Layout title={title} description={description}>
       <main className="repo-markdown-page">
         <div className="container">
           <div className="repo-markdown-page__shell">
-            <SurfaceCard className="repo-markdown-page__hero">
-              <Badge className="repo-markdown-page__eyebrow">Project page</Badge>
-              <h1>{title}</h1>
-              {description ? <p>{description}</p> : null}
-            </SurfaceCard>
+            {hideHero ? null : (
+              <SurfaceCard className="repo-markdown-page__hero">
+                <Badge className="repo-markdown-page__eyebrow">Project page</Badge>
+                <h1>{title}</h1>
+                {description ? <p>{description}</p> : null}
+              </SurfaceCard>
+            )}
             <SurfaceCard asChild className="repo-markdown-page__content">
               <article className="markdown">
                 <Content />
