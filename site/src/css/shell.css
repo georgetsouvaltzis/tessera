@@ -131,7 +131,7 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
-  max-width: 80rem;
+  max-width: none;
   height: 3.5rem;
   margin: 0 auto;
   padding: 0 1rem;
