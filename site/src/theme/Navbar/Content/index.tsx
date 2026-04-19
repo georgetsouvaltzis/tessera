@@ -1,11 +1,12 @@
-import React, {type ReactNode, useCallback, useEffect} from 'react';
+import React, {type ReactNode, useCallback, useEffect, useState} from 'react';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import {useThemeConfig} from '@docusaurus/theme-common';
 import {splitNavbarItems, useNavbarMobileSidebar} from '@docusaurus/theme-common/internal';
-import {useHistory, useLocation} from '@docusaurus/router';
+import {useLocation} from '@docusaurus/router';
 import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
+import SearchBar from '@theme/SearchBar';
 import {GitBranch, Search} from 'lucide-react';
 
 type NavbarConfigItem = {
@@ -66,29 +67,51 @@ export default function NavbarContent(): ReactNode {
   const items = useNavbarItems().filter((item) => item.type !== 'search');
   const [leftItems, rightItems] = splitNavbarItems(items);
   const {pathname} = useLocation();
-  const history = useHistory();
+  const [searchOpen, setSearchOpen] = useState(false);
   const {siteConfig} = useDocusaurusContext();
   const logoSrc = useBaseUrl('/img/logo.svg');
-  const searchRoute = useBaseUrl('/search');
   const githubItem = rightItems.find((item) => item.href);
   const normalizedPath = pathname.startsWith(siteConfig.baseUrl)
     ? pathname.slice(siteConfig.baseUrl.length - 1)
     : pathname;
   const openSearch = useCallback(() => {
-    history.push(searchRoute);
-  }, [history, searchRoute]);
+    setSearchOpen(true);
+  }, []);
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        history.push(searchRoute);
+        setSearchOpen(true);
+      } else if (event.key === 'Escape') {
+        setSearchOpen(false);
       }
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [history, searchRoute]);
+  }, []);
+
+  useEffect(() => {
+    if (!searchOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handle = window.requestAnimationFrame(() => {
+      document.querySelector<HTMLInputElement>('.lumina-search-modal .navbar__search-input')?.focus();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(handle);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [searchOpen]);
 
   return (
     <div className="lumina-navbar__inner">
@@ -132,6 +155,30 @@ export default function NavbarContent(): ReactNode {
           </Link>
         ) : null}
       </div>
+
+      {searchOpen ? (
+        <div
+          className="lumina-search-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Search docs"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              closeSearch();
+            }
+          }}>
+          <div className="lumina-search-modal__panel">
+            <button
+              type="button"
+              className="lumina-search-modal__close"
+              aria-label="Close search"
+              onClick={closeSearch}>
+              ×
+            </button>
+            <SearchBar />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

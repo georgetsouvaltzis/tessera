@@ -268,6 +268,98 @@
   height: 2.25rem;
 }
 
+.lumina-search-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  display: grid;
+  place-items: start center;
+  padding: 7.5rem 1rem 1.5rem;
+  background: color-mix(in srgb, var(--tessera-bg) 76%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.lumina-search-modal__panel {
+  position: relative;
+  width: min(640px, calc(100vw - 2rem));
+  border-radius: 1rem;
+  border: 1px solid var(--tessera-border-strong);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 127, 197, 0.14), transparent 62%),
+    color-mix(in srgb, var(--tessera-surface) 92%, #07030f 8%);
+  box-shadow:
+    0 0 0 1px rgba(255, 127, 197, 0.18),
+    0 0 48px rgba(255, 86, 185, 0.32);
+  padding: 0.85rem 0.85rem 0.65rem;
+  --search-local-modal-width: 100%;
+  --search-local-modal-background: transparent;
+  --search-local-modal-shadow: none;
+  --search-local-spacing: 0.5rem;
+  --search-local-hit-background: rgba(255, 255, 255, 0.02);
+  --search-local-hit-shadow: none;
+  --search-local-hit-color: var(--tessera-text);
+  --search-local-muted-color: var(--tessera-text-soft);
+  --search-local-highlight-color: var(--ifm-color-primary);
+}
+
+.lumina-search-modal__close {
+  position: absolute;
+  top: 0.72rem;
+  right: 0.9rem;
+  z-index: 5;
+  border: 0;
+  background: transparent;
+  color: var(--tessera-text-soft);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.lumina-search-modal__close:hover {
+  color: var(--tessera-text);
+}
+
+.lumina-search-modal [class*='searchBarContainer'] {
+  margin-left: 0;
+}
+
+.lumina-search-modal .navbar__search {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  min-height: 0;
+  color: var(--tessera-text);
+}
+
+.lumina-search-modal .navbar__search-input {
+  width: 100%;
+  border: 1px solid var(--tessera-border);
+  border-radius: 0.72rem;
+  background: color-mix(in srgb, var(--tessera-surface-strong) 80%, transparent);
+  color: var(--tessera-text);
+  padding: 0.68rem 2.2rem 0.68rem 2rem;
+}
+
+.lumina-search-modal [class*='dropdownMenu'] {
+  margin-top: 0.65rem;
+  border: 1px solid var(--tessera-border);
+  border-radius: 0.72rem;
+  background: transparent;
+}
+
+.lumina-search-modal [class*='suggestion'] {
+  border: 1px solid transparent;
+  border-radius: 0.6rem;
+  min-height: 56px;
+}
+
+.lumina-search-modal [class*='suggestion'][class*='cursor'] {
+  background: color-mix(in srgb, var(--ifm-color-primary) 20%, transparent);
+  border-color: rgba(255, 127, 197, 0.24);
+}
+
 .DocSearch-Container {
   background: color-mix(in srgb, var(--tessera-bg) 72%, transparent);
   backdrop-filter: blur(6px);
