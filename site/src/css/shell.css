@@ -5,6 +5,7 @@
   background: var(--ifm-navbar-background-color);
   backdrop-filter: blur(24px);
   box-shadow: none;
+  margin-bottom: 0.65rem;
 }
 
 .navbar-sidebar {
@@ -129,6 +130,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  width: 100%;
   max-width: 80rem;
   height: 3.5rem;
   margin: 0 auto;
@@ -183,6 +185,7 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  margin-right: auto;
 }
 
 .lumina-navbar__link {
@@ -210,7 +213,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .lumina-navbar__search,
