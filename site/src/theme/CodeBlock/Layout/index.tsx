@@ -7,7 +7,7 @@ import { getCodeBlockLanguageMeta } from '../../../lib/codeBlockLanguage';
 import { highlightCode } from '../../../lib/luminaHighlight';
 
 export default function CodeBlockLayout({ className }: Props): ReactNode {
-  const { metadata } = useCodeBlockContext();
+  const { metadata, wordWrap } = useCodeBlockContext();
   const language = getCodeBlockLanguageMeta(metadata.language);
 
   return (
@@ -19,7 +19,10 @@ export default function CodeBlockLayout({ className }: Props): ReactNode {
         <span className="lumina-code-block__header-ext">{language.extension}</span>
       </div>
       <div className="lumina-code-block__body">
-        <pre className="lumina-code-block__pre" tabIndex={0}>
+        <pre
+          ref={wordWrap.codeBlockRef}
+          className="lumina-code-block__pre"
+          tabIndex={0}>
           <code className="lumina-code-block__code">
             {highlightCode(metadata.code, language.label)}
           </code>
