@@ -10,28 +10,29 @@
 
 .theme-doc-markdown h1,
 .markdown h1 {
-  margin-bottom: 1.15rem;
+  margin-bottom: 0.75rem;
   background: linear-gradient(135deg, #ffd8ec, #ff7fc5 56%, #c28dff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   font-size: 2.25rem;
   font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  line-height: 1;
+  letter-spacing: -0.025em;
   text-shadow: none;
 }
 
 .theme-doc-markdown h2,
 .markdown h2 {
-  margin-top: 2.75rem;
-  margin-bottom: 0.9rem;
-  padding-bottom: 0.65rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--tessera-text);
-  font-size: clamp(1.6rem, 2.2vw, 2rem);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.33;
+  letter-spacing: -0.025em;
 }
 
 .theme-doc-markdown h3,
@@ -55,13 +56,14 @@
 .markdown p,
 .markdown li {
   color: var(--tessera-text-muted);
-  font-size: 0.98rem;
-  line-height: 1.68;
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
 .theme-doc-markdown strong,
 .markdown strong {
   color: var(--tessera-text);
+  font-weight: 600;
 }
 
 .theme-doc-markdown a,
@@ -82,8 +84,31 @@
   padding-left: 1.25rem;
 }
 
-.theme-doc-markdown li::marker,
-.markdown li::marker {
+.theme-doc-markdown ul,
+.markdown ul {
+  list-style: none;
+}
+
+.theme-doc-markdown ul > li,
+.markdown ul > li {
+  position: relative;
+}
+
+.theme-doc-markdown ul > li::before,
+.markdown ul > li::before {
+  position: absolute;
+  top: 0.72rem;
+  left: -1rem;
+  width: 0.35rem;
+  height: 0.35rem;
+  content: '';
+  border-radius: 999px;
+  background: var(--ifm-color-primary);
+  box-shadow: 0 0 8px rgba(255, 127, 197, 0.82);
+}
+
+.theme-doc-markdown ol > li::marker,
+.markdown ol > li::marker {
   color: var(--ifm-color-primary);
 }
 
@@ -121,7 +146,7 @@
 pre {
   margin: 1.5rem 0;
   border-color: var(--tessera-border);
-  background: rgba(25, 10, 21, 0.92);
+  background: rgba(45, 24, 40, 0.4);
   box-shadow: none;
 }
 
@@ -137,7 +162,7 @@ pre code {
   gap: 1rem;
   padding: 0.72rem 1rem;
   border-bottom: 1px solid color-mix(in srgb, var(--tessera-border) 78%, transparent);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .lumina-code-block__header-label,
@@ -159,13 +184,13 @@ pre code {
 
 .lumina-code-block__body pre {
   margin: 0;
-  padding: 1.35rem 1rem 1.1rem;
+  padding: 1rem;
   background: transparent !important;
 }
 
 .lumina-code-block__body code {
   font-size: 0.875rem;
-  line-height: 1.6;
+  line-height: 1.625;
 }
 
 .theme-code-block .token-line {
@@ -358,6 +383,7 @@ pre code {
   margin-bottom: 1.4rem;
   color: var(--tessera-text-soft);
   font-size: 0.75rem;
+  line-height: 1;
 }
 
 .lumina-docs-breadcrumbs__link {

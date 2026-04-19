@@ -29,6 +29,8 @@ const luminaPrismTheme: PrismTheme = {
       types: ['keyword', 'atrule', 'selector'],
       style: {
         color: '#ff7fc5',
+        fontWeight: '500',
+        textShadow: '0 0 24px rgba(255, 127, 197, 0.55)',
       },
     },
     {
@@ -71,6 +73,7 @@ const luminaPrismTheme: PrismTheme = {
       types: ['tag'],
       style: {
         color: '#ff7fc5',
+        textShadow: '0 0 24px rgba(255, 127, 197, 0.55)',
       },
     },
   ],
