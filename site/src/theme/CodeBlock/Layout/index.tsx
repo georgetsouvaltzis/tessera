@@ -11,7 +11,7 @@ export default function CodeBlockLayout({ className }: Props): ReactNode {
   const language = getCodeBlockLanguageMeta(metadata.language);
 
   return (
-    <Container as="div" className={clsx(className, metadata.className)}>
+    <Container as="div" className={clsx(className, metadata.className, 'lumina-code-block')}>
       <div className="lumina-code-block__header">
         <span className="lumina-code-block__header-label">
           {metadata.title ?? language.label}

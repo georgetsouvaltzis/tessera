@@ -157,16 +157,24 @@
   font-size: 0.85em;
 }
 
-.theme-code-block {
+.theme-code-block,
+.lumina-code-block {
   margin: 1.5rem 0;
-  border-color: var(--tessera-border);
-  background: color-mix(in oklab, oklch(0.18 0.03 340) 88%, transparent);
+  border-color: oklch(0.28 0.04 340 / 60%);
+  border-radius: 0.75rem;
+  background: oklch(0.18 0.03 340 / 0.4);
   box-shadow: none;
 }
 
 .theme-code-block code,
 pre code {
   color: #f4edf3;
+}
+
+.lumina-code-block,
+.lumina-code-block * {
+  --prism-background-color: transparent;
+  --prism-color: #f4edf3;
 }
 
 .lumina-code-block__header {
@@ -176,7 +184,7 @@ pre code {
   gap: 1rem;
   padding: 0.5rem 1rem;
   border-bottom: 1px solid color-mix(in srgb, var(--tessera-border) 60%, transparent);
-  background: color-mix(in oklab, oklch(0.22 0.04 340) 40%, transparent);
+  background: oklch(0.22 0.04 340 / 0.4);
 }
 
 .lumina-code-block__header-label,
@@ -199,7 +207,7 @@ pre code {
 .lumina-code-block__body pre {
   margin: 0;
   padding: 1rem;
-  background: color-mix(in oklab, oklch(0.18 0.03 340) 40%, transparent) !important;
+  background: oklch(0.18 0.03 340 / 0.4) !important;
 }
 
 .lumina-code-block__body code,
@@ -210,7 +218,7 @@ pre code {
 
 .lumina-code-block__pre {
   overflow-x: auto;
-  background: color-mix(in oklab, oklch(0.18 0.03 340) 40%, transparent);
+  background: oklch(0.18 0.03 340 / 0.4);
 }
 
 .lumina-code-block__code {
@@ -238,9 +246,7 @@ pre code {
 .lumina-token--tag {
   color: var(--ifm-color-primary);
   font-weight: 500;
-  text-shadow:
-    0 0 14px oklch(0.78 0.18 350 / 0.8),
-    0 0 24px oklch(0.78 0.18 350 / 0.55);
+  text-shadow: 0 0 24px oklch(0.78 0.18 350 / 0.55);
 }
 
 .lumina-token--type,
