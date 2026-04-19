@@ -1,4 +1,4 @@
-import React, {type ReactNode} from 'react';
+import React, {type ReactNode, useCallback, useRef} from 'react';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -6,6 +6,7 @@ import {useThemeConfig} from '@docusaurus/theme-common';
 import {splitNavbarItems, useNavbarMobileSidebar} from '@docusaurus/theme-common/internal';
 import {useLocation} from '@docusaurus/router';
 import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
+import SearchBar from '@theme/SearchBar';
 import {GitBranch, Search} from 'lucide-react';
 
 type NavbarConfigItem = {
@@ -69,9 +70,30 @@ export default function NavbarContent(): ReactNode {
   const {siteConfig} = useDocusaurusContext();
   const logoSrc = useBaseUrl('/img/logo.svg');
   const githubItem = rightItems.find((item) => item.href);
+  const searchHostRef = useRef<HTMLDivElement>(null);
   const normalizedPath = pathname.startsWith(siteConfig.baseUrl)
     ? pathname.slice(siteConfig.baseUrl.length - 1)
     : pathname;
+  const openSearch = useCallback(() => {
+    const host = searchHostRef.current;
+    const actionable = host?.querySelector<HTMLElement>('button, input');
+    if (actionable) {
+      actionable.click();
+      actionable.focus();
+      return;
+    }
+
+    const isApplePlatform = /Mac|iPhone|iPod|iPad/.test(navigator.platform);
+    window.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'k',
+        metaKey: isApplePlatform,
+        ctrlKey: !isApplePlatform,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+  }, []);
 
   return (
     <div className="lumina-navbar__inner">
@@ -97,13 +119,18 @@ export default function NavbarContent(): ReactNode {
       <div className="lumina-navbar__actions">
         <button
           type="button"
-          className="lumina-navbar__search">
+          className="lumina-navbar__search"
+          onClick={openSearch}
+          aria-label="Open docs search">
           <Search className="lumina-navbar__search-icon" />
           <span className="lumina-navbar__search-label">Search docs...</span>
           <kbd className="lumina-navbar__search-key">
             ⌘K
           </kbd>
         </button>
+        <div ref={searchHostRef} className="lumina-navbar__search-host" aria-hidden>
+          <SearchBar />
+        </div>
         {githubItem?.href ? (
           <Link
             href={githubItem.href}

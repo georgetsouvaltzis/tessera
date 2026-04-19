@@ -38,6 +38,23 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
+  plugins: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        indexBlog: false,
+        indexDocs: true,
+        indexPages: true,
+        docsDir: ['../docs'],
+        docsRouteBasePath: ['/docs'],
+        language: ['en'],
+        hashed: true,
+        explicitSearchResultPath: true,
+        searchBarShortcut: true,
+        searchBarShortcutHint: true,
+      },
+    ],
+  ],
   themeConfig: {
     navbar: {
       title: 'Tessera',
