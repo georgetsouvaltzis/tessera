@@ -7,7 +7,7 @@ const config: Config = {
   tagline: 'Terminal UI for serious .NET apps',
   favicon: 'img/favicon.svg',
   url: 'https://georgetsouvaltzis.github.io',
-  baseUrl: '/teasharp/',
+  baseUrl: '/tessera/',
   organizationName: 'georgetsouvaltzis',
   projectName: 'teasharp',
   trailingSlash: false,
@@ -47,11 +47,11 @@ const config: Config = {
       },
       items: [
         {
-          to: '/docs',
+          to: '/docs/getting-started',
           position: 'left',
           label: 'Docs',
           activeBaseRegex:
-            '^/(?:teasharp/)?docs(?:$|/(overview|getting-started|install-and-prerequisites|first-app|examples|showcase|app-model|layout-and-screen-composition|runtime-and-screen-options|controls-overview|widgets-inputs-and-forms|widgets-navigation-and-workflow|widgets-data-and-inspection|widgets-dashboards-and-plots|widgets-shells-and-overlays|recipes|recipes-app-shells|recipes-effects-and-refresh|recipes-data-and-workspaces|theme-system|custom-components|troubleshooting|faq|architectural-review|architecture-overview|performance|widget-roadmap|alpha-release-checklist|spec))',
+            '^/(?:(?:teasharp|tessera)/)?docs(?:$|/(overview|getting-started|install-and-prerequisites|first-app|examples|showcase|app-model|layout-and-screen-composition|runtime-and-screen-options|controls-overview|widgets-inputs-and-forms|widgets-navigation-and-workflow|widgets-data-and-inspection|widgets-dashboards-and-plots|widgets-shells-and-overlays|recipes|recipes-app-shells|recipes-effects-and-refresh|recipes-data-and-workspaces|theme-system|custom-components|troubleshooting|faq|architectural-review|architecture-overview|performance|widget-roadmap|alpha-release-checklist|spec|api-reference|public-api-inventory|public-api-guidelines|terminal-font-capability-matrix))',
         },
         {
           to: '/changelog',
@@ -76,10 +76,6 @@ const config: Config = {
         {
           title: 'Docs',
           items: [
-            {
-              label: 'Docs Home',
-              to: '/docs',
-            },
             {
               label: 'Getting Started',
               to: '/docs/getting-started',
