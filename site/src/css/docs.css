@@ -523,6 +523,10 @@ pre code {
   padding-top: 1.1rem;
 }
 
+.repo-markdown-page__content > .markdown > h1:first-child {
+  display: none;
+}
+
 .repo-markdown-page__content > .markdown > :first-child {
   margin-top: 0;
 }
