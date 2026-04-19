@@ -7,7 +7,6 @@ import {
   Boxes,
   Palette,
   Rocket,
-  Search,
   Workflow,
 } from 'lucide-react';
 import {Button} from '@site/src/components/ui/button';
@@ -137,16 +136,6 @@ export default function Home(): React.JSX.Element {
                   <ArrowRight />
                 </Link>
               </Button>
-              <Button asChild variant="secondary" size="lg">
-                <Link to="/docs/showcase">Browse examples</Link>
-              </Button>
-              <button type="button" className="lumina-home__search-cta">
-                <Search className="lumina-home__search-cta-icon" />
-                Search docs
-                <kbd className="lumina-home__search-cta-key">
-                  ⌘K
-                </kbd>
-              </button>
             </div>
 
             <HeroTerminal />
