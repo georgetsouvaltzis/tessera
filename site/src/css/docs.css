@@ -151,11 +151,10 @@
   font-size: 0.85em;
 }
 
-.theme-code-block,
-pre {
+.theme-code-block {
   margin: 1.5rem 0;
   border-color: var(--tessera-border);
-  background: rgba(45, 24, 40, 0.4);
+  background: color-mix(in oklab, oklch(0.18 0.03 340) 88%, transparent);
   box-shadow: none;
 }
 
@@ -169,9 +168,9 @@ pre code {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.72rem 1rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--tessera-border) 78%, transparent);
-  background: rgba(255, 255, 255, 0.04);
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--tessera-border) 60%, transparent);
+  background: color-mix(in oklab, oklch(0.22 0.04 340) 40%, transparent);
 }
 
 .lumina-code-block__header-label,
@@ -194,7 +193,7 @@ pre code {
 .lumina-code-block__body pre {
   margin: 0;
   padding: 1rem;
-  background: transparent !important;
+  background: color-mix(in oklab, oklch(0.18 0.03 340) 40%, transparent) !important;
 }
 
 .lumina-code-block__body code,
@@ -205,12 +204,13 @@ pre code {
 
 .lumina-code-block__pre {
   overflow-x: auto;
-  background: rgba(45, 24, 40, 0.4);
+  background: color-mix(in oklab, oklch(0.18 0.03 340) 40%, transparent);
 }
 
 .lumina-code-block__code {
   display: block;
   color: #f4edf3;
+  font-family: var(--ifm-font-family-monospace);
 }
 
 .lumina-token--comment {
@@ -232,7 +232,9 @@ pre code {
 .lumina-token--tag {
   color: var(--ifm-color-primary);
   font-weight: 500;
-  text-shadow: 0 0 24px oklch(0.78 0.18 350 / 0.55);
+  text-shadow:
+    0 0 14px oklch(0.78 0.18 350 / 0.8),
+    0 0 24px oklch(0.78 0.18 350 / 0.55);
 }
 
 .lumina-token--type,
@@ -432,11 +434,12 @@ pre code {
 .lumina-docs-page {
   width: 100%;
   max-width: 100%;
-  padding: 2.5rem 1rem 4rem;
+  padding: 0;
 }
 
 .lumina-docs-article {
   max-width: none;
+  padding: 2.5rem 1rem;
 }
 
 .lumina-docs-breadcrumbs {
@@ -520,7 +523,9 @@ pre code {
 
 .pagination-nav {
   gap: 0.9rem;
-  margin-top: 2rem;
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid color-mix(in srgb, var(--tessera-border) 60%, transparent);
 }
 
 @media (max-width: 996px) {
@@ -540,7 +545,7 @@ pre code {
   }
 
   .lumina-docs-page {
-    padding: 2.5rem 2rem 4rem;
+    padding: 0;
   }
 }
 
@@ -560,16 +565,18 @@ pre code {
   }
 
   .lumina-docs-page {
-    padding: 1.35rem 1rem 3rem;
+    padding: 0;
   }
 
   .lumina-docs-article {
     max-width: 100%;
+    padding: 1.35rem 1rem 3rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .lumina-docs-page {
-    padding: 2.5rem 3rem 4rem;
+  .lumina-docs-article {
+    padding-right: 3rem;
+    padding-left: 3rem;
   }
 }
