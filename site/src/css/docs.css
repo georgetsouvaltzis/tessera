@@ -1,6 +1,8 @@
 .theme-doc-markdown,
 .markdown {
   color: var(--tessera-text-muted);
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
 .theme-doc-markdown > :first-child,
@@ -41,6 +43,8 @@
   margin-bottom: 0.75rem;
   color: var(--tessera-text);
   font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.75;
   letter-spacing: -0.02em;
 }
 
