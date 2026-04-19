@@ -1,5 +1,5 @@
 ---
-sidebar_label: Install & Prerequisites
+sidebar_label: Installation
 ---
 
 # Install And Prerequisites

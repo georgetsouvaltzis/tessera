@@ -1,6 +1,6 @@
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-import { themes as prismThemes } from 'prism-react-renderer';
+import luminaPrismTheme from './src/lib/luminaPrismTheme';
 
 const config: Config = {
   title: 'Tessera',
@@ -133,8 +133,8 @@ const config: Config = {
       respectPrefersColorScheme: false,
     },
     prism: {
-      theme: prismThemes.oneDark,
-      darkTheme: prismThemes.oneDark,
+      theme: luminaPrismTheme,
+      darkTheme: luminaPrismTheme,
       additionalLanguages: ['bash', 'csharp'],
     },
     metadata: [

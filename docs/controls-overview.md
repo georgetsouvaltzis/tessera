@@ -1,5 +1,5 @@
 ---
-sidebar_label: Widgets Overview
+sidebar_label: Components
 ---
 
 # Widgets Overview

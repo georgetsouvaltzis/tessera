@@ -1,0 +1,26 @@
+import React, { type ReactNode } from 'react';
+import clsx from 'clsx';
+import { useCodeBlockContext } from '@docusaurus/theme-common/internal';
+import Container from '@theme/CodeBlock/Container';
+import Content from '@theme/CodeBlock/Content';
+import type { Props } from '@theme/CodeBlock/Layout';
+import { getCodeBlockLanguageMeta } from '../../../lib/codeBlockLanguage';
+
+export default function CodeBlockLayout({ className }: Props): ReactNode {
+  const { metadata } = useCodeBlockContext();
+  const language = getCodeBlockLanguageMeta(metadata.language);
+
+  return (
+    <Container as="div" className={clsx(className, metadata.className)}>
+      <div className="lumina-code-block__header">
+        <span className="lumina-code-block__header-label">
+          {metadata.title ?? language.label}
+        </span>
+        <span className="lumina-code-block__header-ext">{language.extension}</span>
+      </div>
+      <div className="lumina-code-block__body">
+        <Content />
+      </div>
+    </Container>
+  );
+}

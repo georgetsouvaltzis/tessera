@@ -1,5 +1,5 @@
 ---
-sidebar_label: App Model
+sidebar_label: State & effects
 ---
 
 # App Model

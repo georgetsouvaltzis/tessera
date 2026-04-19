@@ -11,96 +11,71 @@ const sidebars: SidebarsConfig = {
       },
       collapsed: false,
       items: [
-        'overview',
-        'install-and-prerequisites',
-        'first-app',
-        'examples',
-        'showcase',
+        {
+          type: 'doc',
+          id: 'overview',
+          label: 'Introduction',
+        },
+        {
+          type: 'doc',
+          id: 'install-and-prerequisites',
+          label: 'Installation',
+        },
       ],
     },
     {
       type: 'category',
       label: 'Core Concepts',
       items: [
-        'app-model',
-        'layout-and-screen-composition',
-        'runtime-and-screen-options',
-        'theme-system',
-        'custom-components',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Architecture',
-      items: [
-        'architectural-review',
-        'architecture-overview',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Widgets',
-      link: {
-        type: 'doc',
-        id: 'controls-overview',
-      },
-      items: [
-        'widgets-inputs-and-forms',
-        'widgets-navigation-and-workflow',
-        'widgets-data-and-inspection',
-        'widgets-dashboards-and-plots',
-        'widgets-shells-and-overlays',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Recipes',
-      link: {
-        type: 'doc',
-        id: 'recipes',
-      },
-      items: [
-        'recipes-app-shells',
-        'recipes-effects-and-refresh',
-        'recipes-data-and-workspaces',
+        {
+          type: 'doc',
+          id: 'controls-overview',
+          label: 'Components',
+        },
+        {
+          type: 'doc',
+          id: 'app-model',
+          label: 'State & effects',
+        },
       ],
     },
     {
       type: 'category',
       label: 'Reference',
-      link: {
-        type: 'doc',
-        id: 'api-reference',
-      },
       items: [
-        'public-api-guidelines',
-        'public-api-inventory',
-        'terminal-font-capability-matrix',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Help',
-      items: [
-        'troubleshooting',
-        'faq',
+        {
+          type: 'doc',
+          id: 'api-reference',
+          label: 'CLI reference',
+        },
       ],
     },
     {
       type: 'category',
       label: 'Advanced',
       items: [
-        'spec',
+        {
+          type: 'doc',
+          id: 'custom-components',
+          label: 'Custom renderers',
+        },
       ],
     },
     {
       type: 'category',
+      label: 'Help',
+      items: ['troubleshooting'],
+    },
+    {
+      type: 'category',
       label: 'Maintainers',
-      collapsed: true,
+      collapsed: false,
       items: [
-        'performance',
-        'widget-roadmap',
-        'alpha-release-checklist',
+        {
+          type: 'doc',
+          id: 'alpha-release-checklist',
+          label: 'Release process',
+        },
       ],
     },
   ],
