@@ -58,7 +58,7 @@ Tessera theming is semantic-token based:
 - instance overrides
 - state overrides
 
-The full token and override map lives in [theme-system.md](theme-system.md).
+The full token and override map lives in [theme-system](/docs/theme-system).
 
 ## Where To Work
 

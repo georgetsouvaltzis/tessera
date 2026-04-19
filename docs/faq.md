@@ -35,10 +35,10 @@ No. Keep normal apps in:
 
 ## What is the fastest way to learn Tessera?
 
-1. [install-and-prerequisites.md](install-and-prerequisites.md)
-2. [first-app.md](first-app.md)
-3. [examples.md](examples.md)
-4. [showcase.md](showcase.md)
+1. [install-and-prerequisites](/docs/install-and-prerequisites)
+2. [first-app](/docs/first-app)
+3. [examples](/docs/examples)
+4. [showcase](/docs/showcase)
 
 ## How do I handle app state?
 
@@ -59,7 +59,7 @@ runtime.Theme = TesseraThemes.Catppuccin(CatppuccinVariant.Mocha);
 runtime.ThemeOverrides = myOverrides;
 ```
 
-Then use [theme-system.md](theme-system.md) for the token and override model.
+Then use [theme-system](/docs/theme-system) for the token and override model.
 
 ## What terminals are recommended?
 
@@ -70,26 +70,26 @@ Start with:
 - Windows Terminal
 - macOS Terminal
 
-For caveats and capability details, use [terminal-font-capability-matrix.md](terminal-font-capability-matrix.md).
+For caveats and capability details, use [terminal-font-capability-matrix](/docs/terminal-font-capability-matrix).
 
 ## Can I build custom controls?
 
 Yes. Use `Tessera.Controls.Control` for the normal custom widget path. That is the supported custom control contract for interactive widgets.
 
-See [custom-components.md](custom-components.md).
+See [custom-components](/docs/custom-components).
 
 ## Where do I find the full control list?
 
 Use:
 
-- [controls-overview.md](controls-overview.md) for grouped discovery
-- [public-api-inventory.md](public-api-inventory.md) for the exact public list
+- [controls-overview](/docs/controls-overview) for grouped discovery
+- [public-api-inventory](/docs/public-api-inventory) for the exact public list
 
 ## Are images part of V1?
 
 No. The current design contract treats inline image rendering as V1.1 scope, not V1 scope.
 
-See [spec.md](spec.md) for the product boundary.
+See [spec](/docs/spec) for the product boundary.
 
 ## What examples should I run first?
 
@@ -105,4 +105,4 @@ Then flagship evaluation:
 2. `OpsWatch`
 3. `DataWorkbench`
 
-Use [examples.md](examples.md) and [showcase.md](showcase.md).
+Use [examples](/docs/examples) and [showcase](/docs/showcase).

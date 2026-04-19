@@ -127,6 +127,6 @@ You do **not** need to force every tiny app into a message-heavy architecture. K
 
 ## Next step
 
-- screen assembly: [layout-and-screen-composition.md](layout-and-screen-composition.md)
-- runtime knobs: [runtime-and-screen-options.md](runtime-and-screen-options.md)
-- starter examples: [examples.md](examples.md)
+- screen assembly: [layout-and-screen-composition](/docs/layout-and-screen-composition)
+- runtime knobs: [runtime-and-screen-options](/docs/runtime-and-screen-options)
+- starter examples: [examples](/docs/examples)

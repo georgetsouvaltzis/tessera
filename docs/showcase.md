@@ -88,7 +88,7 @@ Use these once the flagship path is already clear:
 
 ## Where to go next
 
-- layout and screen composition: [layout-and-screen-composition.md](layout-and-screen-composition.md)
-- controls by problem domain: [controls-overview.md](controls-overview.md)
-- theme and overrides: [theme-system.md](theme-system.md)
-- exact type names: [api-reference.mdx](api-reference.mdx)
+- layout and screen composition: [layout-and-screen-composition](/docs/layout-and-screen-composition)
+- controls by problem domain: [controls-overview](/docs/controls-overview)
+- theme and overrides: [theme-system](/docs/theme-system)
+- exact type names: [API Reference](/docs/api-reference)

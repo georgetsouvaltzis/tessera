@@ -95,6 +95,6 @@ public override Screen Build(ScreenContext context)
 
 ## Related pages
 
-- app model: [app-model.md](app-model.md)
-- widgets overview: [controls-overview.md](controls-overview.md)
-- shells and overlays widgets: [widgets-shells-and-overlays.md](widgets-shells-and-overlays.md)
+- app model: [app-model](/docs/app-model)
+- widgets overview: [controls-overview](/docs/controls-overview)
+- shells and overlays widgets: [widgets-shells-and-overlays](/docs/widgets-shells-and-overlays)

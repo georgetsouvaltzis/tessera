@@ -134,6 +134,6 @@ That is easier to maintain than one giant nested tree.
 
 ## Next step
 
-- lifecycle and message flow: [app-model.md](app-model.md)
-- runtime configuration: [runtime-and-screen-options.md](runtime-and-screen-options.md)
-- real examples: [examples.md](examples.md) and [showcase.md](showcase.md)
+- lifecycle and message flow: [app-model](/docs/app-model)
+- runtime configuration: [runtime-and-screen-options](/docs/runtime-and-screen-options)
+- real examples: [examples](/docs/examples) and [showcase](/docs/showcase)

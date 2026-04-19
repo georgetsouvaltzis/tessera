@@ -162,8 +162,8 @@ When you review a feature or doc change, ask:
 
 ## Related pages
 
-- architecture map for contributors: [architecture-overview.md](architecture-overview.md)
-- lifecycle and message flow: [app-model.md](app-model.md)
-- composition model: [layout-and-screen-composition.md](layout-and-screen-composition.md)
-- runtime knobs: [runtime-and-screen-options.md](runtime-and-screen-options.md)
-- widget families: [controls-overview.md](controls-overview.md)
+- architecture map for contributors: [architecture-overview](/docs/architecture-overview)
+- lifecycle and message flow: [app-model](/docs/app-model)
+- composition model: [layout-and-screen-composition](/docs/layout-and-screen-composition)
+- runtime knobs: [runtime-and-screen-options](/docs/runtime-and-screen-options)
+- widget families: [controls-overview](/docs/controls-overview)

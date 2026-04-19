@@ -140,11 +140,11 @@ Default app shape:
 
 Canonical learning path:
 
-1. [overview.md](overview.md)
-2. [install-and-prerequisites.md](install-and-prerequisites.md)
-3. [first-app.md](first-app.md)
-4. [examples.md](examples.md)
-5. [showcase.md](showcase.md)
+1. [overview](/docs/overview)
+2. [install-and-prerequisites](/docs/install-and-prerequisites)
+3. [first-app](/docs/first-app)
+4. [examples](/docs/examples)
+5. [showcase](/docs/showcase)
 
 ### Interaction Contract
 
@@ -174,7 +174,7 @@ The default authoring model should read like explicit screen composition, not a 
 
 ### Control Contract
 
-The public control surface is tracked in [public-api-inventory.md](public-api-inventory.md).
+The public control surface is tracked in [public-api-inventory](/docs/public-api-inventory).
 
 High-level rules:
 
@@ -193,7 +193,7 @@ High-level rules:
 - existing `Current*` members remain compatibility aliases only where already shipped
 - new bordered controls must ship border-style hooks, theme-token mapping, and regression coverage in the same slice
 
-Custom-widget authoring remains supported through [custom-components.md](custom-components.md).
+Custom-widget authoring remains supported through [custom-components](/docs/custom-components).
 
 ## Theme And Style Contract
 
@@ -208,9 +208,9 @@ Typography contract:
 
 - ANSI emphasis intent is portable (`TesseraStyle`, `TesseraFontWeight`)
 - terminal font requests are best-effort only
-- terminal-specific caveats live in [terminal-font-capability-matrix.md](terminal-font-capability-matrix.md)
+- terminal-specific caveats live in [terminal-font-capability-matrix](/docs/terminal-font-capability-matrix)
 
-Detailed token and hook mapping lives in [theme-system.md](theme-system.md).
+Detailed token and hook mapping lives in [theme-system](/docs/theme-system).
 
 ## V1 Boundaries
 

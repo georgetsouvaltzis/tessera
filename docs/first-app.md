@@ -99,6 +99,6 @@ That is fine for tiny demos. The builder path is usually better once you need ru
 
 ## What to do next
 
-1. Run the starter ladder in [examples.md](examples.md).
-2. Read [app-model.md](app-model.md) to understand `Initialize`, `Update`, `Build`, `Post`, and effects.
-3. Read [layout-and-screen-composition.md](layout-and-screen-composition.md) to understand `Screen.Build(...)`.
+1. Run the starter ladder in [examples](/docs/examples).
+2. Read [app-model](/docs/app-model) to understand `Initialize`, `Update`, `Build`, `Post`, and effects.
+3. Read [layout-and-screen-composition](/docs/layout-and-screen-composition) to understand `Screen.Build(...)`.

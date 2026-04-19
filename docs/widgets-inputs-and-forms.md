@@ -55,6 +55,6 @@ Use these widgets when the user is editing data, confirming choices, or moving t
 
 ## Related pages
 
-- recipes: [recipes-app-shells.md](recipes-app-shells.md)
-- recipes: [recipes-effects-and-refresh.md](recipes-effects-and-refresh.md)
-- API inventory: [public-api-inventory.md](public-api-inventory.md)
+- recipes: [recipes-app-shells](/docs/recipes-app-shells)
+- recipes: [recipes-effects-and-refresh](/docs/recipes-effects-and-refresh)
+- API inventory: [public-api-inventory](/docs/public-api-inventory)

@@ -48,6 +48,6 @@ Use these widgets when the app needs shell chrome, transient overlays, or denser
 
 ## Related pages
 
-- recipes: [recipes-data-and-workspaces.md](recipes-data-and-workspaces.md)
-- widgets overview: [controls-overview.md](controls-overview.md)
-- architecture: [architectural-review.md](architectural-review.md)
+- recipes: [recipes-data-and-workspaces](/docs/recipes-data-and-workspaces)
+- widgets overview: [controls-overview](/docs/controls-overview)
+- architecture: [architectural-review](/docs/architectural-review)

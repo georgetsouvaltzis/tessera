@@ -96,10 +96,10 @@ Move beyond the simple rail/grid/inspector shell when you need:
 - tabbed subpanes -> `PaneTabs`
 - heavier transient overlays -> `Dialog`, `Modal`, `ContextMenu`
 
-Those widgets belong in [widgets-shells-and-overlays.md](widgets-shells-and-overlays.md).
+Those widgets belong in [widgets-shells-and-overlays](/docs/widgets-shells-and-overlays).
 
 ## Related pages
 
-- widgets: [widgets-data-and-inspection.md](widgets-data-and-inspection.md)
-- widgets: [widgets-shells-and-overlays.md](widgets-shells-and-overlays.md)
-- showcase: [showcase.md](showcase.md)
+- widgets: [widgets-data-and-inspection](/docs/widgets-data-and-inspection)
+- widgets: [widgets-shells-and-overlays](/docs/widgets-shells-and-overlays)
+- showcase: [showcase](/docs/showcase)

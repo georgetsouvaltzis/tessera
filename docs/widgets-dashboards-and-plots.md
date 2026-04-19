@@ -46,6 +46,6 @@ Use these widgets when the surface is metric-heavy, chart-heavy, or built around
 
 ## Related pages
 
-- showcase: [showcase.md](showcase.md)
-- recipes: [recipes-effects-and-refresh.md](recipes-effects-and-refresh.md)
-- API inventory: [public-api-inventory.md](public-api-inventory.md)
+- showcase: [showcase](/docs/showcase)
+- recipes: [recipes-effects-and-refresh](/docs/recipes-effects-and-refresh)
+- API inventory: [public-api-inventory](/docs/public-api-inventory)

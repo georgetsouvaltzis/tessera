@@ -69,7 +69,7 @@ Required:
 
 Reference:
 
-- [performance.md](performance.md)
+- [performance](/docs/performance)
 - `docs/perf-baselines/latest-slo-gate-result.json`
 - `docs/perf-baselines/latest-runtime-e2e-result.json`
 
@@ -81,22 +81,22 @@ Open caveat:
 
 Before public alpha signoff, do one final docs pass confirming that these files agree:
 
-- [overview.md](overview.md)
-- [CHANGELOG.md](/changelog)
-- [SUPPORT.md](/support)
-- [getting-started.md](getting-started.md)
-- [examples.md](examples.md)
-- [architecture-overview.md](architecture-overview.md)
-- [CONTRIBUTING.md](/contributing)
-- [CODE_OF_CONDUCT.md](/code-of-conduct)
-- [SECURITY.md](/security)
+- [overview](/docs/overview)
+- [Changelog](/changelog)
+- [Support](/support)
+- [getting-started](/docs/getting-started)
+- [examples](/docs/examples)
+- [architecture-overview](/docs/architecture-overview)
+- [Contributing](/contributing)
+- [Code of Conduct](/code-of-conduct)
+- [Security](/security)
 
-- [spec.md](spec.md)
-- [public-api-guidelines.md](public-api-guidelines.md)
-- [public-api-inventory.md](public-api-inventory.md)
-- [theme-system.md](theme-system.md)
-- [widget-roadmap.md](widget-roadmap.md)
-- [performance.md](performance.md)
+- [spec](/docs/spec)
+- [public-api-guidelines](/docs/public-api-guidelines)
+- [public-api-inventory](/docs/public-api-inventory)
+- [theme-system](/docs/theme-system)
+- [widget-roadmap](/docs/widget-roadmap)
+- [performance](/docs/performance)
 
 Goal:
 

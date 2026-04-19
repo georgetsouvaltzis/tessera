@@ -55,6 +55,6 @@ Use these widgets when the user needs to move between sections, search, execute 
 
 ## Related pages
 
-- recipes: [recipes-data-and-workspaces.md](recipes-data-and-workspaces.md)
-- showcase: [showcase.md](showcase.md)
-- API inventory: [public-api-inventory.md](public-api-inventory.md)
+- recipes: [recipes-data-and-workspaces](/docs/recipes-data-and-workspaces)
+- showcase: [showcase](/docs/showcase)
+- API inventory: [public-api-inventory](/docs/public-api-inventory)

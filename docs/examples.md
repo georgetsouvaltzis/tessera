@@ -78,4 +78,4 @@ Look for:
 
 ## Next step
 
-Once the starter ladder feels coherent, continue to [showcase.md](showcase.md) for `GitConsole`, `OpsWatch`, `DataWorkbench`, and the supporting demos.
+Once the starter ladder feels coherent, continue to [showcase](/docs/showcase) for `GitConsole`, `OpsWatch`, `DataWorkbench`, and the supporting demos.

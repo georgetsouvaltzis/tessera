@@ -51,6 +51,6 @@ Use these widgets when the surface is record-heavy, evidence-heavy, or inspectio
 
 ## Related pages
 
-- recipes: [recipes-data-and-workspaces.md](recipes-data-and-workspaces.md)
-- widgets overview: [controls-overview.md](controls-overview.md)
-- API inventory: [public-api-inventory.md](public-api-inventory.md)
+- recipes: [recipes-data-and-workspaces](/docs/recipes-data-and-workspaces)
+- widgets overview: [controls-overview](/docs/controls-overview)
+- API inventory: [public-api-inventory](/docs/public-api-inventory)

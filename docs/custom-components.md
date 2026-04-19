@@ -1,6 +1,6 @@
 # Tessera Custom Components
 
-For the default app shell, startup pattern, and default composition path, see [public-api-guidelines.md](public-api-guidelines.md).
+For the default app shell, startup pattern, and default composition path, see [public-api-guidelines](/docs/public-api-guidelines).
 
 Tessera keeps custom widgets available, but through a smaller contract than the full runtime engine.
 

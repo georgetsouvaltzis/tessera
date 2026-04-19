@@ -101,7 +101,7 @@ runtime.Theme = TesseraThemes.Catppuccin(CatppuccinVariant.Mocha);
 runtime.ThemeOverrides = myOverrides;
 ```
 
-Use [theme-system.md](theme-system.md) for the token and override model itself.
+Use [theme-system](/docs/theme-system) for the token and override model itself.
 
 ## Common mistakes
 
@@ -114,6 +114,6 @@ Use [theme-system.md](theme-system.md) for the token and override model itself.
 
 ## Next step
 
-- theming and overrides: [theme-system.md](theme-system.md)
-- terminal caveats: [terminal-font-capability-matrix.md](terminal-font-capability-matrix.md)
-- problem symptoms and fixes: [troubleshooting.md](troubleshooting.md)
+- theming and overrides: [theme-system](/docs/theme-system)
+- terminal caveats: [terminal-font-capability-matrix](/docs/terminal-font-capability-matrix)
+- problem symptoms and fixes: [troubleshooting](/docs/troubleshooting)

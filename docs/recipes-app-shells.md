@@ -101,6 +101,6 @@ That keeps the top-level screen readable without inventing a second framework la
 
 ## Related pages
 
-- lifecycle and messages: [app-model.md](app-model.md)
-- composition details: [layout-and-screen-composition.md](layout-and-screen-composition.md)
-- runtime options: [runtime-and-screen-options.md](runtime-and-screen-options.md)
+- lifecycle and messages: [app-model](/docs/app-model)
+- composition details: [layout-and-screen-composition](/docs/layout-and-screen-composition)
+- runtime options: [runtime-and-screen-options](/docs/runtime-and-screen-options)

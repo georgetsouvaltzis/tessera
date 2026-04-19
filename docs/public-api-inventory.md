@@ -248,7 +248,7 @@ The intended beginner path is:
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - keep configuration in `TesseraRuntimeOptions` and `ScreenOptions`
-- follow the public onboarding path in [getting-started.md](getting-started.md), starting with `HelloWorld`, `CounterForm`, and `WorkspaceApp` in [examples.md](examples.md) before the flagship showcases in [showcase.md](showcase.md)
+- follow the public onboarding path in [getting-started](/docs/getting-started), starting with `HelloWorld`, `CounterForm`, and `WorkspaceApp` in [examples](/docs/examples) before the flagship showcases in [showcase](/docs/showcase)
 - treat `Tessera.Core` as the low-level advanced lane, not default onboarding
 - use semantic theme tokens and palette-driven styling on the default path
 
@@ -500,8 +500,8 @@ Their old `Tessera.Components.Prebuilt.*` counterparts have been removed instead
 ## Theme Mapping Status
 
 Current shipped theme mapping is centralized in `Tessera.Styles.TesseraThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`, `FormsAndShell`).
-Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system.md](theme-system.md).
-Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system.md](theme-system.md).
+Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system](/docs/theme-system).
+Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system](/docs/theme-system).
 Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract. For onboarding/default app flows, use `Notifications`; treat `NotificationInbox` as advanced dev/ops surface.
 Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TesseraThemeControlExtensions.Workspace.cs`.
@@ -557,7 +557,7 @@ Planned reference sample: `examples/PlottingDashboard` (once available).
   - iTerm2 profile requests are emitted only when `SupportsIterm2ProfileRequests` is true.
 - Preference rule: if iTerm2 profile switching is supported and `Iterm2Profile` is set, renderer prefers profile switching over OSC 50 font requests.
 - Explicit caveat: all font requests are best-effort and terminal-dependent.
-- Terminal matrix: [terminal-font-capability-matrix.md](terminal-font-capability-matrix.md).
+- Terminal matrix: [terminal-font-capability-matrix](/docs/terminal-font-capability-matrix).
 
 Usage guidance (default path):
 

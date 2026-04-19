@@ -4,19 +4,19 @@ sidebar_label: Components
 
 # Widgets Overview
 
-Tessera ships a broad widget surface. End-users should learn it by problem domain, not by one giant alphabetical dump.
+Tessera ships a broad widget surface. Learn it by product problem, not alphabet.
 
-Use this page as the bridge between the starter examples and the full [public-api-inventory.md](public-api-inventory.md).
+Use this page as the bridge between [Starter Examples](/docs/examples) and [Public API Inventory](/docs/public-api-inventory).
 
 ## Read the widget docs in this order
 
 | Family | Use it when you need | Best examples | Page |
 | --- | --- | --- | --- |
-| Inputs & forms | data entry, validation, pickers, and model editing | `CounterForm` | [widgets-inputs-and-forms.md](widgets-inputs-and-forms.md) |
-| Navigation & workflow | tabs, rails, commands, search, file/workflow movement | `WorkspaceApp`, `GitConsole` | [widgets-navigation-and-workflow.md](widgets-navigation-and-workflow.md) |
-| Data & inspection | tables, logs, diffs, inspectors, traces, record-heavy surfaces | `DataWorkbench`, `GitConsole` | [widgets-data-and-inspection.md](widgets-data-and-inspection.md) |
-| Dashboards, planning & plots | metrics, charts, boards, schedules, visual density | `OpsWatch`, `DataWorkbench` | [widgets-dashboards-and-plots.md](widgets-dashboards-and-plots.md) |
-| Shells & overlays | dialogs, notifications, pane systems, shell chrome | `WorkspaceApp`, `DataWorkbench` | [widgets-shells-and-overlays.md](widgets-shells-and-overlays.md) |
+| Inputs & forms | data entry, validation, pickers, and model editing | `CounterForm` | [Inputs & Forms](/docs/widgets-inputs-and-forms) |
+| Navigation & workflow | tabs, rails, commands, search, file/workflow movement | `WorkspaceApp`, `GitConsole` | [Navigation & Workflow](/docs/widgets-navigation-and-workflow) |
+| Data & inspection | tables, logs, diffs, inspectors, traces, record-heavy surfaces | `DataWorkbench`, `GitConsole` | [Data & Inspection](/docs/widgets-data-and-inspection) |
+| Dashboards, planning & plots | metrics, charts, boards, schedules, visual density | `OpsWatch`, `DataWorkbench` | [Dashboards & Plots](/docs/widgets-dashboards-and-plots) |
+| Shells & overlays | dialogs, notifications, pane systems, shell chrome | `WorkspaceApp`, `DataWorkbench` | [Shells & Overlays](/docs/widgets-shells-and-overlays) |
 
 ## Start with the widgets you will actually use first
 
@@ -37,7 +37,30 @@ Ask these questions in order:
 3. Does the control need to be compact, data-dense, or high-visibility?
 4. Will it need theme overrides or state styling?
 
-If you still need the exact type name after that, open [public-api-inventory.md](public-api-inventory.md).
+If you still need the exact type name after that, open [Public API Inventory](/docs/public-api-inventory).
+
+## Minimal sample
+
+```csharp
+using Tessera.Controls;
+using Tessera.Layout;
+
+var nav = new Tabs();
+var grid = new DataGrid();
+var status = new StatusBar { LeftText = "Ready" };
+
+return Screen.Build(window =>
+{
+    window.Footer(1, status);
+    window.Body(body =>
+    {
+        body.Row(0.12f, nav);
+        body.Row(0.88f, grid);
+    });
+});
+```
+
+This is the standard "navigation + content + status" shell that most product apps grow from.
 
 ## What this page does not replace
 
@@ -51,7 +74,7 @@ The Widgets section is for discovery and capability mapping. Use the reference p
 
 For those, use:
 
-- [api-reference.mdx](api-reference.mdx)
-- [public-api-guidelines.md](public-api-guidelines.md)
-- [public-api-inventory.md](public-api-inventory.md)
-- [theme-system.md](theme-system.md)
+- [API Reference](/docs/api-reference)
+- [API Guidelines](/docs/public-api-guidelines)
+- [Public API Inventory](/docs/public-api-inventory)
+- [Theme System](/docs/theme-system)

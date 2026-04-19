@@ -310,5 +310,5 @@ Execution rules:
 
 ## Coordination Notes
 
-- Source-of-truth milestone mapping stays in [alpha-release-checklist.md](alpha-release-checklist.md).
-- Public API and theme consistency remain aligned with [public-api-inventory.md](public-api-inventory.md) and [theme-system.md](theme-system.md).
+- Source-of-truth milestone mapping stays in [alpha-release-checklist](/docs/alpha-release-checklist).
+- Public API and theme consistency remain aligned with [public-api-inventory](/docs/public-api-inventory) and [theme-system](/docs/theme-system).

@@ -12,9 +12,9 @@ Use them when you do not want a full example app, but you also do not want to re
 
 | Recipe lane | Use it for | Page |
 | --- | --- | --- |
-| App shells | minimal startup, quit handling, shell framing, status bars | [recipes-app-shells.md](recipes-app-shells.md) |
-| Effects and refresh | button-to-message flow, periodic updates, notifications | [recipes-effects-and-refresh.md](recipes-effects-and-refresh.md) |
-| Data and workspaces | rails, grids, inspectors, denser record surfaces | [recipes-data-and-workspaces.md](recipes-data-and-workspaces.md) |
+| App shells | minimal startup, quit handling, shell framing, status bars | [App Shell Recipes](/docs/recipes-app-shells) |
+| Effects and refresh | button-to-message flow, periodic updates, notifications | [Effects & Refresh Recipes](/docs/recipes-effects-and-refresh) |
+| Data and workspaces | rails, grids, inspectors, denser record surfaces | [Data & Workspace Recipes](/docs/recipes-data-and-workspaces) |
 
 ## How to use the recipes
 
@@ -29,6 +29,6 @@ These pages are not the complete API inventory.
 
 For exact types, helper records, glyph sets, and options, use:
 
-- [api-reference.mdx](api-reference.mdx)
-- [public-api-inventory.md](public-api-inventory.md)
-- [theme-system.md](theme-system.md)
+- [API Reference](/docs/api-reference)
+- [Public API Inventory](/docs/public-api-inventory)
+- [Theme System](/docs/theme-system)

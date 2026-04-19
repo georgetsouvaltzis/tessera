@@ -31,7 +31,7 @@ Recommended first terminals:
 - Windows Terminal
 - macOS Terminal
 
-If terminal-specific behavior is the problem, use [terminal-font-capability-matrix.md](terminal-font-capability-matrix.md).
+If terminal-specific behavior is the problem, use [terminal-font-capability-matrix](/docs/terminal-font-capability-matrix).
 
 ## Mouse, hover, or click interaction does not work
 
@@ -94,7 +94,7 @@ Refactor by screen regions instead of inventing a second architecture:
 - move header/body/footer/side regions into helper methods
 - keep state transitions in `Update(...)`
 
-Use [layout-and-screen-composition.md](layout-and-screen-composition.md) for the preferred composition style.
+Use [layout-and-screen-composition](/docs/layout-and-screen-composition) for the preferred composition style.
 
 ## I am not sure whether I need `Tessera.Core`
 
@@ -113,14 +113,14 @@ Reach for `Tessera.Core` only when you are intentionally working at the runtime 
 
 Open:
 
-- [api-reference.mdx](api-reference.mdx)
-- [public-api-inventory.md](public-api-inventory.md)
+- [API Reference](/docs/api-reference)
+- [public-api-inventory](/docs/public-api-inventory)
 
 ## Still stuck?
 
 Read:
 
-- [faq.md](faq.md)
+- [faq](/docs/faq)
 - [support](/support)
 
 If the issue is example-specific, compare against the starter ladder first and then the flagship apps.
