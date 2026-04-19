@@ -37,6 +37,11 @@
   letter-spacing: -0.025em;
 }
 
+.theme-doc-markdown .hash-link,
+.markdown .hash-link {
+  display: none;
+}
+
 .theme-doc-markdown h3,
 .markdown h3 {
   margin-top: 2rem;
@@ -192,9 +197,64 @@ pre code {
   background: transparent !important;
 }
 
-.lumina-code-block__body code {
+.lumina-code-block__body code,
+.lumina-code-block__code {
   font-size: 0.875rem;
   line-height: 1.625;
+}
+
+.lumina-code-block__pre {
+  overflow-x: auto;
+  background: rgba(45, 24, 40, 0.4);
+}
+
+.lumina-code-block__code {
+  display: block;
+  color: #f4edf3;
+}
+
+.lumina-token--comment {
+  color: rgba(214, 176, 197, 0.72);
+  font-style: italic;
+}
+
+.lumina-token--string {
+  color: oklch(0.82 0.15 140);
+}
+
+.lumina-token--number,
+.lumina-token--attribute {
+  color: oklch(0.82 0.15 60);
+}
+
+.lumina-token--keyword,
+.lumina-token--prompt,
+.lumina-token--tag {
+  color: var(--ifm-color-primary);
+  font-weight: 500;
+  text-shadow: 0 0 24px oklch(0.78 0.18 350 / 0.55);
+}
+
+.lumina-token--type,
+.lumina-token--flag {
+  color: oklch(0.78 0.15 200);
+}
+
+.lumina-token--function {
+  color: oklch(0.75 0.18 300);
+}
+
+.lumina-token--variable {
+  color: oklch(0.82 0.15 200);
+}
+
+.lumina-token--punct {
+  color: rgba(214, 176, 197, 0.74);
+}
+
+.lumina-token--ident,
+.lumina-token--text {
+  color: rgba(244, 237, 243, 0.9);
 }
 
 .theme-code-block .token-line {
