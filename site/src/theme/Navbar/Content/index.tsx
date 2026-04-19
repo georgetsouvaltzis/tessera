@@ -1,12 +1,11 @@
-import React, {type ReactNode, useCallback, useRef} from 'react';
+import React, {type ReactNode, useCallback, useEffect} from 'react';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import {useThemeConfig} from '@docusaurus/theme-common';
 import {splitNavbarItems, useNavbarMobileSidebar} from '@docusaurus/theme-common/internal';
-import {useLocation} from '@docusaurus/router';
+import {useHistory, useLocation} from '@docusaurus/router';
 import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
-import SearchBar from '@theme/SearchBar';
 import {GitBranch, Search} from 'lucide-react';
 
 type NavbarConfigItem = {
@@ -67,33 +66,29 @@ export default function NavbarContent(): ReactNode {
   const items = useNavbarItems().filter((item) => item.type !== 'search');
   const [leftItems, rightItems] = splitNavbarItems(items);
   const {pathname} = useLocation();
+  const history = useHistory();
   const {siteConfig} = useDocusaurusContext();
   const logoSrc = useBaseUrl('/img/logo.svg');
+  const searchRoute = useBaseUrl('/search');
   const githubItem = rightItems.find((item) => item.href);
-  const searchHostRef = useRef<HTMLDivElement>(null);
   const normalizedPath = pathname.startsWith(siteConfig.baseUrl)
     ? pathname.slice(siteConfig.baseUrl.length - 1)
     : pathname;
   const openSearch = useCallback(() => {
-    const host = searchHostRef.current;
-    const actionable = host?.querySelector<HTMLElement>('button, input');
-    if (actionable) {
-      actionable.click();
-      actionable.focus();
-      return;
-    }
+    history.push(searchRoute);
+  }, [history, searchRoute]);
 
-    const isApplePlatform = /Mac|iPhone|iPod|iPad/.test(navigator.platform);
-    window.dispatchEvent(
-      new KeyboardEvent('keydown', {
-        key: 'k',
-        metaKey: isApplePlatform,
-        ctrlKey: !isApplePlatform,
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
-  }, []);
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        history.push(searchRoute);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [history, searchRoute]);
 
   return (
     <div className="lumina-navbar__inner">
@@ -128,9 +123,6 @@ export default function NavbarContent(): ReactNode {
             ⌘K
           </kbd>
         </button>
-        <div ref={searchHostRef} className="lumina-navbar__search-host" aria-hidden>
-          <SearchBar />
-        </div>
         {githubItem?.href ? (
           <Link
             href={githubItem.href}
