@@ -361,7 +361,6 @@
 
 .lumina-panel,
 .card,
-.pagination-nav__link,
 .theme-admonition,
 .theme-code-block,
 .docs-link-card {
@@ -377,7 +376,6 @@
 
 .lumina-panel::before,
 .card::before,
-.pagination-nav__link::before,
 .theme-admonition::before,
 .theme-code-block::before,
 .docs-link-card::before {
@@ -480,7 +478,7 @@
 
 .theme-doc-sidebar-container {
   border-right: 1px solid color-mix(in srgb, var(--tessera-border) 60%, transparent);
-  background: color-mix(in srgb, var(--tessera-bg) 60%, transparent);
+  background: color-mix(in oklab, oklch(0.12 0.025 340) 40%, transparent);
   backdrop-filter: blur(18px);
 }
 
@@ -569,7 +567,9 @@
 .lumina-docs-sidebar__link--active {
   background: rgba(255, 127, 197, 0.15);
   color: var(--ifm-color-primary);
-  text-shadow: 0 0 24px rgba(255, 127, 197, 0.55);
+  text-shadow:
+    0 0 12px rgba(255, 127, 197, 0.72),
+    0 0 24px rgba(255, 127, 197, 0.55);
 }
 
 .collapseSidebarButton_PEFL,
@@ -741,17 +741,30 @@
   height: 100%;
   min-height: 6.25rem;
   padding: 1rem 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--tessera-border) 78%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, oklch(0.18 0.03 340) 40%, transparent);
+  box-shadow: none;
+}
+
+.pagination-nav__link:hover {
+  border-color: rgba(255, 127, 197, 0.36);
+  background: color-mix(in oklab, oklch(0.18 0.03 340) 52%, transparent);
 }
 
 .pagination-nav__sublabel {
   color: var(--tessera-text-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.68rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .pagination-nav__label {
   color: var(--tessera-text);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  font-weight: 600;
 }
 
 .hero--primary {

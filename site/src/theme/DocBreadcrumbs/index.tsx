@@ -18,20 +18,25 @@ export default function DocBreadcrumbs(): React.JSX.Element | null {
       <span className="lumina-docs-breadcrumbs__link">Docs</span>
       {breadcrumbs.map((item, index) => {
         const isLast = index === breadcrumbs.length - 1;
+        const isCategory = index === breadcrumbs.length - 2;
         const href = item.type === 'category' && item.linkUnlisted ? undefined : item.href;
+        const crumbClass = `lumina-docs-breadcrumbs__link ${
+          isLast
+            ? 'lumina-docs-breadcrumbs__link--current'
+            : isCategory
+              ? 'lumina-docs-breadcrumbs__link--category'
+              : ''
+        }`;
 
         return (
           <React.Fragment key={`${item.label}-${index}`}>
             <span className="lumina-docs-breadcrumbs__sep">›</span>
             {href && !isLast ? (
-              <Link className="lumina-docs-breadcrumbs__link" href={href}>
+              <Link className={crumbClass} href={href}>
                 {item.label}
               </Link>
             ) : (
-              <span
-                className={`lumina-docs-breadcrumbs__link ${
-                  isLast ? 'lumina-docs-breadcrumbs__link--current' : ''
-                }`}>
+              <span className={crumbClass}>
                 {item.label}
               </span>
             )}

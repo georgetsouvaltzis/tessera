@@ -90,6 +90,7 @@
 .theme-doc-markdown ol,
 .markdown ul,
 .markdown ol {
+  margin: 1rem 0;
   padding-left: 1.25rem;
 }
 
@@ -103,17 +104,22 @@
   position: relative;
 }
 
+.theme-doc-markdown ul > li + li,
+.markdown ul > li + li {
+  margin-top: 0.38rem;
+}
+
 .theme-doc-markdown ul > li::before,
 .markdown ul > li::before {
   position: absolute;
-  top: 0.72rem;
+  top: 0.67rem;
   left: -1rem;
-  width: 0.35rem;
-  height: 0.35rem;
+  width: 0.375rem;
+  height: 0.375rem;
   content: '';
   border-radius: 999px;
   background: var(--ifm-color-primary);
-  box-shadow: 0 0 8px rgba(255, 127, 197, 0.82);
+  box-shadow: 0 0 10px rgba(255, 127, 197, 0.82);
 }
 
 .theme-doc-markdown ol > li::marker,
@@ -466,6 +472,10 @@ pre code {
 .lumina-docs-breadcrumbs__link--current {
   color: var(--tessera-text);
   font-weight: 500;
+}
+
+.lumina-docs-breadcrumbs__link--category {
+  color: var(--ifm-color-primary);
 }
 
 .lumina-docs-breadcrumbs__sep {
