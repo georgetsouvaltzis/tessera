@@ -6,6 +6,11 @@ sidebar_label: Your First App
 
 This page shows the smallest real Tessera app worth building. It uses the configured startup path because that is the public lane most teams will actually keep.
 
+If you have not run a quickstart yet, do that first:
+
+- [Quickstart (New App)](/docs/quickstart-new-app)
+- [Quickstart (Existing App)](/docs/quickstart-existing-app)
+
 ## Paste this into `Program.cs`
 
 ```csharp
@@ -69,6 +74,13 @@ internal sealed class OrdersApp : TesseraApp
 ```bash
 dotnet run
 ```
+
+## Verify before moving on
+
+- the app launches without terminal corruption
+- pressing `Enter` on the button updates the count
+- pressing `Ctrl+Q` exits immediately
+- rerunning `dotnet run` starts clean again
 
 ## What each part does
 

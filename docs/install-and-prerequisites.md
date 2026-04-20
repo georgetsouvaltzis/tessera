@@ -49,4 +49,6 @@ Add `using Tessera.Styles;` when theme, color, or style work starts to matter.
 
 ## Next step
 
-Build [Your First App](/docs/first-app), then run [Starter Examples](/docs/examples).
+- starting from empty folder: [Quickstart (New App)](/docs/quickstart-new-app)
+- integrating into an existing project: [Quickstart (Existing App)](/docs/quickstart-existing-app)
+- then continue to [Your First App](/docs/first-app) and [Starter Examples](/docs/examples)

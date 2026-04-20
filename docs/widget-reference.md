@@ -6,6 +6,8 @@ sidebar_label: Widget Reference
 
 This page is the practical index for choosing widgets by product problem, with starter samples you can paste.
 
+If you need a page per control (usage + public properties + events), go to [Widget Pages](/docs/widgets).
+
 ## Choose by task
 
 | Task | Start here | Docs page |
@@ -88,5 +90,4 @@ return Screen.Build(window =>
 
 ## Next step
 
-Use [Widgets Overview](/docs/controls-overview) for family-level capability mapping, then use [Public API Inventory](/docs/public-api-inventory) for exact type names.
-
+Use [Widget Pages](/docs/widgets) for control-by-control details, [Widgets Overview](/docs/controls-overview) for family-level capability mapping, then [Public API Inventory](/docs/public-api-inventory) for full surface auditing.

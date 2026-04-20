@@ -2,6 +2,7 @@ bin/
 obj/
 .vs/
 .idea/*
+**/.idea/
 .DS_Store
 *.user
 *.suo

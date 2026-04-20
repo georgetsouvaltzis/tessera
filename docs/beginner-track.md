@@ -23,9 +23,10 @@ That is enough for the normal public path.
 Start with a new `net10.0` console app, then move through this order:
 
 1. [Installation](/docs/install-and-prerequisites)
-2. [Your First App](/docs/first-app)
-3. [Starter Examples](/docs/examples)
-4. [Flagship Evaluation](/docs/showcase)
+2. [Quickstart (New App)](/docs/quickstart-new-app) or [Quickstart (Existing App)](/docs/quickstart-existing-app)
+3. [Your First App](/docs/first-app)
+4. [Starter Examples](/docs/examples)
+5. [Flagship Evaluation](/docs/showcase)
 
 ## Learning order by problem
 
@@ -35,6 +36,8 @@ If your team is building:
 - navigation-heavy shells: read [Navigation & Workflow](/docs/widgets-navigation-and-workflow)
 - record-heavy investigations: read [Data & Inspection](/docs/widgets-data-and-inspection)
 - dashboard/monitoring screens: read [Dashboards & Plots](/docs/widgets-dashboards-and-plots)
+
+If you want one page per control with usage + properties + events, use [Widget Pages](/docs/widgets).
 
 ## Minimal app shape to remember
 
@@ -68,4 +71,3 @@ internal sealed class OrdersApp : TesseraApp
 ## Next step
 
 Once this track feels stable, continue with [Advanced Track](/docs/advanced-track).
-

@@ -10,13 +10,25 @@ dotnet add package Tessera
 
 Then continue immediately to [Your First App](/docs/first-app).
 
+## Choose your start path
+
+- **I am creating a new app**
+  - [Installation](/docs/install-and-prerequisites)
+  - [Quickstart (New App)](/docs/quickstart-new-app)
+  - [Your First App](/docs/first-app)
+- **I am integrating into an existing app**
+  - [Installation](/docs/install-and-prerequisites)
+  - [Quickstart (Existing App)](/docs/quickstart-existing-app)
+  - [Your First App](/docs/first-app)
+
 ## Recommended order
 
 1. [Introduction](/docs/overview)
 2. [Installation](/docs/install-and-prerequisites)
-3. [Your First App](/docs/first-app)
-4. [Starter Examples](/docs/examples)
-5. [Flagship Evaluation](/docs/showcase)
+3. [Quickstart (New App)](/docs/quickstart-new-app) or [Quickstart (Existing App)](/docs/quickstart-existing-app)
+4. [Your First App](/docs/first-app)
+5. [Starter Examples](/docs/examples)
+6. [Flagship Evaluation](/docs/showcase)
 
 ## Which project should you start with
 
@@ -49,8 +61,8 @@ await app.RunAsync();
 
 ## What to read next by question
 
-- "How do I get running quickly?" -> [Installation](/docs/install-and-prerequisites), [Your First App](/docs/first-app)
-- "Which widgets should I use?" -> [Widget Reference](/docs/widget-reference), [Widgets Overview](/docs/controls-overview)
+- "How do I get running quickly?" -> [Installation](/docs/install-and-prerequisites), [Quickstart (New App)](/docs/quickstart-new-app), [Quickstart (Existing App)](/docs/quickstart-existing-app), [Your First App](/docs/first-app)
+- "Which widgets should I use?" -> [Widget Reference](/docs/widget-reference), [Widget Pages](/docs/widgets), [Widgets Overview](/docs/controls-overview)
 - "How do I structure real screens?" -> [App Model](/docs/app-model), [Screen & Layout](/docs/layout-and-screen-composition)
 - "How do I configure runtime/theming?" -> [Runtime & Screen Options](/docs/runtime-and-screen-options), [Theme System](/docs/theme-system)
 - "How do I solve common integration tasks?" -> [Recipes](/docs/recipes), [Troubleshooting](/docs/troubleshooting)

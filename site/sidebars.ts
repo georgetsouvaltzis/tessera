@@ -23,6 +23,16 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'doc',
+          id: 'quickstart-new-app',
+          label: 'Quickstart (New App)',
+        },
+        {
+          type: 'doc',
+          id: 'quickstart-existing-app',
+          label: 'Quickstart (Existing App)',
+        },
+        {
+          type: 'doc',
           id: 'first-app',
           label: 'Your First App',
         },
@@ -77,6 +87,11 @@ const sidebars: SidebarsConfig = {
           type: 'doc',
           id: 'widget-reference',
           label: 'Widget Reference',
+        },
+        {
+          type: 'doc',
+          id: 'widgets/index',
+          label: 'Widget Pages',
         },
         {
           type: 'doc',

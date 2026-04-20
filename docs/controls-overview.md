@@ -7,6 +7,7 @@ sidebar_label: Components
 Tessera ships a broad widget surface. Learn it by product problem, not alphabet.
 
 Use this page as the bridge between [Starter Examples](/docs/examples) and [Public API Inventory](/docs/public-api-inventory).
+For one page per control (usage + properties + events), use [Widget Pages](/docs/widgets).
 
 ## Read the widget docs in this order
 
