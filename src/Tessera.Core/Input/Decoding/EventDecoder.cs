@@ -175,7 +175,8 @@ internal sealed class EventDecoder : IEventDecoder
             if (buffer.Length > 2)
             {
                 var prefix = buffer[2];
-                if (prefix is (byte)'<' or (byte)'?' or (byte)'>')
+                if (prefix is (byte)'<' or (byte)'?' or (byte)'>'
+                    or >= (byte)'0' and <= (byte)'9')
                 {
                     return new DecodeResult(0, null, true);
                 }

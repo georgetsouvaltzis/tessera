@@ -112,6 +112,63 @@ public sealed class TerminalReaderMouseLeakRegressionTests
         AssertNoLeak(events);
     }
 
+    [Test]
+    public async Task TerminalReaderMouseLeakRegressionSplit1015AcrossTimeoutDoesNotEmitCharacterFragments()
+    {
+        var stream = new TimedChunkReadStream(
+        [
+            ("\e["u8.ToArray(), 0),
+            ("35;83;7M\e["u8.ToArray(), 35),
+            ("0;84;7M"u8.ToArray(), 35)
+        ]);
+        var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
+        var events = new List<IMessage>();
+
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
+
+        Assert.That(events.Count, Is.EqualTo(2),
+            "Split/repeated 1015 mouse chunks should decode to two mouse events.");
+        Assert.That(
+            events[0] is MouseMotionMsg { Button: MouseButton.None, X: 82, Y: 6 },
+            Is.True,
+            "First decoded event should be motion.");
+        Assert.That(
+            events[1] is MouseClickMsg { Button: MouseButton.Left, X: 83, Y: 6 },
+            Is.True,
+            "Second decoded event should be click.");
+
+        AssertNoLeak(events);
+    }
+
+    [Test]
+    public async Task TerminalReaderMouseLeakRegressionEscapeThenDelayed1015AcrossTimeoutDoesNotEmitCharacterFragments()
+    {
+        var stream = new TimedChunkReadStream(
+        [
+            ("\e"u8.ToArray(), 0),
+            ("[35;83;7M"u8.ToArray(), 35),
+            ("\e"u8.ToArray(), 35),
+            ("[0;84;7M"u8.ToArray(), 35)
+        ]);
+        var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
+        var events = new List<IMessage>();
+
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
+
+        Assert.That(events.Count, Is.EqualTo(2),
+            "Split ESC then delayed 1015 reports should decode to two mouse events.");
+        Assert.That(
+            events[0] is MouseMotionMsg { Button: MouseButton.None, X: 82, Y: 6 },
+            Is.True,
+            "First decoded event should be motion.");
+        Assert.That(
+            events[1] is MouseClickMsg { Button: MouseButton.Left, X: 83, Y: 6 },
+            Is.True,
+            "Second decoded event should be click.");
+
+        AssertNoLeak(events);
+    }
+
     private static void AssertNoLeak(List<IMessage> events)
     {
         foreach (var message in events)

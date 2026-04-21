@@ -30,8 +30,8 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_DcsCapabilityResponse_InvalidHexFallsBackToRawText",
             DcsCapabilityResponse_InvalidHexFallsBackToRawText);
         yield return new TestCase("Decoder_KeyboardEnhancementReport_Parses", KeyboardEnhancementReport_Parses);
-        yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout",
-            PartialCsi_RequestsMoreDataUntilTimeout);
+        yield return new TestCase("Decoder_PartialDigitCsi_RequestsMoreDataEvenOnTimeout",
+            PartialDigitCsi_RequestsMoreDataEvenOnTimeout);
         yield return new TestCase("Decoder_Utf8Rune_ParsesWithoutReplacement", Utf8Rune_ParsesWithoutReplacement);
         yield return new TestCase("Decoder_Utf8Partial_RequestsMoreData", Utf8Partial_RequestsMoreData);
         yield return new TestCase("Decoder_UnknownSequence_ProducesUnknownMessage",
@@ -450,7 +450,7 @@ internal static class EventDecoderGoldenTests
         return Task.CompletedTask;
     }
 
-    private static Task PartialCsi_RequestsMoreDataUntilTimeout()
+    private static Task PartialDigitCsi_RequestsMoreDataEvenOnTimeout()
     {
         // Arrange
         var decoder = new EventDecoder();
@@ -462,8 +462,9 @@ internal static class EventDecoderGoldenTests
         // Assert
         TestAssert.True(partial.NeedMoreData, "Partial CSI should request more data.");
         AssertConsumed(partial, 0);
-        AssertConsumed(timedOutPartial, 1);
-        AssertKey(timedOutPartial, KeyCode.Escape);
+        TestAssert.True(timedOutPartial.NeedMoreData,
+            "Timed out digit-led partial CSI should stay buffered to avoid escape-fragment leaks.");
+        AssertConsumed(timedOutPartial, 0);
         return Task.CompletedTask;
     }
 
