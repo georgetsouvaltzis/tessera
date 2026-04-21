@@ -11,6 +11,7 @@ internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private readonly bool _ownsOutput;
     private readonly bool _treatControlAsInputOriginal;
     private readonly UnixRawModeSession _unixRawMode = new();
+    private bool _isWindowsVirtualTerminalInputEnabled;
     private uint _originalInputMode;
     private uint _originalOutputMode;
     private bool _prepared;
@@ -45,6 +46,9 @@ internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
     public bool IsRawModeActive => _unixRawMode.IsRawModeActive;
 
+    public bool IsVirtualTerminalInputEnabled =>
+        !OperatingSystem.IsWindows() || _isWindowsVirtualTerminalInputEnabled;
+
     public string RawModeDiagnostics => _unixRawMode.RawModeDiagnostics;
 
     public string RawModeError => _unixRawMode.RawModeError;
@@ -69,7 +73,8 @@ internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
         Console.TreatControlCAsInput = true;
         if (OperatingSystem.IsWindows())
         {
-            WindowsConsoleSession.TryEnableVirtualTerminalModes(ref _originalInputMode, ref _originalOutputMode);
+            _isWindowsVirtualTerminalInputEnabled =
+                WindowsConsoleSession.TryEnableVirtualTerminalModes(ref _originalInputMode, ref _originalOutputMode);
         }
         else
         {
@@ -94,6 +99,7 @@ internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
             _unixRawMode.Restore();
         }
 
+        _isWindowsVirtualTerminalInputEnabled = false;
         _prepared = false;
         return ValueTask.CompletedTask;
     }

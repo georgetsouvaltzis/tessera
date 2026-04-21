@@ -19,14 +19,15 @@ internal static partial class WindowsConsoleSession
     private const uint WaitTimeout = 0x00000102;
     private const uint WaitFailed = 0xFFFFFFFF;
 
-    public static void TryEnableVirtualTerminalModes(ref uint originalInputMode, ref uint originalOutputMode)
+    public static bool TryEnableVirtualTerminalModes(ref uint originalInputMode, ref uint originalOutputMode)
     {
         var inputHandle = GetStdHandle(StdInputHandle);
         var outputHandle = GetStdHandle(StdOutputHandle);
+        var vtInputEnabled = false;
 
         if (IsInvalidHandle(inputHandle) || IsInvalidHandle(outputHandle))
         {
-            return;
+            return false;
         }
 
         if (GetConsoleMode(inputHandle, out var imode))
@@ -34,7 +35,7 @@ internal static partial class WindowsConsoleSession
             originalInputMode = imode;
             var nextInputMode = imode | EnableVirtualTerminalInput;
             nextInputMode &= ~(EnableLineInput | EnableEchoInput | EnableProcessedInput);
-            _ = SetConsoleMode(inputHandle, nextInputMode);
+            vtInputEnabled = SetConsoleMode(inputHandle, nextInputMode);
         }
 
         if (GetConsoleMode(outputHandle, out var omode))
@@ -42,6 +43,8 @@ internal static partial class WindowsConsoleSession
             originalOutputMode = omode;
             _ = SetConsoleMode(outputHandle, omode | EnableVirtualTerminalProcessing | DisableNewlineAutoReturn);
         }
+
+        return vtInputEnabled;
     }
 
     public static void TryRestoreModes(uint originalInputMode, uint originalOutputMode)

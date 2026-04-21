@@ -327,7 +327,8 @@ internal sealed class TesseraRuntimeLoop(
 
         if (_runtime.Terminal is ConsoleTerminalAdapter consoleTerminal
             && ShouldUseConsoleKeyEventLoop(_options.UseConsoleKeyEvents, consoleTerminal.IsRawModeActive,
-                _runtime.Capabilities))
+                _runtime.Capabilities,
+                OperatingSystem.IsWindows() && !consoleTerminal.IsVirtualTerminalInputEnabled))
         {
             return Task.Run(() => ConsoleTerminalAdapter.StreamConsoleKeyEventsAsync(Send, token), token);
         }
@@ -340,13 +341,26 @@ internal sealed class TesseraRuntimeLoop(
     internal static bool ShouldUseConsoleKeyEventLoop(
         bool useConsoleKeyEvents,
         bool isRawModeActive,
-        TerminalCapabilityProfile runtimeCapabilities)
+        TerminalCapabilityProfile runtimeCapabilities,
+        bool forceConsoleKeyFallbackForInterop = false)
     {
         ArgumentNullException.ThrowIfNull(runtimeCapabilities);
 
+        if (!useConsoleKeyEvents)
+        {
+            return false;
+        }
+
+        // If VT input could not be enabled (for example legacy conhost policy),
+        // force Console.ReadKey fallback to avoid mis-decoding raw stream fragments.
+        if (forceConsoleKeyFallbackForInterop)
+        {
+            return true;
+        }
+
         // Raw mode should prefer terminal byte-stream decoding so mouse/focus/paste CSI
         // sequences remain available. Console.ReadKey fallback is for non-raw consoles.
-        if (!useConsoleKeyEvents || isRawModeActive)
+        if (isRawModeActive)
         {
             return false;
         }

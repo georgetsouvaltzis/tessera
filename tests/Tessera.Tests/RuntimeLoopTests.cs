@@ -62,6 +62,8 @@ internal static class RuntimeLoopTests
             InputLoopSelection_NonRawModeWithLegacyCapabilitiesUsesConsoleKeyFallback);
         yield return new TestCase("Runtime_InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader",
             InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader);
+        yield return new TestCase("Runtime_InputLoopSelection_ForceFallbackUsesConsoleKeyLoop",
+            InputLoopSelection_ForceFallbackUsesConsoleKeyLoop);
         yield return new TestCase("Runtime_ModeReport_RefinesTerminalCapabilities",
             ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Runtime_ModeReport_LegacyMouseSetEnablesCapability",
@@ -856,6 +858,21 @@ internal static class RuntimeLoopTests
 
         // Assert
         TestAssert.True(!useConsoleKeyLoop, "Disabling console key events should force terminal byte-stream reader.");
+        return Task.CompletedTask;
+    }
+
+    private static Task InputLoopSelection_ForceFallbackUsesConsoleKeyLoop()
+    {
+        // Arrange / Act
+        var useConsoleKeyLoop = TesseraRuntimeLoop.ShouldUseConsoleKeyEventLoop(
+            true,
+            false,
+            TerminalCapabilityProfile.AllSupported,
+            forceConsoleKeyFallbackForInterop: true);
+
+        // Assert
+        TestAssert.True(useConsoleKeyLoop,
+            "When VT input cannot be enabled on Windows, runtime should force Console.ReadKey fallback.");
         return Task.CompletedTask;
     }
 
