@@ -3,6 +3,7 @@ using System.Threading.Channels;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 using Tessera.Core.Terminal;
+using Tessera.Core.Terminal.Adapters;
 
 namespace Tessera.Core.Application.Internal;
 

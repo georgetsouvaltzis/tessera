@@ -1,8 +1,11 @@
 using System.Threading.Channels;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Input;
+using Tessera.Core.Input.Decoding;
 using Tessera.Core.Messages;
 using Tessera.Core.Rendering;
+using Tessera.Core.Terminal.Adapters;
+using Tessera.Core.Terminal.Capabilities;
 
 namespace Tessera.Core.Application.Internal;
 

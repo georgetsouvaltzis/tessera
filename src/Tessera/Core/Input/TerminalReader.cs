@@ -2,6 +2,7 @@ using System.Buffers;
 using System.ComponentModel;
 using System.Text;
 using Tessera.Core.Abstractions;
+using Tessera.Core.Input.Decoding;
 using Tessera.Core.Messages;
 
 namespace Tessera.Core.Input;

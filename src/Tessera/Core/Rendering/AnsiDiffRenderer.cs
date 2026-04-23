@@ -2,6 +2,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using Tessera.Core.Abstractions;
+using Tessera.Core.Rendering.Internal;
+using Tessera.Core.Terminal.Capabilities;
 
 namespace Tessera.Core.Rendering;
 

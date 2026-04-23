@@ -1,4 +1,5 @@
 using Tessera.Core.Abstractions;
+using Tessera.Core.Terminal.Capabilities;
 
 namespace Tessera.Core.Messages;
 

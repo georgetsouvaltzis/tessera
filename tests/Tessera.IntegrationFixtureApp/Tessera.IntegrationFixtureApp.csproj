@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Tessera\Tessera.csproj" />
-    <ProjectReference Include="..\..\src\Tessera.Core\Tessera.Core.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

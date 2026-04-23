@@ -3,6 +3,7 @@ using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 using Tessera.Core.Rendering;
 using Tessera.Core.Terminal;
+using Tessera.Core.Terminal.Capabilities;
 
 namespace Tessera.Core.Application.Internal;
 

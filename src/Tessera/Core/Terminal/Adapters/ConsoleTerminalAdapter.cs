@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
+using Tessera.Core.Terminal.Adapters.Internal;
 
 namespace Tessera.Core.Terminal.Adapters;
 

@@ -1,3 +1,5 @@
+using Tessera.Core.Rendering.Internal;
+
 namespace Tessera.Core.Rendering;
 
 internal sealed class DisplayLine(string?[] cells, string?[] styles)

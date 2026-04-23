@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using Tessera.Core.Abstractions;
+using Tessera.Core.Input.Decoding;
 using Tessera.Core.Rendering;
 using Tessera.Core.Terminal;
+using Tessera.Core.Terminal.Capabilities;
 
 namespace Tessera.Core.Application;
 
