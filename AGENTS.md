@@ -9,7 +9,7 @@
 
 ## Project Structure
 - `src/Tessera`: default public app-authoring API.
-- `src/Tessera.Core`: advanced low-level runtime layer, supported but not onboarding-first.
+- `src/Tessera/Core`: advanced low-level runtime layer (`Tessera.Core` namespaces), supported but not onboarding-first.
 - `tests/Tessera.Tests`: unit/contract/regression tests.
 - `tests/Tessera.IntegrationTests`: runtime/integration flows.
 - `examples/HelloWorld`, `examples/CounterForm`, `examples/WorkspaceApp`: canonical onboarding progression.
@@ -19,7 +19,7 @@
 ## Public API Boundaries
 - Public app path is library-first and no-DI by default.
 - Keep starter guidance in `Tessera`, `Tessera.Controls`, and `Tessera.Layout`.
-- Do not leak `Tessera.Core.*` into onboarding examples/docs.
+- Do not leak `Tessera.Core.*` namespaces into onboarding examples/docs.
 - Advanced hosting/runtime seams stay under `Tessera.Hosting`/advanced docs.
 
 ## Styling/Theming Direction

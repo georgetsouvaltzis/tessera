@@ -49,7 +49,7 @@ Normal apps should primarily live in:
 - `Tessera.Styles`
 
 Advanced seams belong in opt-in lanes such as `Tessera.Hosting`.
-Normal onboarding must not require `Tessera.Core.*`.
+Normal onboarding must not require `Tessera.Core.*` namespaces.
 
 ### Startup
 

@@ -652,7 +652,7 @@ Acceptance criteria:
 - focus, hover, selection, disabled, and error styles are configurable
 - Catppuccin + Rosé Pine + custom palette can be applied without control-level rewiring
 - docs and examples demonstrate global theme selection and per-control override
-- `Tessera.Core.*` remains out of starter theming docs
+- `Tessera.Core.*` namespaces remain out of starter theming docs
 
 ## V1.1 Note
 

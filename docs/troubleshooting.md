@@ -96,7 +96,7 @@ Refactor by screen regions instead of inventing a second architecture:
 
 Use [layout-and-screen-composition](/docs/layout-and-screen-composition) for the preferred composition style.
 
-## I am not sure whether I need `Tessera.Core`
+## I am not sure whether I need `Tessera.Core` namespaces
 
 Most likely, you do not.
 
@@ -107,7 +107,7 @@ Stay on:
 - `Tessera.Layout`
 - `Tessera.Styles`
 
-Reach for `Tessera.Core` only when you are intentionally working at the runtime layer.
+Reach for `Tessera.Core` namespaces only when you are intentionally working at the runtime layer.
 
 ## I need exact public names, not guidance
 

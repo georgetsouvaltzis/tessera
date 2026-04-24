@@ -7,7 +7,7 @@ This document is the implementation policy for a C#-first Tessera API.
 Tessera supports two intentional product layers:
 
 - `Tessera`: primary app-authoring surface for most C# developers building TUIs.
-- `Tessera.Core`: low-level product for expert/runtime-driven scenarios.
+- `Tessera.Core` namespaces: low-level runtime lane for expert/runtime-driven scenarios (inside the `Tessera` package).
 
 Advanced host seams (`Tessera.Hosting`) remain supported as an opt-in lane, but they are not the beginner path.
 
@@ -70,7 +70,7 @@ Public onboarding should teach one story:
 4. use the starter example order in [examples](/docs/examples): `HelloWorld` -> `CounterForm` -> `WorkspaceApp`
 5. use the flagship evaluation path in [showcase](/docs/showcase) only after the starter ladder is clear
 
-Keep examples in `Tessera` namespaces. `Tessera.Core` is the low-level advanced lane and should not appear in the starter or flagship public examples.
+Keep examples in `Tessera` namespaces. `Tessera.Core` namespaces are the low-level advanced lane and should not appear in the starter or flagship public examples.
 
 ## Canonical Theme Pattern
 
@@ -115,7 +115,7 @@ using Tessera.Layout;
 
 ## Boundary Rules
 
-- Normal app examples should not import `Tessera.Core.*`.
+- Normal app examples should not import `Tessera.Core.*` namespaces.
 - Public docs should use `Tessera.Styles` (not legacy namespace names).
 - Runtime knobs for advanced hosting should live under `Tessera.Hosting` discoverability as opt-in APIs, not the default path.
 - Images are V1.1 scope, not V1 scope.

@@ -14,14 +14,14 @@ Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 
 ## Development Prerequisites
 
-- `.NET 10.0.103` SDK pinned in `global.json`
+- `.NET 10` SDK configured in `global.json` (baseline + feature-band roll-forward)
 - a terminal with strong ANSI/CSI behavior for manual app checks
 - repo-local tools via `dotnet tool restore`
 
 ## Repo Layout
 
 - `src/Tessera`: default public API
-- `src/Tessera.Core`: advanced runtime internals
+- `src/Tessera/Core`: advanced runtime internals (`Tessera.Core` namespaces)
 - `tests/Tessera.Tests`: unit, regression, and contract tests
 - `tests/Tessera.IntegrationTests`: integration/runtime coverage
 - `examples`: public examples and showcase apps
@@ -53,7 +53,7 @@ If your change touches perf-sensitive code or release-track behavior, also follo
 - fix root causes, not temporary patches
 - add regression tests when fixing bugs
 - keep the default public path in `Tessera`, `Tessera.Controls`, `Tessera.Layout`, and `Tessera.Styles`
-- do not move onboarding toward `Tessera.Core`
+- do not move onboarding toward `Tessera.Core` namespaces
 - update docs when public behavior or public examples change
 - use conventional commits when maintainers ask for commit-ready slices
 

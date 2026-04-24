@@ -58,11 +58,10 @@ await app.RunAsync();
 - widget selection based on product tasks, not API novelty
 - one flagship example chosen as a reference architecture
 
-## Use `Tessera.Core` only when needed
+## Use `Tessera.Core` namespaces only when needed
 
-Stay on the public `Tessera` lane for most apps. Move into lower-level seams only when the default runtime contract is not enough for your product constraints.
+Stay on the public `Tessera` lane for most apps. Move into lower-level `Tessera.Core` namespaces only when the default runtime contract is not enough for your product constraints.
 
 ## Next step
 
 When implementing feature surfaces, pick from [Widget Reference](/docs/widget-reference) first, then use [Recipes](/docs/recipes) for practical assembly patterns.
-

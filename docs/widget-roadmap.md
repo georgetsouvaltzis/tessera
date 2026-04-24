@@ -16,7 +16,7 @@ Each widget in this roadmap must implement the same minimum visual contract from
 - hover/focus/selected behavior: visually distinct in both color and monochrome terminals; `Focus` must not be hidden by `Hover`
 - glyph hooks: widget-specific glyph set properties (no hardcoded glyph literals in render path)
 - override layers: global theme -> control type defaults -> instance overrides -> state overrides
-- API shape: explicit C# properties/events; no `Tessera.Core.*` leakage in default authoring path
+- API shape: explicit C# properties/events; no `Tessera.Core.*` namespace leakage in default authoring path
 
 ## Delivery Waves (+34 Widgets)
 

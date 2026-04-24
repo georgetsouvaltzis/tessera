@@ -80,7 +80,7 @@ Verify:
 
 - keeping old console loop code active alongside Tessera startup
 - mixing business mutation directly inside rendering code
-- jumping to `Tessera.Core` too early
+- jumping to `Tessera.Core` namespaces too early
 
 Keep normal app integration inside:
 

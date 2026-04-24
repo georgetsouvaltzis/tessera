@@ -25,7 +25,7 @@ This layer remains public, but it is not the beginner path.
 
 ### 3. Low-Level Runtime Layer
 
-- `Tessera.Core`
+- `Tessera.Core` namespaces (implemented under `src/Tessera/Core`)
 
 This is the engine-adjacent layer. It should not leak into normal onboarding, README snippets, or flagship public examples.
 
@@ -63,7 +63,7 @@ The full token and override map lives in [theme-system](/docs/theme-system).
 ## Where To Work
 
 - public API and controls: `src/Tessera`
-- low-level runtime/engine work: `src/Tessera.Core`
+- low-level runtime/engine work: `src/Tessera/Core`
 - regression and contract tests: `tests/Tessera.Tests`
 - runtime/integration flows: `tests/Tessera.IntegrationTests`
 - public examples: `examples`
@@ -76,4 +76,4 @@ When changing public behavior:
 1. update tests
 2. update public docs in the same slice
 3. keep the default public path simpler, not more clever
-4. avoid moving public guidance toward `Tessera.Core`
+4. avoid moving public guidance toward `Tessera.Core` namespaces

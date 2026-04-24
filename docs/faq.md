@@ -24,7 +24,7 @@ Use:
 
 Most real apps will prefer the builder.
 
-## Do I need `Tessera.Core` to build a normal app?
+## Do I need `Tessera.Core` namespaces to build a normal app?
 
 No. Keep normal apps in:
 
@@ -32,6 +32,8 @@ No. Keep normal apps in:
 - `Tessera.Controls`
 - `Tessera.Layout`
 - `Tessera.Styles`
+
+`Tessera.Core` ships in the same package but is an advanced runtime lane, not the default onboarding path.
 
 ## What is the fastest way to learn Tessera?
 

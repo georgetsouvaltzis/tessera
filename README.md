@@ -157,7 +157,7 @@ The full guide lives in [docs/examples.md](docs/examples.md).
 ## Repo Layout
 
 - `src/Tessera`: default public app-authoring API
-- `src/Tessera.Core`: advanced low-level runtime layer
+- `src/Tessera/Core`: advanced low-level runtime internals (namespaced as `Tessera.Core`)
 - `tests/Tessera.Tests`: unit, contract, and regression tests
 - `tests/Tessera.IntegrationTests`: integration coverage
 - `examples`: public examples and showcase apps
@@ -195,7 +195,7 @@ The full guide lives in [docs/examples.md](docs/examples.md).
 
 ## Build And Verify
 
-Tessera uses the `.NET 10.0.103` SDK pinned in `global.json`.
+Tessera uses `.NET 10` from `global.json` (baseline `10.0.100` with feature-band roll-forward).
 
 Primary repo verification commands:
 

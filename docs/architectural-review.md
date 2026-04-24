@@ -11,7 +11,7 @@ The goal is simple:
 - one public app-authoring path
 - clear layer ownership
 - explicit seams when the app gets dense
-- no accidental leak of `Tessera.Core` into normal app guidance
+- no accidental leak of `Tessera.Core` namespaces into normal app guidance
 
 ## Layer DAG
 
@@ -42,7 +42,7 @@ Tessera.Hosting / Runtime Loop
 Terminal Adapter + Renderer
     |
     v
-Tessera.Core
+Core runtime namespaces (`Tessera.Core`)
 ```
 
 ## Render and message flow
@@ -72,7 +72,7 @@ That is the core loop. Most of the public docs should stay at that level.
 | Theme layer | tokens, palettes, control defaults, state overrides | app state and runtime loop policy | `Tessera.Styles` |
 | Runtime config layer | frame pacing, pointer activation, theme selection, screen options | screen composition or business logic | `TesseraRuntimeOptions`, `ScreenOptions` |
 | Hosting layer | renderer, terminal adapters, event decoding, alternate host seams | beginner onboarding path | `Tessera.Hosting` |
-| Core runtime layer | engine-adjacent transport, rendering internals, terminal plumbing | public onboarding examples and normal app code | `Tessera.Core` |
+| Core runtime layer | engine-adjacent transport, rendering internals, terminal plumbing | public onboarding examples and normal app code | `Tessera.Core` (in `Tessera` package) |
 
 ## Public path versus advanced path
 
@@ -92,7 +92,7 @@ The advanced path exists when you need:
 - terminal capability probing
 - lower-level runtime control
 
-That is where `Tessera.Hosting` and `Tessera.Core` matter.
+That is where `Tessera.Hosting` and advanced `Tessera.Core` namespaces matter.
 
 ## Responsibility map by question
 
@@ -145,7 +145,7 @@ Use the examples as architecture checkpoints:
 
 ## Common architectural mistakes
 
-- pushing normal docs or examples toward `Tessera.Core`
+- pushing normal docs or examples toward `Tessera.Core` namespaces
 - letting widgets become app-state containers
 - mixing terminal configuration into screen composition code
 - solving dense screens by inventing a second framework story

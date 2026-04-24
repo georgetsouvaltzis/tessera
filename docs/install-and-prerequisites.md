@@ -24,15 +24,15 @@ dotnet add package Tessera
 
 ## Environment requirements
 
-- `.NET 10.0.103` SDK
+- `.NET 10` SDK (from `global.json`)
 - terminal with reliable ANSI/CSI support
   - Ghostty
   - iTerm2
   - Windows Terminal
   - macOS Terminal
 
-:::tip Advanced package
-`Tessera.Core` is the low-level runtime layer. Keep it out of the beginner path unless you are intentionally working on advanced runtime seams.
+:::tip Advanced runtime lane
+`Tessera.Core` namespaces are the low-level runtime layer, shipped inside the same `Tessera` package. Keep them out of the beginner path unless you are intentionally working on advanced runtime seams.
 :::
 
 ## Default namespaces to import
