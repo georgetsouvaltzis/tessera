@@ -32,7 +32,7 @@ dotnet add package Tessera
   - macOS Terminal
 
 :::tip Advanced runtime lane
-`Tessera.Core` namespaces are the low-level runtime layer, shipped inside the same `Tessera` package. Keep them out of the beginner path unless you are intentionally working on advanced runtime seams.
+`Tessera.Core` namespaces are the low-level runtime layer, shipped inside the same `Tessera` package. Most beginner apps stay in the primary `Tessera` namespaces.
 :::
 
 ## Default namespaces to import

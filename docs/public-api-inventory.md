@@ -249,7 +249,7 @@ The intended beginner path is:
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - keep configuration in `TesseraRuntimeOptions` and `ScreenOptions`
 - follow the public onboarding path in [getting-started](/docs/getting-started), starting with `HelloWorld`, `CounterForm`, and `WorkspaceApp` in [examples](/docs/examples) before the flagship showcases in [showcase](/docs/showcase)
-- treat `Tessera.Core` namespaces as the low-level advanced lane (inside the `Tessera` package), not default onboarding
+- treat `Tessera.Core` namespaces as the low-level advanced lane (inside the `Tessera` package), while keeping onboarding centered on primary `Tessera` namespaces
 - use semantic theme tokens and palette-driven styling on the default path
 
 ### Pointer Runtime Semantics (Tier 1)
@@ -492,7 +492,7 @@ Their old `Tessera.Components.Prebuilt.*` counterparts have been removed instead
 ## Design Constraints
 
 - normal apps should stay in `Tessera`
-- normal apps should not import `Tessera.Core.*` namespaces
+- normal apps usually start with primary `Tessera` namespaces, then add `Tessera.Core.*` namespaces only when advanced runtime control is needed
 - normal apps should not manage terminal size manually
 - normal apps should not manage input scopes or region routing manually
 - custom widgets should remain possible through a small stable contract
@@ -663,7 +663,7 @@ Modal/chart summary controls with direct token mappings:
 
 1. keep moving control authoring toward a single obvious configuration style
 2. review Tier 2 periodically and internalize anything that is public only by inertia
-3. keep `Tessera.Core` as the intentional low-level namespace lane (shipped in `Tessera`) and keep docs/examples explicit about when app authors should prefer `Tessera` instead
+3. keep `Tessera.Core` as the intentional low-level namespace lane (shipped in `Tessera`) and keep docs/examples explicit about when app authors should stay on the primary `Tessera` path
 4. keep custom widget extensibility stable while internal runtime details continue to shrink and stay behind Tessera-owned internal adapters
 5. preserve discoverability and parity policy tests (for example `BorderedControlParityPolicyTests.cs`) so new bordered controls cannot drift from required hook/mapping coverage
 6. keep V1 image scope out of the V1 default path docs (image rendering planned for V1.1)

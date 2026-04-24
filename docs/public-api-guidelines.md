@@ -70,7 +70,7 @@ Public onboarding should teach one story:
 4. use the starter example order in [examples](/docs/examples): `HelloWorld` -> `CounterForm` -> `WorkspaceApp`
 5. use the flagship evaluation path in [showcase](/docs/showcase) only after the starter ladder is clear
 
-Keep examples in `Tessera` namespaces. `Tessera.Core` namespaces are the low-level advanced lane and should not appear in the starter or flagship public examples.
+Keep starter and flagship examples centered on the primary `Tessera` namespaces. Use `Tessera.Core` namespaces for advanced runtime-focused examples.
 
 ## Canonical Theme Pattern
 
@@ -113,9 +113,9 @@ using Tessera.Controls;
 using Tessera.Layout;
 ```
 
-## Boundary Rules
+## Guidance Rules
 
-- Normal app examples should not import `Tessera.Core.*` namespaces.
+- Normal app examples should prefer primary `Tessera` namespaces; advanced runtime samples can use `Tessera.Core.*` where it adds clarity.
 - Public docs should use `Tessera.Styles` (not legacy namespace names).
 - Runtime knobs for advanced hosting should live under `Tessera.Hosting` discoverability as opt-in APIs, not the default path.
 - Images are V1.1 scope, not V1 scope.

@@ -66,7 +66,7 @@ internal sealed class OrdersApp : TesseraApp
 - keep app state in your `TesseraApp`
 - use messages/effects for state transitions, not hidden side effects
 - keep runtime configuration in builder setup
-- do not start with `Tessera.Core` namespaces unless you need advanced seams
+- start with primary `Tessera` namespaces first, then add `Tessera.Core` namespaces if you move into advanced runtime seams
 
 ## Next step
 

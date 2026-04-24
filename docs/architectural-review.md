@@ -11,7 +11,7 @@ The goal is simple:
 - one public app-authoring path
 - clear layer ownership
 - explicit seams when the app gets dense
-- no accidental leak of `Tessera.Core` namespaces into normal app guidance
+- clear emphasis on the primary app-authoring path before advanced runtime seams
 
 ## Layer DAG
 
@@ -145,7 +145,7 @@ Use the examples as architecture checkpoints:
 
 ## Common architectural mistakes
 
-- pushing normal docs or examples toward `Tessera.Core` namespaces
+- introducing advanced runtime seams before the primary app model is clear
 - letting widgets become app-state containers
 - mixing terminal configuration into screen composition code
 - solving dense screens by inventing a second framework story

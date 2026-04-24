@@ -98,7 +98,7 @@ Use [layout-and-screen-composition](/docs/layout-and-screen-composition) for the
 
 ## I am not sure whether I need `Tessera.Core` namespaces
 
-Most likely, you do not.
+You usually do not need them for a first app.
 
 Stay on:
 
@@ -107,7 +107,7 @@ Stay on:
 - `Tessera.Layout`
 - `Tessera.Styles`
 
-Reach for `Tessera.Core` namespaces only when you are intentionally working at the runtime layer.
+Reach for `Tessera.Core` namespaces when you are intentionally working at the runtime layer.
 
 ## I need exact public names, not guidance
 

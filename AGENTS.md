@@ -19,7 +19,7 @@
 ## Public API Boundaries
 - Public app path is library-first and no-DI by default.
 - Keep starter guidance in `Tessera`, `Tessera.Controls`, and `Tessera.Layout`.
-- Do not leak `Tessera.Core.*` namespaces into onboarding examples/docs.
+- Keep onboarding examples/docs focused on `Tessera`, `Tessera.Controls`, `Tessera.Layout`, and `Tessera.Styles`.
 - Advanced hosting/runtime seams stay under `Tessera.Hosting`/advanced docs.
 
 ## Styling/Theming Direction

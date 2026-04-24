@@ -76,4 +76,4 @@ When changing public behavior:
 1. update tests
 2. update public docs in the same slice
 3. keep the default public path simpler, not more clever
-4. avoid moving public guidance toward `Tessera.Core` namespaces
+4. keep public guidance centered on the primary `Tessera` app-authoring path

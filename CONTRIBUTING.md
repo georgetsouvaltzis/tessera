@@ -53,7 +53,7 @@ If your change touches perf-sensitive code or release-track behavior, also follo
 - fix root causes, not temporary patches
 - add regression tests when fixing bugs
 - keep the default public path in `Tessera`, `Tessera.Controls`, `Tessera.Layout`, and `Tessera.Styles`
-- do not move onboarding toward `Tessera.Core` namespaces
+- keep onboarding centered on `Tessera`, `Tessera.Controls`, `Tessera.Layout`, and `Tessera.Styles`
 - update docs when public behavior or public examples change
 - use conventional commits when maintainers ask for commit-ready slices
 

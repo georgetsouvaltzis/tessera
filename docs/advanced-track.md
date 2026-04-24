@@ -58,7 +58,7 @@ await app.RunAsync();
 - widget selection based on product tasks, not API novelty
 - one flagship example chosen as a reference architecture
 
-## Use `Tessera.Core` namespaces only when needed
+## When to use `Tessera.Core` namespaces
 
 Stay on the public `Tessera` lane for most apps. Move into lower-level `Tessera.Core` namespaces only when the default runtime contract is not enough for your product constraints.
 
