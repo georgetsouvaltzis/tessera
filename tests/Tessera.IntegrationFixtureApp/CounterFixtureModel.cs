@@ -1,6 +1,4 @@
-using Tessera;
 using Tessera.Core.Abstractions;
-using Tessera.Core.Input;
 using Tessera.Core.Messages;
 
 namespace Tessera.IntegrationFixtureApp;

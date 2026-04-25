@@ -3,6 +3,10 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Deterministic>true</Deterministic>
     <DebugType>portable</DebugType>
+    <!-- Enable IDE0005 (remove unnecessary usings) during build across all projects. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Do not require XML docs on every public member for test/bench/helper assemblies. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
