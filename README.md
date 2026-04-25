@@ -1,7 +1,7 @@
 # Tessera
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/georgetsouvaltzis/tessera/master/site/static/img/tessera-nuget-icon.png" alt="Tessera icon" width="260" />
+  <img src="./site/static/img/img.png" alt="Tessera icon" width="256" />
 </p>
 
 Build terminal apps that feel like real products, not throwaway demos.

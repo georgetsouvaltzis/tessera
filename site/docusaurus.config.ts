@@ -5,7 +5,7 @@ import luminaPrismTheme from './src/lib/luminaPrismTheme';
 const config: Config = {
   title: 'Tessera',
   tagline: 'Terminal UI for serious .NET apps',
-  favicon: 'img/favicon.svg',
+  favicon: 'img/tessera-nuget-icon.png',
   url: 'https://georgetsouvaltzis.github.io',
   baseUrl: '/tessera/',
   organizationName: 'georgetsouvaltzis',
