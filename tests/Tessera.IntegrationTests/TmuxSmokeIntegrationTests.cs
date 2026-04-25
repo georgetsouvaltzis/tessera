@@ -8,6 +8,7 @@ namespace Tessera.IntegrationTests;
 public sealed class TmuxSmokeIntegrationTests
 {
     private static readonly string RepoRoot = ResolveRepoRoot();
+    private static readonly string HostShellPath = ResolveHostShellPath();
     private static readonly string FixtureProjectPath = Path.Combine("tests", "Tessera.IntegrationFixtureApp");
     private const string FixtureProcessName = "Tessera.IntegrationFixtureApp";
     private static readonly Regex CsiRegex = new(@"\x1B\[[0-?]*[ -/]*[@-~]", RegexOptions.Compiled);
@@ -25,7 +26,7 @@ public sealed class TmuxSmokeIntegrationTests
         var session = $"tessera_smoke_{Guid.NewGuid():N}".Substring(0, 24);
         try
         {
-            RunChecked("tmux", $"new-session -d -s {session} /bin/zsh -lc \"{BuildAppRunCommand()}\"");
+            RunChecked("tmux", $"new-session -d -s {session} {HostShellPath} -lc \"{BuildAppRunCommand()}\"");
             var boot = await WaitForPaneContains(session, "Count: 0", TimeSpan.FromSeconds(5));
             StringAssert.Contains("Counter", boot, "App should render counter on boot.");
 
@@ -67,7 +68,7 @@ public sealed class TmuxSmokeIntegrationTests
         var session = $"tessera_showcase_{Guid.NewGuid():N}".Substring(0, 24);
         try
         {
-            RunChecked("tmux", $"new-session -d -s {session} /bin/zsh -lc \"{BuildAppRunCommand()}\"");
+            RunChecked("tmux", $"new-session -d -s {session} {HostShellPath} -lc \"{BuildAppRunCommand()}\"");
             _ = await WaitForPaneContains(session, "Count: 0", TimeSpan.FromSeconds(5));
 
             SendKeys(session, "Up");
@@ -227,7 +228,7 @@ public sealed class TmuxSmokeIntegrationTests
     private static string BuildAppRunCommand()
     {
         var command =
-            $"cd {QuoteForShell(RepoRoot)} && dotnet run --project {QuoteForShell(FixtureProjectPath)} --no-build; exec /bin/zsh -i";
+            $"cd {QuoteForShell(RepoRoot)} && dotnet run --project {QuoteForShell(FixtureProjectPath)} --no-build; exec {QuoteForShell(HostShellPath)} -i";
         return command.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("\"", "\\\"", StringComparison.Ordinal);
     }
 
@@ -253,6 +254,20 @@ public sealed class TmuxSmokeIntegrationTests
 
         throw new InvalidOperationException(
             "Could not locate Tessera.slnx from the integration test output directory.");
+    }
+
+    private static string ResolveHostShellPath()
+    {
+        var candidates = new[] { "/bin/bash", "/bin/zsh", "/bin/sh" };
+        foreach (var candidate in candidates)
+        {
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return "/bin/sh";
     }
 
     private sealed record CommandResult(int ExitCode, string StdOut, string StdErr);
