@@ -18,10 +18,11 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <PackageId>Tessera</PackageId>
         <Title>Tessera</Title>
-        <Description>Message-driven terminal UI framework for .NET with application-facing components and host APIs.</Description>
+        <Description>C#-first terminal UI framework for .NET. Build dashboards, workflows, and multi-pane workbenches with a message-driven app model, rich widgets, and theme-first styling.</Description>
         <Authors>George Tsouvaltzis</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageTags>tui;terminal-ui;console;csharp;dotnet</PackageTags>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageTags>tui;terminal-ui;console-ui;csharp;dotnet;ansi;widgets;dashboard;workbench</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/georgetsouvaltzis/tessera</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
