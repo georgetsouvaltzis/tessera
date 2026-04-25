@@ -1,10 +1,15 @@
 name: release-nuget
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types:
+      - published
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version (without v), e.g. 1.0.0-alpha.1'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -25,15 +30,19 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Resolve package version from tag
+      - name: Resolve package version from release tag
         id: version
         shell: bash
         run: |
-          REF_NAME="${GITHUB_REF_NAME}"
-          VERSION="${REF_NAME#v}"
-          if [[ -z "$VERSION" || "$VERSION" == "$REF_NAME" ]]; then
-            echo "Expected tag format v<version>, got: $REF_NAME" >&2
-            exit 1
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            REF_NAME="${{ github.event.release.tag_name }}"
+            VERSION="${REF_NAME#v}"
+            if [[ -z "$VERSION" || "$VERSION" == "$REF_NAME" ]]; then
+              echo "Expected release tag format v<version>, got: $REF_NAME" >&2
+              exit 1
+            fi
+          else
+            VERSION="${{ inputs.version }}"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Publishing version: $VERSION"
