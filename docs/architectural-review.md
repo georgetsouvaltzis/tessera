@@ -13,6 +13,14 @@ The goal is simple:
 - explicit seams when the app gets dense
 - clear emphasis on the primary app-authoring path before advanced runtime seams
 
+Tessera's core app loop is TEA-inspired:
+
+- `Model` -> your app state
+- `Update` -> `Update(Message)`
+- `View` -> `Build(ScreenContext)` -> `Screen`
+
+The implementation remains .NET/terminal-native rather than a direct Elm runtime clone.
+
 ## Layer DAG
 
 This DAG is intentionally plain Markdown so it renders everywhere without extra plugins.

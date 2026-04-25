@@ -24,6 +24,7 @@ Then continue with [Installation](/docs/install-and-prerequisites) and [Your Fir
 ## Why teams choose Tessera
 
 - **Product-first app model**: explicit `Initialize`, `Update(Message)`, and `Build(ScreenContext)` lifecycle
+- **TEA-inspired flow**: state + message update + view rebuild in a .NET-native terminal runtime
 - **Single mental model**: starter apps and flagship showcases use the same public API lane
 - **Widget depth**: forms, navigation, grids, inspectors, overlays, dashboards, and plot surfaces
 - **Theme-first visuals**: semantic tokens, control defaults, and instance/state overrides

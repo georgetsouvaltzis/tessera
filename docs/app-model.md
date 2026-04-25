@@ -13,6 +13,10 @@ Tessera keeps the core app contract intentionally small:
 
 That is the public model you should learn first.
 
+This model is **TEA-inspired** (The Elm Architecture): state + message update + view rebuild. In Tessera terms that maps to app state + `Update(Message)` + `Build(ScreenContext)`.
+
+Tessera is not a strict Elm runtime port. It stays .NET-native and includes control events and terminal runtime configuration as first-class seams.
+
 ## Lifecycle order
 
 The runtime calls your app in this order:

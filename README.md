@@ -10,6 +10,16 @@ Tessera is a C#-first terminal UI framework for `.NET 10`. It gives you a small 
 
 Tessera is in public alpha. It is ready for evaluation, experimentation, and contribution. Breaking changes are still allowed when they simplify the long-term public path.
 
+## Architecture Note
+
+Tessera's app loop is **inspired by The Elm Architecture (TEA)**:
+
+- model/state lives in your app type
+- `Update(Message)` handles transitions and decides effects
+- `Build(ScreenContext)` renders the next UI tree from current state
+
+It is not a direct Elm runtime clone. Tessera keeps .NET-first semantics, control events, and terminal/runtime seams that fit C# product apps.
+
 ## Why Tessera
 
 - explicit C# object model instead of a nested layout DSL
