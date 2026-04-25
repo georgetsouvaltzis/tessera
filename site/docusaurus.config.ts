@@ -60,7 +60,7 @@ const config: Config = {
       title: 'Tessera',
       logo: {
         alt: 'Tessera logo',
-        src: 'img/logo.svg',
+        src: 'img/tessera-nuget-icon.png',
       },
       items: [
         {

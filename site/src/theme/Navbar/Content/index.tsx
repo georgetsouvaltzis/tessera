@@ -66,7 +66,7 @@ export default function NavbarContent(): ReactNode {
   const [leftItems, rightItems] = splitNavbarItems(items);
   const {pathname} = useLocation();
   const {siteConfig} = useDocusaurusContext();
-  const logoSrc = useBaseUrl('/img/logo.svg');
+  const logoSrc = useBaseUrl('/img/tessera-nuget-icon.png');
   const githubItem = rightItems.find((item) => item.href);
   const normalizedPath = pathname.startsWith(siteConfig.baseUrl)
     ? pathname.slice(siteConfig.baseUrl.length - 1)
