@@ -72,9 +72,7 @@ jobs:
           path: site/build
 
   deploy:
-    if: |
-      (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')) ||
-      (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'))
+    if: ${{ needs.build.result == 'success' && github.event_name != 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
     environment:
