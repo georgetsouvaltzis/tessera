@@ -8,5 +8,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/Tessera.IntegrationTests/Tessera.IntegrationTests.csproj" />
     <Project Path="tests/Tessera.Tests/Tessera.Tests.csproj" />
+    <Project Path="tests\Tessera.IntegrationFixtureApp\Tessera.IntegrationFixtureApp.csproj" Type="Classic C#" />
   </Folder>
 </Solution>

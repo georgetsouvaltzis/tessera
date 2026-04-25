@@ -14,20 +14,20 @@ public sealed class CounterFixtureModel
             return null;
         }
 
-        if (key.Is(KeyCode.Up, KeyModifiers.None))
+        if (key.Is(KeyCode.Up))
         {
             _count++;
             return null;
         }
 
-        if (key.Is(KeyCode.Down, KeyModifiers.None))
+        if (key.Is(KeyCode.Down))
         {
             _count--;
             return null;
         }
 
         return key.IsCharacter('q', KeyModifiers.None)
-            ? Tessera.Core.Commands.Effects.Quit
+            ? Core.Commands.Effects.Quit
             : null;
     }
 
