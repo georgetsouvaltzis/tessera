@@ -1,5 +1,9 @@
 # Tessera
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/georgetsouvaltzis/tessera/master/site/static/img/tessera-nuget-icon.png" alt="Tessera icon" width="260" />
+</p>
+
 Build terminal apps that feel like real products, not throwaway demos.
 
 Tessera is a C#-first terminal UI framework for `.NET 10`. It gives you a small public app model, first-class controls and layouts, semantic theming, and enough structure to build serious terminal software without dragging you into a host-heavy framework story.

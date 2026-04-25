@@ -3,6 +3,7 @@
     <ItemGroup>
         <None Include="..\..\README.md" Pack="true" PackagePath="\" Link="README.md"/>
         <None Include="..\..\LICENSE" Pack="true" PackagePath="\" Link="LICENSE"/>
+        <None Include="..\..\site\static\img\tessera-nuget-icon.png" Pack="true" PackagePath="\" Link="tessera-nuget-icon.png"/>
     </ItemGroup>
 
     <PropertyGroup>
@@ -24,6 +25,7 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageTags>tui;terminal-ui;console-ui;csharp;dotnet;ansi;widgets;dashboard;workbench</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>tessera-nuget-icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/georgetsouvaltzis/tessera</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageProjectUrl>https://github.com/georgetsouvaltzis/tessera</PackageProjectUrl>
