@@ -1,0 +1,76 @@
+name: release-nuget
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nuget-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Resolve package version from tag
+        id: version
+        shell: bash
+        run: |
+          REF_NAME="${GITHUB_REF_NAME}"
+          VERSION="${REF_NAME#v}"
+          if [[ -z "$VERSION" || "$VERSION" == "$REF_NAME" ]]; then
+            echo "Expected tag format v<version>, got: $REF_NAME" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Publishing version: $VERSION"
+
+      - name: Verify NuGet API key is configured
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        shell: bash
+        run: |
+          if [[ -z "$NUGET_API_KEY" ]]; then
+            echo "Repository secret NUGET_API_KEY is not configured." >&2
+            exit 1
+          fi
+
+      - name: Restore
+        run: dotnet restore Tessera.slnx
+
+      - name: Build
+        run: dotnet build Tessera.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test Tessera.slnx -c Release --no-build
+
+      - name: Pack Tessera
+        run: |
+          dotnet pack src/Tessera/Tessera.csproj \
+            -c Release \
+            --no-build \
+            -o .artifacts/nuget \
+            -p:ContinuousIntegrationBuild=true \
+            -p:PackageVersion=${{ steps.version.outputs.version }}
+
+      - name: Publish to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push ".artifacts/nuget/*.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key "$NUGET_API_KEY" \
+            --skip-duplicate
